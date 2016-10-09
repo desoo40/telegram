@@ -63,6 +63,37 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Data\logo.jpg" />
+    <Content Include="Data\PlayersPhoto\10_корнеев.jpg" />
+    <Content Include="Data\PlayersPhoto\11_шрейдер.jpg" />
+    <Content Include="Data\PlayersPhoto\12_мусинский.jpg" />
+    <Content Include="Data\PlayersPhoto\14_наконечный.jpg" />
+    <Content Include="Data\PlayersPhoto\15_семенов.jpg" />
+    <Content Include="Data\PlayersPhoto\17_липецкий.jpg" />
+    <Content Include="Data\PlayersPhoto\18_гунт.jpg" />
+    <Content Include="Data\PlayersPhoto\1_черненков.jpg" />
+    <Content Include="Data\PlayersPhoto\20_миронов.jpg" />
+    <Content Include="Data\PlayersPhoto\21_гуськов.jpg" />
+    <Content Include="Data\PlayersPhoto\22_глухов.jpg" />
+    <Content Include="Data\PlayersPhoto\28_флотский.jpg" />
+    <Content Include="Data\PlayersPhoto\2_зайцев.jpg" />
+    <Content Include="Data\PlayersPhoto\44_кабанов.jpg" />
+    <Content Include="Data\PlayersPhoto\53_кузьмичев.jpg" />
+    <Content Include="Data\PlayersPhoto\55_сидоров.jpg" />
+    <Content Include="Data\PlayersPhoto\57_евграфов.jpg" />
+    <Content Include="Data\PlayersPhoto\59_калинин.jpg" />
+    <Content Include="Data\PlayersPhoto\5_трофимов.jpg" />
+    <Content Include="Data\PlayersPhoto\63_гуськов.jpg" />
+    <Content Include="Data\PlayersPhoto\73_перцевый.jpg" />
+    <Content Include="Data\PlayersPhoto\7_глазунов.jpg" />
+    <Content Include="Data\PlayersPhoto\81_капустин.jpg" />
+    <Content Include="Data\PlayersPhoto\88_сорокин.jpg" />
+    <Content Include="Data\PlayersPhoto\8_денисов.jpg" />
+    <Content Include="Data\PlayersPhoto\91_зубарев.jpg" />
+    <Content Include="Data\PlayersPhoto\95_лялин.jpg" />
+    <Content Include="Data\PlayersPhoto\9_савенков.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
