@@ -11,7 +11,7 @@ namespace Aviators
 {
     class Program
     {
-        static readonly TelegramBotClient Bot = new TelegramBotClient("297610365:AAG3yzYtC0XgLrQC0ong1qdJ5odMkqiGHno");
+        static readonly TelegramBotClient Bot = new TelegramBotClient("272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4");
         static readonly List<Player> Players = new List<Player>();
         static readonly FuckGen Fuck = new FuckGen();
         static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"\data_base\PlayersInfo.txt";
@@ -72,7 +72,7 @@ namespace Aviators
             var photo = new Telegram.Bot.Types.FileToSend(randomPlayer.Number + ".jpg", (new StreamReader(Path.Combine(DBPlayersPhotoDirPath, randomPlayer.PhotoFile))).BaseStream);
 
             //await Bot.SendTextMessage(cid, playerDescription);
-            await Bot.SendPhoto(cid, photo, playerDescription);
+            await Bot.SendPhotoAsync(cid, photo, playerDescription);
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
