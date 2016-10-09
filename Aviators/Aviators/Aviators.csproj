@@ -65,6 +65,7 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="data_base\logo.jpg" />
+    <Content Include="data_base\PlayersInfo.txt" />
     <Content Include="data_base\PlayersPhoto\10_корнеев.jpg" />
     <Content Include="data_base\PlayersPhoto\11_шрейдер.jpg" />
     <Content Include="data_base\PlayersPhoto\12_мусинский.jpg" />
