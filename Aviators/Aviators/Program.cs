@@ -14,13 +14,15 @@ namespace Aviators
         static readonly TelegramBotClient Bot = new TelegramBotClient("297610365:AAG3yzYtC0XgLrQC0ong1qdJ5odMkqiGHno");
         static readonly List<Player> Players = new List<Player>();
         static readonly FuckGen Fuck = new FuckGen();
+        static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"\data_base\PlayersInfo.txt";
+        static readonly string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + @"\data_base\PlayersPhoto\";
         static bool End = true;
 
         static void Main(string[] args)
         {
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-            LoadPlayers("");
+            LoadPlayers(DBPlayersInfoPath);
 
             StartBot();
         }
@@ -36,7 +38,7 @@ namespace Aviators
                     var fields = line.Split(';');
                     if (fields.Length != 3) continue;
 
-                    Players.Add(new Player(int.Parse(fields[0]),fields[1],fields[2]));
+                    Players.Add(new Player(int.Parse(fields[0]),fields[2],fields[1]));
                 }
             }
         }
@@ -62,9 +64,15 @@ namespace Aviators
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
-            Console.WriteLine(e.Message.Text);
+            Console.WriteLine("Incoming request: " + e.Message.Text);
 
-            await Bot.SendTextMessage(e.Message.Chat.Id, Fuck.GetFuck());
+            var cid = e.Message.Chat.Id;
+            var randomPlayer = Players[(new Random()).Next(Players.Count)];
+            var playerDescription = string.Format("Игрок под номером {0}: {1} {2}", randomPlayer.Number, randomPlayer.Name, randomPlayer.Surname);
+            var photo = new Telegram.Bot.Types.FileToSend(randomPlayer.Number + ".jpg", (new StreamReader(Path.Combine(DBPlayersPhotoDirPath, randomPlayer.PhotoFile))).BaseStream);
+
+            //await Bot.SendTextMessage(cid, playerDescription);
+            await Bot.SendPhoto(cid, photo, playerDescription);
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)

@@ -18,7 +18,7 @@ namespace Aviators
             Number = number;
             Name = name;
             Surname = surname;
-            PhotoFile = string.Format("{0}_{1}.jpg", number, name);
+            PhotoFile = string.Format("{0}_{1}.jpg", number, surname.ToLower());
         }
     }
 }
