@@ -65,6 +65,38 @@
     <None Include="App.config" />
     <None Include="packages.config" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="data_base\logo.jpg" />
+    <Content Include="data_base\PlayersInfo.txt" />
+    <Content Include="data_base\PlayersPhoto\10_корнеев.jpg" />
+    <Content Include="data_base\PlayersPhoto\11_шрейдер.jpg" />
+    <Content Include="data_base\PlayersPhoto\12_мусинский.jpg" />
+    <Content Include="data_base\PlayersPhoto\14_наконечный.jpg" />
+    <Content Include="data_base\PlayersPhoto\15_семенов.jpg" />
+    <Content Include="data_base\PlayersPhoto\17_липецкий.jpg" />
+    <Content Include="data_base\PlayersPhoto\18_гунт.jpg" />
+    <Content Include="data_base\PlayersPhoto\1_черненков.jpg" />
+    <Content Include="data_base\PlayersPhoto\20_миронов.jpg" />
+    <Content Include="data_base\PlayersPhoto\21_гуськов.jpg" />
+    <Content Include="data_base\PlayersPhoto\22_глухов.jpg" />
+    <Content Include="data_base\PlayersPhoto\28_флотский.jpg" />
+    <Content Include="data_base\PlayersPhoto\2_зайцев.jpg" />
+    <Content Include="data_base\PlayersPhoto\44_кабанов.jpg" />
+    <Content Include="data_base\PlayersPhoto\53_кузьмичев.jpg" />
+    <Content Include="data_base\PlayersPhoto\55_сидоров.jpg" />
+    <Content Include="data_base\PlayersPhoto\57_евграфов.jpg" />
+    <Content Include="data_base\PlayersPhoto\59_калинин.jpg" />
+    <Content Include="data_base\PlayersPhoto\5_трофимов.jpg" />
+    <Content Include="data_base\PlayersPhoto\63_гуськов.jpg" />
+    <Content Include="data_base\PlayersPhoto\73_перцевый.jpg" />
+    <Content Include="data_base\PlayersPhoto\7_глазунов.jpg" />
+    <Content Include="data_base\PlayersPhoto\81_капустин.jpg" />
+    <Content Include="data_base\PlayersPhoto\88_сорокин.jpg" />
+    <Content Include="data_base\PlayersPhoto\8_денисов.jpg" />
+    <Content Include="data_base\PlayersPhoto\91_зубарев.jpg" />
+    <Content Include="data_base\PlayersPhoto\95_лялин.jpg" />
+    <Content Include="data_base\PlayersPhoto\9_савенков.jpg" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
