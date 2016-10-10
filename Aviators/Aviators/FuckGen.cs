@@ -24,20 +24,9 @@ namespace Aviators
 
         private void InitializateFucks()
         {
-            fucks.Add("Пошёл нахуй!");
-            fucks.Add("Соси");
-            fucks.Add("Fuck you!");
-            fucks.Add("Ты залупа!");
-            fucks.Add("А может ты залупоед?");
-            fucks.Add("Знаешь что я делал с твоей мамкой?");
-            fucks.Add("Ебись конём");
-            fucks.Add("А твоя мамка так не считает.");
-            fucks.Add("Пиздуй отсюда.");
-            fucks.Add("В рот ебал.");
-            fucks.Add("Отъебись.");
-            fucks.Add("Чтоб тебя черти выебли без вазелина.");
-            fucks.Add("Каждый дрочит сам, как хочет.");
-            fucks.Add("А я пиздатый Бот.");
+            fucks.Add("Вот красавчик, которого вы искали:\n\n");
+            fucks.Add("Бравый авиатор:\n\n");
+            fucks.Add("Ну не красавец ли? Это у нас:\n\n");
         }
     }
 }

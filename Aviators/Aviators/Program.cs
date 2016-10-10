@@ -102,7 +102,8 @@ namespace Aviators
                     }
                     else
                     {
-                        var playerDescription = string.Format("Игрок под номером {0}: {1} {2}", playerByNumber.Number, playerByNumber.Name, playerByNumber.Surname);
+                        var playerDescription = Fuck.GetFuck();
+                        playerDescription += string.Format("#{0} {1} {2}", playerByNumber.Number, playerByNumber.Name, playerByNumber.Surname);
                         var photo = new Telegram.Bot.Types.FileToSend(playerByNumber.Number + ".jpg", (new StreamReader(Path.Combine(DBPlayersPhotoDirPath, playerByNumber.PhotoFile))).BaseStream);
 
                         await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
@@ -112,7 +113,7 @@ namespace Aviators
                 catch (Exception ex)
                 {
                     Console.WriteLine(ex.Message);
-                    await Bot.SendTextMessage(chatFinded.Id, "Что-то пошло не так... Сорьки");
+                    await Bot.SendTextMessage(chatFinded.Id, "Неверный формат ввода, введите номер");
                 }
             }
             else
