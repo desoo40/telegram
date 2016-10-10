@@ -12,6 +12,7 @@ namespace Aviators
     class Program
     {
         static readonly TelegramBotClient Bot = new TelegramBotClient("272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4");
+        static readonly List<Chat> Chats = new List<Chat>();
         static readonly List<Player> Players = new List<Player>();
         static readonly FuckGen Fuck = new FuckGen();
         static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"\data_base\PlayersInfo.txt";
@@ -64,15 +65,68 @@ namespace Aviators
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
-            Console.WriteLine("Incoming request: " + e.Message.Text);
+            var msg = e.Message.Text;
+            Console.WriteLine("Incoming request: " + msg);
+
+            if (msg == null) return;
 
             var cid = e.Message.Chat.Id;
-            var randomPlayer = Players[(new Random()).Next(Players.Count)];
-            var playerDescription = string.Format("Игрок под номером {0}: {1} {2}", randomPlayer.Number, randomPlayer.Name, randomPlayer.Surname);
-            var photo = new Telegram.Bot.Types.FileToSend(randomPlayer.Number + ".jpg", (new StreamReader(Path.Combine(DBPlayersPhotoDirPath, randomPlayer.PhotoFile))).BaseStream);
 
-            //await Bot.SendTextMessage(cid, playerDescription);
-            await Bot.SendPhotoAsync(cid, photo, playerDescription);
+            Console.WriteLine("Search known chat: " + cid);
+            var chatFinded = Chats.FindLast(chat => chat.Id == cid);
+            if(chatFinded == null)
+            {
+                chatFinded = new Chat(cid);
+                Chats.Add(chatFinded);
+            }
+
+            if(chatFinded.WhoMode)
+            {
+                if (msg.Contains("кто"))
+                {
+                    chatFinded.WhoMode = false;
+                    await Bot.SendTextMessage(chatFinded.Id, "Вы вышли из режима поиска игрока.");
+                    return;
+                }
+
+                try
+                {
+                    msg = msg.Trim('/',' ');
+                    int playerNumber = int.Parse(msg);
+                    //var randomPlayer = Players[(new Random()).Next(Players.Count)];
+                    var playerByNumber = Players.FindLast(p => p.Number == playerNumber);
+
+                    if (playerByNumber == null)
+                    {
+                        await Bot.SendTextMessage(chatFinded.Id, string.Format("Игрок под номером {0} не найден.", playerNumber));
+                    }
+                    else
+                    {
+                        var playerDescription = string.Format("Игрок под номером {0}: {1} {2}", playerByNumber.Number, playerByNumber.Name, playerByNumber.Surname);
+                        var photo = new Telegram.Bot.Types.FileToSend(playerByNumber.Number + ".jpg", (new StreamReader(Path.Combine(DBPlayersPhotoDirPath, playerByNumber.PhotoFile))).BaseStream);
+
+                        await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+                    }
+                    return;
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    await Bot.SendTextMessage(chatFinded.Id, "Что-то пошло не так... Сорьки");
+                }
+            }
+            else
+            {
+                if (msg.Contains("кто"))
+                {
+                    chatFinded.WhoMode = true;
+                    await Bot.SendTextMessage(chatFinded.Id, "Вы вошли в режим поиска игрока.");
+                    return;
+                }
+
+                await Bot.SendTextMessage(chatFinded.Id, "Вы можете войти в режим поиска по номеру игрока просто напечатав 'кто', выход из режима таким же образом.");
+            }
+
         }
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
