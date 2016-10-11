@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
+using System.Net;
+using System.Net.Security;
+using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Threading;
@@ -16,16 +19,26 @@ namespace Aviators
         static readonly List<Player> Players = new List<Player>();
         static readonly List<Chat> Chats = new List<Chat>();
         static readonly FuckGen Fuck = new FuckGen();
-        static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"\data_base\PlayersInfo.txt";
-        static readonly string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + @"\data_base\PlayersPhoto\";
+        static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"/data_base/PlayersInfo.txt";
+        static readonly string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + @"/data_base/PlayersPhoto/";
         static bool End = true;
+
+        public static bool Validator(object sender, X509Certificate certificate, X509Chain chain,
+                                      SslPolicyErrors sslPolicyErrors)
+        {
+            return true;
+        }
 
         static void Main(string[] args)
         {
+            //to ignore untrusted SSL certificates, linux and mono love it ;)
+            ServicePointManager.ServerCertificateValidationCallback = Validator;
             Console.CancelKeyPress += Console_CancelKeyPress;
 
+            Console.WriteLine("Loading players...");
             LoadPlayers(DBPlayersInfoPath);
 
+            Console.WriteLine("Starting Bot...");
             StartBot();
         }
 
@@ -52,6 +65,8 @@ namespace Aviators
             Console.WriteLine("Press ctrl+c to kill me.");
 
             Bot.OnMessage += Bot_OnMessage;
+
+            Console.WriteLine("StartReceiving...");
             Bot.StartReceiving();
 
             while (End)
@@ -61,11 +76,14 @@ namespace Aviators
                 Thread.Sleep(1000);
             }
 
+            Console.WriteLine("StopReceiving...");
             Bot.StopReceiving();
         }
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
+            Console.WriteLine("Bot_OnMessage...");
+
             var msg = e.Message.Text;
             var cid = e.Message.Chat.Id;
 
@@ -140,7 +158,7 @@ namespace Aviators
         {
             Console.WriteLine("It's the end! Bye.");
             End = false;
-            e.Cancel = true;
+            if(!End) e.Cancel = true;
         }
 
         private static void modeCode()
