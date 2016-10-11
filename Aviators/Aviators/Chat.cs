@@ -10,7 +10,7 @@ namespace Aviators
     {
         public long Id { get; set; }
 
-        public bool WhoMode { get; set; }  = false;
+        public bool WhoMode { get; set; } = false;
 
         public Chat(long id)
         {
