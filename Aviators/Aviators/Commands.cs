@@ -138,7 +138,12 @@ namespace Aviators
 
         private async void Statistic(Chat chatFinded, string[] fields)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я статистика");
+            var player = DB.GetPlayerStatistic(fields[1]);
+            string outpStr;
+            if (player == null) outpStr = "Игрок не найден";
+            else outpStr = $"{player.Surname} забросил {player.Goals} шайб";
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, outpStr);
         }
 
         public async void Help(Chat chatFinded)

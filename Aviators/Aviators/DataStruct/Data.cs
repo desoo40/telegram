@@ -17,6 +17,27 @@ namespace Aviators
 
         public List<GameAction> Actions { get; set; }
 
+        public int Goals
+        {
+            get { return Actions.Count(a => a.Action == Action.Гол); }
+        }
+        public int Pas
+        {
+            get { return Actions.Count(a => a.Action == Action.Пас); }
+        }
+        public int Shtraf
+        {
+            get { return Actions.Count(a => a.Action == Action.Штраф); }
+        }
+        public int Games
+        {
+            get { return Actions.Count(a => a.Action == Action.Игра); }
+        }
+        public int PlusMinus
+        {
+            get { return (Actions.Count(a => a.Action == Action.Плюс) - Actions.Count(a => a.Action == Action.Минус)); }
+        }
+
         public Player(int number, string name, string surname)
         {
             Actions = new List<GameAction>();
@@ -64,6 +85,14 @@ namespace Aviators
 
     class GameAction
     {
+
+        public GameAction(Player player, string game, Action action)
+        {
+            Player = player;
+            Game = new Game {Id = Convert.ToInt32(game)};
+            Action = action;
+        }
+
         public int Id { get; set; }
         public Player Player { get; set; }
         public Game Game { get; set; }
