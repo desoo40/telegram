@@ -63,130 +63,134 @@
     </Reference>
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Chat.cs" />
-    <Compile Include="Commands.cs" />
-    <Compile Include="data_base\DBCore.cs" />
-    <Compile Include="Randomiser.cs" />
-    <Compile Include="DataStruct\Data.cs" />
+    <Compile Include="Bot\AviaBot.cs" />
+    <Compile Include="Bot\Chat.cs" />
+    <Compile Include="Bot\CommandProcessor.cs" />
+    <Compile Include="Configs\Config.cs" />
+    <Compile Include="DB\DBCore.cs" />
+    <None Include="Obsolete\Utils.cs" />
+    <Compile Include="Bot\Randomiser.cs" />
+    <Compile Include="Data\Data.cs" />
+    <Compile Include="Network\SSL.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="DataStruct\DataCD.cd" />
+    <None Include="Data\DataCD.cd" />
     <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="data_base\GamesInfo.txt">
+    <Content Include="DB\GamesInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\logo.jpg">
+    <Content Include="DB\logo.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersInfo.txt">
+    <Content Include="DB\PlayersInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\100_данилин.jpg">
+    <Content Include="DB\PlayersPhoto\100_данилин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\10_корнеев.jpg">
+    <Content Include="DB\PlayersPhoto\10_корнеев.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\11_шрейдер.jpg">
+    <Content Include="DB\PlayersPhoto\11_шрейдер.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\12_мусинский.jpg">
+    <Content Include="DB\PlayersPhoto\12_мусинский.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\14_наконечный.jpg">
+    <Content Include="DB\PlayersPhoto\14_наконечный.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\15_семенов.jpg">
+    <Content Include="DB\PlayersPhoto\15_семенов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\17_липецкий.jpg">
+    <Content Include="DB\PlayersPhoto\17_липецкий.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\18_гунт.jpg">
+    <Content Include="DB\PlayersPhoto\18_гунт.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\1_черненков.jpg">
+    <Content Include="DB\PlayersPhoto\1_черненков.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\20_миронов.jpg">
+    <Content Include="DB\PlayersPhoto\20_миронов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\21_гуськов.jpg">
+    <Content Include="DB\PlayersPhoto\21_гуськов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\22_глухов.jpg">
+    <Content Include="DB\PlayersPhoto\22_глухов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\28_флотский.jpg">
+    <Content Include="DB\PlayersPhoto\28_флотский.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\2_зайцев.jpg">
+    <Content Include="DB\PlayersPhoto\2_зайцев.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\44_кабанов.jpg">
+    <Content Include="DB\PlayersPhoto\44_кабанов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\4_морозов.jpg">
+    <Content Include="DB\PlayersPhoto\4_морозов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\53_кузьмичев.jpg">
+    <Content Include="DB\PlayersPhoto\53_кузьмичев.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\55_сидоров.jpg">
+    <Content Include="DB\PlayersPhoto\55_сидоров.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\57_евграфов.jpg">
+    <Content Include="DB\PlayersPhoto\57_евграфов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\59_калинин.jpg">
+    <Content Include="DB\PlayersPhoto\59_калинин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\5_трофимов.jpg">
+    <Content Include="DB\PlayersPhoto\5_трофимов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\63_гуськов.jpg">
+    <Content Include="DB\PlayersPhoto\63_гуськов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\71_ружицкий.jpg">
+    <Content Include="DB\PlayersPhoto\71_ружицкий.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\73_перцевый.jpg">
+    <Content Include="DB\PlayersPhoto\73_перцевый.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\7_глазунов.jpg">
+    <Content Include="DB\PlayersPhoto\7_глазунов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\81_капустин.jpg">
+    <Content Include="DB\PlayersPhoto\81_капустин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\88_сорокин.jpg">
+    <Content Include="DB\PlayersPhoto\88_сорокин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\8_денисов.jpg">
+    <Content Include="DB\PlayersPhoto\8_денисов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\91_зубарев.jpg">
+    <Content Include="DB\PlayersPhoto\91_зубарев.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\95_лялин.jpg">
+    <Content Include="DB\PlayersPhoto\95_лялин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\PlayersPhoto\9_савенков.jpg">
+    <Content Include="DB\PlayersPhoto\9_савенков.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\SQLDBCreate.sql">
+    <Content Include="DB\SQLDBCreate.sql">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\TeamsInfo.txt">
+    <Content Include="DB\TeamsInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="data_base\TimeTable.txt" />
+    <Content Include="DB\TimeTable.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />

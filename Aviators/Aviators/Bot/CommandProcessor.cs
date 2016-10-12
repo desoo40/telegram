@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aviators.Configs;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel.Design;
 using System.IO;
@@ -10,15 +11,13 @@ using Telegram.Bot;
 
 namespace Aviators
 {
-    public class Commands
+    public class CommandProcessor
     {
         private TelegramBotClient Bot;
         readonly Randomiser Gen;
         DBCore DB;
 
-        string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + @"/data_base/PlayersPhoto/";
-
-        public Commands(TelegramBotClient bot)
+        public CommandProcessor(TelegramBotClient bot)
         {
             Bot = bot;
             Gen = new Randomiser();
@@ -53,7 +52,7 @@ namespace Aviators
                     playerDescription += string.Format("#{0} {1} {2}", player.Number, player.Name,
                         player.Surname);
                     var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                        (new StreamReader(Path.Combine(DBPlayersPhotoDirPath, player.PhotoFile))).BaseStream);
+                        (new StreamReader(Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile))).BaseStream);
 
                     Console.WriteLine($"Send player:{player.Surname}");
                     

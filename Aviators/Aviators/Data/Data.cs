@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Aviators
 {
-    class Player
+    public class Player
     {
         public int Id { get; set; }
         public int Number { get; set; }
@@ -33,7 +33,7 @@ namespace Aviators
         }
     }
 
-    class Game
+    public class Game
     {
         public int Id { get; set; }
         public DateTime Date { get; set; }
@@ -56,13 +56,13 @@ namespace Aviators
         }
     }
 
-    class Team
+    public class Team
     {
         public int Id { get; set; }
         public string Name { get; set; }
     }
 
-    class GameAction
+    public class GameAction
     {
         public int Id { get; set; }
         public Player Player { get; set; }

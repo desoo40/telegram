@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Aviators.Configs;
+using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
 using System.Dynamic;
@@ -12,8 +13,8 @@ namespace Aviators
 {
     class DBCore
     {
-        string DBFile => Program.DBFile;
-        readonly string SQLForCreateon = @"data_base\SQLDBCreate.sql";
+        string DBFile => Config.DBFile;
+        readonly string SQLForCreateon = @"DB\SQLDBCreate.sql";
 
         SQLiteConnection conn;
 
@@ -91,7 +92,7 @@ namespace Aviators
 
         public void LoadPlayersFromFile()
         {
-            var players = File.ReadAllLines("data_base\\PlayersInfo.txt");
+            var players = File.ReadAllLines("DB\\PlayersInfo.txt");
 
             foreach (var player in players)
             {
@@ -114,7 +115,7 @@ namespace Aviators
 
         public void LoadTeamsFromFile()
         {
-            var teams = File.ReadAllText("data_base\\TeamsInfo.txt");
+            var teams = File.ReadAllText("DB\\TeamsInfo.txt");
 
             Match m = Regex.Match(teams, "(?<name>.*)\\((?<town>.*)\\)");
             while (m.Success)
@@ -138,7 +139,7 @@ namespace Aviators
 
         public void LoadGamesFromFile()
         {
-            var teams = File.ReadAllText("data_base\\GamesInfo.txt");
+            var teams = File.ReadAllText("DB\\GamesInfo.txt");
             teams = teams.Replace("\r", "").Replace("\n", "");
             var games = teams.Split(new[] {"---"}, StringSplitOptions.RemoveEmptyEntries);
 
@@ -252,6 +253,27 @@ namespace Aviators
                 players.Add(player);
             }
             return players;
+        }
+
+        public static void Initialization()
+        {
+            Console.WriteLine("Start Initialization");
+            File.Delete(Config.DBFile);
+            DBCore db = new DBCore();
+
+            Console.WriteLine("CreateDB");
+            db.CreateDefaultDB();
+
+            Console.WriteLine("FillPlayersFromFile");
+            db.LoadPlayersFromFile();
+            Console.WriteLine("FillTeamsFromFile");
+            db.LoadTeamsFromFile();
+
+            Console.WriteLine("FillGamesFromFile");
+            db.LoadGamesFromFile();
+
+            db.Disconnect();
+            Console.WriteLine("Finish Initialization");
         }
 }
 }
