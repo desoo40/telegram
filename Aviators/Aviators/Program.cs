@@ -19,6 +19,8 @@ namespace Aviators
         static readonly TelegramBotClient Bot = new TelegramBotClient("272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4");
         //БОРИН БОТ
         //static readonly TelegramBotClient Bot = new TelegramBotClient("124248191:AAGDONDKlfyU1R0bv3MqWRYbvZQJiSJycm8");
+        //ДЕНИСА БОТ
+        //static readonly TelegramBotClient Bot = new TelegramBotClient("297610365:AAEflHFUSK87OiCmjjS4H05D_FDtN57ijLY");
 
         static readonly List<Player> Players = new List<Player>();
         static readonly List<Chat> Chats = new List<Chat>();
@@ -29,7 +31,7 @@ namespace Aviators
 
         //Флаг для создания базы и табличек, что бы из кода.
         //Можно так же аргумент в свойствах проекта прописывать, но неудобно
-        private static bool InitFromCode = false;
+        private static bool InitFromCode = true;
 
         /// <summary>
         /// Тут будут храниться команды для бота
@@ -77,21 +79,21 @@ namespace Aviators
             StartBot();
         }
 
-        static void LoadPlayers(string path)
-        {
-            Console.WriteLine("Try parse " + path);
-            using (var sr = new StreamReader(path))
-            {
-                while (!sr.EndOfStream)
-                {
-                    var line = sr.ReadLine();
-                    var fields = line.Split(';');
-                    if (fields.Length != 3) continue;
+        //static void LoadPlayers(string path)
+        //{
+        //    Console.WriteLine("Try parse " + path);
+        //    using (var sr = new StreamReader(path))
+        //    {
+        //        while (!sr.EndOfStream)
+        //        {
+        //            var line = sr.ReadLine();
+        //            var fields = line.Split(';');
+        //            if (fields.Length != 3) continue;
 
-                    Players.Add(new Player(int.Parse(fields[0]), fields[2], fields[1]));
-                }
-            }
-        }
+        //            Players.Add(new Player(int.Parse(fields[0]), fields[2], fields[1]));
+        //        }
+        //    }
+        //}
 
         static void StartBot()
         {
@@ -133,18 +135,9 @@ namespace Aviators
             }
 
             if (msg == null) return;
-            msg = msg.Trim('/');
 
-            Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
-            if (rxNums.IsMatch(msg))
-            {
-                Commands.ShowPlayerByNubmer(msg, chatFinded);
-            }
-            else
-            {
-                msg = msg.ToLower();
-                await Bot.SendTextMessageAsync(chatFinded.Id, "МАИ это Я");
-            }
+            msg = msg.Trim('/');
+            Commands.FindCommand(msg, chatFinded);
 
             modeCode();
         }

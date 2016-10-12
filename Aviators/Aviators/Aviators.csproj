@@ -66,7 +66,7 @@
     <Compile Include="Chat.cs" />
     <Compile Include="Commands.cs" />
     <Compile Include="data_base\DBCore.cs" />
-    <Compile Include="FuckGen.cs" />
+    <Compile Include="Randomiser.cs" />
     <Compile Include="DataStruct\Data.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -186,6 +186,7 @@
     <Content Include="data_base\TeamsInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="data_base\TimeTable.txt" />
   </ItemGroup>
   <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
