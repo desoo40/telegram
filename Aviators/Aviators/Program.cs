@@ -15,13 +15,24 @@ namespace Aviators
 {
     class Program
     {
+        //АВИАТОРЫ
         static readonly TelegramBotClient Bot = new TelegramBotClient("272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4");
+        //БОРИН БОТ
+        //static readonly TelegramBotClient Bot = new TelegramBotClient("124248191:AAGDONDKlfyU1R0bv3MqWRYbvZQJiSJycm8");
+
         static readonly List<Player> Players = new List<Player>();
         static readonly List<Chat> Chats = new List<Chat>();
-        static readonly FuckGen Fuck = new FuckGen();
         static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"/data_base/PlayersInfo.txt";
-        static readonly string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + @"/data_base/PlayersPhoto/";
         static bool End = true;
+
+        //Флаг для создания базы и табличек, что бы из кода.
+        //Можно так же аргумент в свойствах проекта прописывать, но неудобно
+        private static bool InitFromCode = false;
+
+        /// <summary>
+        /// Тут будут храниться команды для бота
+        /// </summary>
+        private static Commands Commands;
 
         public static bool Validator(object sender, X509Certificate certificate, X509Chain chain,
                                       SslPolicyErrors sslPolicyErrors)
@@ -35,8 +46,26 @@ namespace Aviators
             ServicePointManager.ServerCertificateValidationCallback = Validator;
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-            Console.WriteLine("Loading players...");
-            LoadPlayers(DBPlayersInfoPath);
+            if (InitFromCode || args.Length > 0 && args[0] == "init")
+            {
+                Console.WriteLine("Start Initializate");
+                DBCore db = new DBCore();
+
+                Console.WriteLine("CreateDB");
+                db.CreateDefaultDB();
+
+                Console.WriteLine("FillPlayersFromFile");
+                db.LoadPlayersFromFile();
+                //Console.WriteLine("FillPlayersFromFile");
+                //db.LoadTeamsFromFile();
+
+                db.Disconnect();
+                Console.WriteLine("Finish Initializate");
+            }
+
+            //Console.WriteLine("Loading players...");
+            //LoadPlayers(DBPlayersInfoPath);
+            Commands = new Commands(Bot);
 
             Console.WriteLine("Starting Bot...");
             StartBot();
@@ -82,13 +111,13 @@ namespace Aviators
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
         {
-            Console.WriteLine("Bot_OnMessage...");
+            //Console.WriteLine("Bot_OnMessage...");
 
             var msg = e.Message.Text;
             var cid = e.Message.Chat.Id;
 
             Console.WriteLine("Incoming request: " + msg);
-            Console.WriteLine("Search known chat: " + cid);
+            Console.WriteLine("Search known chat: " + e.Message.Chat.FirstName + "; " + cid);
 
             var chatFinded = Chats.FindLast(chat => chat.Id == cid);
             if (chatFinded == null)
@@ -103,7 +132,7 @@ namespace Aviators
             Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
             if (rxNums.IsMatch(msg))
             {
-                ShowPlayerByNubmer(msg, chatFinded);
+                Commands.ShowPlayerByNubmer(msg, chatFinded);
             }
             else
             {
@@ -115,44 +144,7 @@ namespace Aviators
         }
 
 
-        private static async void ShowPlayerByNubmer(string msg, Chat chatFinded)
-        {
-            try
-            {
-                int playerNumber = int.Parse(msg);
-
-                if (playerNumber < 0 || playerNumber > 100)
-                {
-                    await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный формат, введите корректный номер игрока.");
-                    return;
-                }
-
-                var playerByNumber = Players.FindLast(p => p.Number == playerNumber);
-
-                if (playerByNumber == null)
-                {
-                    await
-                        Bot.SendTextMessageAsync(chatFinded.Id,
-                            string.Format("Игрок под номером {0} не найден.", playerNumber));
-                }
-                else
-                {
-                    var playerDescription = Fuck.GetFuck();
-                    playerDescription += string.Format("#{0} {1} {2}", playerByNumber.Number, playerByNumber.Name,
-                        playerByNumber.Surname);
-                    var photo = new Telegram.Bot.Types.FileToSend(playerByNumber.Number + ".jpg",
-                        (new StreamReader(Path.Combine(DBPlayersPhotoDirPath, playerByNumber.PhotoFile))).BaseStream);
-
-                    await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
-                }
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-                await Bot.SendTextMessageAsync(chatFinded.Id, "Больше так не делай, мне больно(");
-
-            }
-        }
+        
 
         private static void Console_CancelKeyPress(object sender, ConsoleCancelEventArgs e)
         {

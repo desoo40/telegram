@@ -10,13 +10,24 @@ namespace Aviators
 {
     class DBCore
     {
-        SQLiteConnection conn = new SQLiteConnection("Data Source=data_base\\database.db; Version=3;");
+        private readonly string SQLForCreateon = "data_base\\SQLDBCreate.sql";
+        private readonly string DBFile = "data_base\\database.db";
 
+        SQLiteConnection conn;
+
+        /// <summary>
+        /// При создании класса, сразу подключаем.(если базы нет, он ее создаст)
+        /// </summary>
+        public DBCore()
+        {
+            Connect();
+        }
 
         public void Connect()
         {
             try
             {
+                conn = new SQLiteConnection($"Data Source={DBFile}; Version=3;");
                 conn.Open();
 
                 SQLiteCommand cmd = conn.CreateCommand();
@@ -30,25 +41,9 @@ namespace Aviators
             }
         }
 
-        public void CreateTables()
+        public void CreateDefaultDB()
         {
-            string sql =
-@"CREATE TABLE team (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    logo TEXT NULL    
-); 
-CREATE TABLE player(
-    id INTEGER PRIMARY KEY,
-    number INTEGER NOT NULL,
-    name TEXT NOT NULL,
-    lastname TEXT NOT NULL,
-    photo TEXT NULL,
-team_id integer null,
-FOREIGN KEY(team_id) REFERENCES team(id)
-);
-
-            ";
+            string sql = File.ReadAllText(SQLForCreateon);
 
             SQLiteCommand cmd = conn.CreateCommand();
             cmd.CommandText = sql;
@@ -73,7 +68,7 @@ FOREIGN KEY(team_id) REFERENCES team(id)
 
                 SQLiteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
-                    playerinfo[0], playerinfo[1], playerinfo[2]);
+                    playerinfo[0], playerinfo[2], playerinfo[1]);
 
                 try
                 {
@@ -107,5 +102,14 @@ FOREIGN KEY(team_id) REFERENCES team(id)
             return null;
         }
 
+        public void Disconnect()
+        {
+           conn.Close();
+        }
+
+        public void LoadTeamsFromFile()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

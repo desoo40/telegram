@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Aviators
 {
-    class Chat
+    public class Chat
     {
         public long Id { get; set; }
 
