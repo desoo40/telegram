@@ -24,6 +24,8 @@ namespace Aviators
         static readonly List<Chat> Chats = new List<Chat>();
         static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"/data_base/PlayersInfo.txt";
         static bool End = true;
+        
+        public static readonly string DBFile = Directory.GetCurrentDirectory() + @"\data_base\database.db";
 
         //Флаг для создания базы и табличек, что бы из кода.
         //Можно так же аргумент в свойствах проекта прописывать, но неудобно
@@ -49,6 +51,7 @@ namespace Aviators
             if (InitFromCode || args.Length > 0 && args[0] == "init")
             {
                 Console.WriteLine("Start Initializate");
+                File.Delete(DBFile);
                 DBCore db = new DBCore();
 
                 Console.WriteLine("CreateDB");
@@ -56,8 +59,11 @@ namespace Aviators
 
                 Console.WriteLine("FillPlayersFromFile");
                 db.LoadPlayersFromFile();
-                //Console.WriteLine("FillPlayersFromFile");
-                //db.LoadTeamsFromFile();
+                Console.WriteLine("FillTeamsFromFile");
+                db.LoadTeamsFromFile();
+
+                Console.WriteLine("FillGamesFromFile");
+                db.LoadGamesFromFile();
 
                 db.Disconnect();
                 Console.WriteLine("Finish Initializate");

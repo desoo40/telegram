@@ -67,12 +67,13 @@
     <Compile Include="Commands.cs" />
     <Compile Include="data_base\DBCore.cs" />
     <Compile Include="FuckGen.cs" />
-    <Compile Include="DataStruct\Player.cs" />
+    <Compile Include="DataStruct\Data.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="DataStruct\DataCD.cd" />
     <None Include="packages.config" />
     <None Include="README.md" />
   </ItemGroup>

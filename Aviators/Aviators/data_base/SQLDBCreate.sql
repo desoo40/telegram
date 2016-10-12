@@ -10,8 +10,9 @@ DROP TABLE IF EXISTS season;
 
 CREATE TABLE team (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    logo TEXT NULL    
+    name TEXT NOT NULL ,
+    logo TEXT NULL,
+	town text null    
 );
 
 CREATE TABLE position_dic (
@@ -46,7 +47,7 @@ CREATE TABLE place (
 
 CREATE TABLE game(
     id INTEGER PRIMARY KEY,
-    data TEXT NOT NULL,
+    date TEXT NOT NULL,
     opteam_id INTEGER NOT NULL,
     opteamscore INTEGER NULL,
     place_id INTEGER NULL,	
@@ -67,7 +68,7 @@ CREATE TABLE game_action(
 
 CREATE TABLE tournament(
     id INTEGER PRIMARY KEY,
-    name INTEGER NOT NULL,
+    name TEXT NOT NULL,
     season_id INTEGER NOT NULL,    
 	FOREIGN KEY(season_id) REFERENCES season(id)
 	);
