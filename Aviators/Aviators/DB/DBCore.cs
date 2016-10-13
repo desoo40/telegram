@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Data.SQLite;
 using System.IO;
 using System.Text.RegularExpressions;
+using Mono.Data.Sqlite;
 using Aviators.Configs;
 
 namespace Aviators
@@ -10,9 +10,9 @@ namespace Aviators
     class DBCore
     {
         string DBFile => Config.DBFile;
-        readonly string SQLForCreateon = @"DB\SQLDBCreate.sql";
+        readonly string SQLForCreateon = @"DB/SQLDBCreate.sql";
 
-        SQLiteConnection conn;
+        SqliteConnection conn;
 
         /// <summary>
         /// При создании класса, сразу подключаем.(если базы нет, он ее создаст)
@@ -26,15 +26,15 @@ namespace Aviators
         {
             try
             {
-                conn = new SQLiteConnection($"Data Source={DBFile}; Version=3;");
+                conn = new SqliteConnection($"Data Source={DBFile}; Version=3;");
                 conn.Open();
 
-                SQLiteCommand cmd = conn.CreateCommand();
+                SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = "PRAGMA foreign_keys = 1";
                 cmd.ExecuteNonQuery();
 
             }
-            catch (SQLiteException ex)
+            catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -44,14 +44,14 @@ namespace Aviators
         {
             string sql = File.ReadAllText(SQLForCreateon);
 
-            SQLiteCommand cmd = conn.CreateCommand();
+            SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText = sql;
 
             try
             {
                 cmd.ExecuteNonQuery();
             }
-            catch (SQLiteException ex)
+            catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -59,15 +59,15 @@ namespace Aviators
 
         public Player GetPlayerByNumber(int number)
         {
-            SQLiteCommand cmd = conn.CreateCommand();
+            SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText = "SELECT * FROM player WHERE number = " + number;
 
-            SQLiteDataReader reader = null;
+            SqliteDataReader reader = null;
             try
             {
                 reader = cmd.ExecuteReader();
             }
-            catch (SQLiteException ex)
+            catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -90,13 +90,13 @@ namespace Aviators
 
         public void LoadPlayersFromFile()
         {
-            var players = File.ReadAllLines("DB\\PlayersInfo.txt");
+            var players = File.ReadAllLines(@"DB/PlayersInfo.txt");
 
             foreach (var player in players)
             {
                 var playerinfo = player.Split(';');
 
-                SQLiteCommand cmd = conn.CreateCommand();
+                SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
                     playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim());
 
@@ -104,7 +104,7 @@ namespace Aviators
                 {
                     cmd.ExecuteNonQuery();
                 }
-                catch (SQLiteException ex)
+                catch (SqliteException ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
@@ -113,12 +113,12 @@ namespace Aviators
 
         public void LoadTeamsFromFile()
         {
-            var teams = File.ReadAllText("DB\\TeamsInfo.txt");
+            var teams = File.ReadAllText(@"DB/TeamsInfo.txt");
 
             Match m = Regex.Match(teams, "(?<name>.*)\\((?<town>.*)\\)");
             while (m.Success)
             {
-                SQLiteCommand cmd = conn.CreateCommand();
+                SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = string.Format("INSERT INTO team (name, town) VALUES('{0}', '{1}')",
                     m.Groups["name"].ToString().Trim(), m.Groups["town"].ToString().Trim());
 
@@ -126,7 +126,7 @@ namespace Aviators
                 {
                     cmd.ExecuteNonQuery();
                 }
-                catch (SQLiteException ex)
+                catch (SqliteException ex)
                 {
                     Console.WriteLine(ex.Message);
                 }
@@ -137,7 +137,7 @@ namespace Aviators
 
         public void LoadGamesFromFile()
         {
-            var teams = File.ReadAllText("DB\\GamesInfo.txt");
+            var teams = File.ReadAllText(@"DB/GamesInfo.txt");
             teams = teams.Replace("\r", "").Replace("\n", "");
             var games = teams.Split(new[] {"---"}, StringSplitOptions.RemoveEmptyEntries);
 
@@ -157,7 +157,7 @@ namespace Aviators
                 var score = gameinfo[3].Split(':');
                 newgame.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));
 
-                SQLiteCommand cmd = conn.CreateCommand();
+                SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = string.Format("INSERT INTO game (date, opteam_id, opteamscore,tournament_id) " +
                                                 "VALUES('{0}',(select ID from team where lower(name) = '{1}' )," +
                                                 " {2}, (select ID from tournament where lower(name) = '{3}'))",
@@ -170,7 +170,7 @@ namespace Aviators
                     cmd.CommandText = @"select last_insert_rowid()";
                     newgame.Id = Convert.ToInt32((long) cmd.ExecuteScalar());
                 }
-                catch (SQLiteException ex)
+                catch (SqliteException ex)
                 {
                     Console.WriteLine(ex.Message);
                     continue;
@@ -209,7 +209,7 @@ namespace Aviators
 
         private void AddAction(int newgameId, int playerId, Action action)
         {
-            SQLiteCommand cmd = conn.CreateCommand();
+            SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText = string.Format("INSERT INTO game_action (game_id, player_id, action) VALUES({0}, {1}, {2})",
                 newgameId, playerId, (int)action);
 
@@ -217,7 +217,7 @@ namespace Aviators
             {
                 cmd.ExecuteNonQuery();
             }
-            catch (SQLiteException ex)
+            catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -225,15 +225,15 @@ namespace Aviators
 
         public List<Player> GetAllPlayerWitoutStatistic()
         {
-            SQLiteCommand cmd = conn.CreateCommand();
+            SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText = "SELECT * FROM player";
 
-            SQLiteDataReader reader = null;
+            SqliteDataReader reader = null;
             try
             {
                 reader = cmd.ExecuteReader();
             }
-            catch (SQLiteException ex)
+            catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -266,16 +266,16 @@ namespace Aviators
                 player = GetPlayerByName(input);
             }
             if (player == null) return null;
-            
-            SQLiteCommand cmd = conn.CreateCommand();
+
+            SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText = "SELECT * FROM game_action WHERE player_id = " + player.Id;
 
-            SQLiteDataReader reader = null;
+            SqliteDataReader reader = null;
             try
             {
                 reader = cmd.ExecuteReader();
             }
-            catch (SQLiteException ex)
+            catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
             }
@@ -293,15 +293,15 @@ namespace Aviators
 
         private Player GetPlayerByName(string input)
         {
-            SQLiteCommand cmd = conn.CreateCommand();
+            SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText =$"SELECT * FROM player WHERE lastname = '{input}' OR name = '{input}'";
 
-            SQLiteDataReader reader = null;
+            SqliteDataReader reader = null;
             try
             {
                 reader = cmd.ExecuteReader();
             }
-            catch (SQLiteException ex)
+            catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
             }
