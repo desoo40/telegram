@@ -4,6 +4,7 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Mono.Data.Sqlite;
 using Aviators.Configs;
+using System.Globalization;
 
 namespace Aviators
 {
@@ -151,7 +152,9 @@ namespace Aviators
                 var gameinfo = game.Split(';');
 
                 Game newgame = new Game();
-                newgame.Date = DateTime.Parse(gameinfo[0]);
+                var date = DateTime.Now;
+                DateTime.TryParse(gameinfo[0], out date);
+                newgame.Date = date;
                 newgame.Tournament = gameinfo[1];
                 newgame.Team2 = gameinfo[2];
                 var score = gameinfo[3].Split(':');
