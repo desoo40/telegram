@@ -1,9 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.IO;
 
 namespace Aviators.Configs
 {
@@ -12,5 +7,13 @@ namespace Aviators.Configs
         public static readonly string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + @"/DB/PlayersPhoto/";
         public static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"/DB/PlayersInfo.txt";
         public static readonly string DBFile = Directory.GetCurrentDirectory() + @"/DB/database.db";
+
+        public static class BotToken
+        {
+            public static readonly string Aviators = "272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4";
+            public static readonly string Boris = "124248191:AAGDONDKlfyU1R0bv3MqWRYbvZQJiSJycm8";
+            public static readonly string Denis = "297610365:AAEflHFUSK87OiCmjjS4H05D_FDtN57ijLY";
+        }
+
     }
 }

@@ -1,13 +1,9 @@
-﻿using Aviators.Configs;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Data.SQLite;
-using System.Dynamic;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
+using Aviators.Configs;
 
 namespace Aviators
 {
@@ -60,8 +56,6 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
         }
-
-
 
         public Player GetPlayerByNumber(int number)
         {

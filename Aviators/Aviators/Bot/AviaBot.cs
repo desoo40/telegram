@@ -1,26 +1,15 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
 using System.Threading;
-using System.Threading.Tasks;
 using Telegram.Bot;
+using Aviators.Configs;
 
 namespace Aviators.Bot
 {
     public static class AviaBot
     {
-        //АВИАТОРЫ
-        //public static readonly TelegramBotClient Bot = new TelegramBotClient("272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4");
-        //БОРИН БОТ
-        //static readonly TelegramBotClient Bot = new TelegramBotClient("124248191:AAGDONDKlfyU1R0bv3MqWRYbvZQJiSJycm8");
-        //ДЕНИСА БОТ
-        static readonly TelegramBotClient Bot = new TelegramBotClient("297610365:AAEflHFUSK87OiCmjjS4H05D_FDtN57ijLY");
-
-        /// <summary>
-        /// Тут будут храниться команды для бота
-        /// </summary>
-        private static CommandProcessor Commands = new CommandProcessor(Bot);
+        private static TelegramBotClient Bot;
+        private static CommandProcessor Commands;
 
         public static readonly List<Player> Players = new List<Player>();
         public static readonly List<Chat> Chats = new List<Chat>();
@@ -28,6 +17,9 @@ namespace Aviators.Bot
         public static bool End = true;
         public static void Start()
         {
+            Bot = new TelegramBotClient(Config.BotToken.Denis);
+            Commands = new CommandProcessor(Bot);
+
             var me = Bot.GetMeAsync().Result;
             Console.WriteLine("Hello my name is " + me.FirstName);
             Console.WriteLine("Press ctrl+c to kill me.");

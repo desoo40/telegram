@@ -1,16 +1,14 @@
-﻿using Aviators.Configs;
-using System;
-using System.Collections.Generic;
-using System.ComponentModel.Design;
+﻿using System;
 using System.IO;
-using System.Linq;
-using System.Text;
 using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 using Telegram.Bot;
+using Aviators.Configs;
 
 namespace Aviators
 {
+    /// <summary>
+    /// Тут обрабатываются команды для бота
+    /// </summary
     public class CommandProcessor
     {
         private TelegramBotClient Bot;
