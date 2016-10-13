@@ -11,11 +11,11 @@ namespace Aviators.Bot
     public static class AviaBot
     {
         //АВИАТОРЫ
-        public static readonly TelegramBotClient Bot = new TelegramBotClient("272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4");
+        //public static readonly TelegramBotClient Bot = new TelegramBotClient("272766435:AAH9_EKKEHS9KOMhc1bdXQgHD8BMNY8YNN4");
         //БОРИН БОТ
         //static readonly TelegramBotClient Bot = new TelegramBotClient("124248191:AAGDONDKlfyU1R0bv3MqWRYbvZQJiSJycm8");
         //ДЕНИСА БОТ
-        //static readonly TelegramBotClient Bot = new TelegramBotClient("297610365:AAEflHFUSK87OiCmjjS4H05D_FDtN57ijLY");
+        static readonly TelegramBotClient Bot = new TelegramBotClient("297610365:AAEflHFUSK87OiCmjjS4H05D_FDtN57ijLY");
 
         /// <summary>
         /// Тут будут храниться команды для бота

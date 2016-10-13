@@ -79,7 +79,11 @@ namespace Aviators
             }
             while (reader.Read())
             {
-                return new Player(number, reader["name"].ToString(), reader["lastname"].ToString());
+                var player = new Player(Convert.ToInt32(reader["number"].ToString()), 
+                    reader["name"].ToString(),
+                    reader["lastname"].ToString());
+                player.Id = Convert.ToInt32(reader["id"].ToString());
+                return player;
             }
             return null;
         }
@@ -253,6 +257,68 @@ namespace Aviators
                 players.Add(player);
             }
             return players;
+        }
+
+        public Player GetPlayerStatistic(string input)
+        {
+            Player player;
+            Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
+            if (rxNums.IsMatch(input))
+            {
+                player = GetPlayerByNumber(Convert.ToInt32(input));
+            }
+            else
+            {
+                player = GetPlayerByName(input);
+            }
+            if (player == null) return null;
+            
+            SQLiteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT * FROM game_action WHERE player_id = " + player.Id;
+
+            SQLiteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SQLiteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            //var playeractions = new List<GameAction>();
+            while (reader.Read())
+            {
+                var game = reader["game_id"].ToString();
+                var action = (Action) Convert.ToInt32(reader["action"].ToString());
+                var gameaction  = new GameAction(player, game, action);
+
+                player.Actions.Add(gameaction);
+            }
+            return player;
+        }
+
+        private Player GetPlayerByName(string input)
+        {
+            SQLiteCommand cmd = conn.CreateCommand();
+            cmd.CommandText =$"SELECT * FROM player WHERE lastname = '{input}' OR name = '{input}'";
+
+            SQLiteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SQLiteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            while (reader.Read())
+            {
+                var player = new Player(Convert.ToInt32(reader["number"].ToString()), reader["name"].ToString(),
+                    reader["lastname"].ToString());
+                player.Id = Convert.ToInt32(reader["id"].ToString());
+                return player;
+            }
+            return null;
         }
 
         public static void Initialization()
