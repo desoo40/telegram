@@ -35,16 +35,16 @@ namespace Aviators
                 try
                 {
                     DBCore.Initialization();
+                }
+                    catch(Exception e)
+                {
+                        Console.WriteLine("Unknown DBCore exception: " + e.Message);
+                }
             }
-                catch(Exception e)
-        {
-                    Console.WriteLine("Unknown DBCore exception: " + e.Message);
-            }
-        }
 
             Console.WriteLine("Starting Bot...");
             try
-        {
+            {
                 AviaBot.Start();
             }
             catch (Exception e)
