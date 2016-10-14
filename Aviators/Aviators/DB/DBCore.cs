@@ -152,8 +152,8 @@ namespace Aviators
                 var gameinfo = game.Split(';');
 
                 Game newgame = new Game();
-                var date = DateTime.Now;
-                DateTime.TryParse(gameinfo[0], out date);
+                DateTime date = DateTime.Now;
+                DateTime.TryParse(gameinfo[0], CultureInfo.CreateSpecificCulture("ru"), DateTimeStyles.None, out date);
                 newgame.Date = date;
                 newgame.Tournament = gameinfo[1];
                 newgame.Team2 = gameinfo[2];
@@ -316,6 +316,47 @@ namespace Aviators
                 return player;
             }
             return null;
+        }
+
+        public void AddPlayerFromMsg(string input)
+        {
+            var playerinfo = input.Split(';');
+            if(playerinfo.Length != 3)
+            {
+                Console.WriteLine("Wrong input format: " + input);
+                return;
+            }
+
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
+                playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim());
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void RemovePlayer(int input)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            var player = GetPlayerByNumber(input);
+
+            try
+            {
+                cmd.CommandText = string.Format("DELETE from game_action where player_id={0}", player.Id);
+                cmd.ExecuteNonQuery();
+                cmd.CommandText = string.Format("DELETE from player where number={0}", input);
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public static void Initialization()

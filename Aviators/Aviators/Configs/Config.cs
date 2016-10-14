@@ -14,6 +14,20 @@ namespace Aviators.Configs
             public static readonly string Boris = "124248191:AAGDONDKlfyU1R0bv3MqWRYbvZQJiSJycm8";
             public static readonly string Denis = "297610365:AAEflHFUSK87OiCmjjS4H05D_FDtN57ijLY";
         }
+        public static class BotAdmin
+        {
+            private static readonly int DimaId = 85914401;
+            private static readonly int BorisId = 0;
+            private static readonly int DenisId = 0;
 
+            public static bool isAdmin(int id)
+            {
+                if (id == DimaId) return true;
+                if (id == BorisId) return true;
+                if (id == DenisId) return true;
+
+                return false;
+            }
+        }
     }
 }

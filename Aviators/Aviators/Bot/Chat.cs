@@ -11,10 +11,21 @@ namespace Aviators
         public long Id { get; set; }
 
         public bool WhoMode { get; set; }  = false;
+        public bool StatMode { get; set; }  = false;
+        public bool AddMode { get; set; }  = false;
+        public bool RemoveMode { get; set; }  = false;
 
         public Chat(long id)
         {
             Id = id;
+        }
+
+        internal void ResetMode()
+        {
+            WhoMode = false;
+            StatMode = false;
+            AddMode = false;
+            RemoveMode = false;
         }
     }
 }

@@ -49,12 +49,21 @@ namespace Aviators
                     var playerDescription = Gen.GetPlayerDescr();
                     playerDescription += string.Format("#{0} {1} {2}", player.Number, player.Name,
                         player.Surname);
-                    var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                        (new StreamReader(Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile))).BaseStream);
+
+                    var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
 
                     Console.WriteLine($"Send player:{player.Surname}");
-                    
-                    await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+                    if (File.Exists(photopath))
+                    {
+                        var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
+                            (new StreamReader(photopath)).BaseStream);
+                        await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Photo file {photopath} not found.");
+                        await Bot.SendTextMessageAsync(chatFinded.Id, playerDescription);
+                    }
 
                 }
             }
@@ -66,29 +75,65 @@ namespace Aviators
             }
         }
 
-        public async void FindCommand(string msg, Chat chatFinded)
+        public async void FindCommand(string msg, Chat chatFinded, int fromId)
         {
+            if (chatFinded.AddMode)
+            {
+                chatFinded.AddMode = false;
+                DB.AddPlayerFromMsg(msg);
+                await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали добавить {msg}.");
+                return;
+            }
+
             Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
             if (rxNums.IsMatch(msg))
             {
+                if (chatFinded.StatMode)
+                {
+                    chatFinded.StatMode = false;
+                    var request = new string[] { "статистика", msg };
+                    Statistic(chatFinded, request);
+                    return;
+                }
+                if (chatFinded.RemoveMode)
+                {
+                    chatFinded.RemoveMode = false;
+                    DB.RemovePlayer(int.Parse(msg));
+                    await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {int.Parse(msg)}, проверим успешность поиском.");
+                    ShowPlayerByNubmer(msg, chatFinded);                    
+                    return;
+                }
+
                 ShowPlayerByNubmer(msg, chatFinded);
             }
             else
             {
                 msg = msg.ToLower();
                 var fields = msg.Split(' ');
-
+                var flenght = fields.Length;
+                
                 if (fields[0] == "помощь")
                 {
                     Help(chatFinded);
+                    chatFinded.ResetMode();
                     return;
                 }
                 if (fields[0] == "статистика")
                 {
-                    Statistic(chatFinded, fields);
-                    return;
+                    if(flenght == 2)
+                    {
+                        Statistic(chatFinded, fields);
+                        chatFinded.ResetMode();
+                        return;
+                    }
+                    if (flenght == 1 && !chatFinded.StatMode)
+                    {
+                        chatFinded.StatMode = true;
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер игрока, например, /10");
+                        return;
+                    }
                 }
-                if (fields[0] == "расписание")
+                if (flenght == 2 && fields[0] == "расписание")
                 {
                     TimeTable(chatFinded, fields);
                     return;
@@ -106,9 +151,41 @@ namespace Aviators
                 if (fields[0] == "кричалки")
                 {
                     Slogans(chatFinded);
+                    chatFinded.ResetMode();
                     return;
                 }
+                if (fields[0] == "add")
+                {
+                    if(!Config.BotAdmin.isAdmin(fromId))
+                    {
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться этой командой.");
+                        chatFinded.ResetMode();
+                        return;
+                    }
+                    if (flenght == 1 && !chatFinded.StatMode)
+                    {
+                        chatFinded.AddMode = true;
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Добавить игрока в формате '99;Залупа;Чистая'");
+                        return;
+                    }                    
+                }
+                if (fields[0] == "remove")
+                {
+                    if (!Config.BotAdmin.isAdmin(fromId))
+                    {
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться этой командой.");
+                        chatFinded.ResetMode();
+                        return;
+                    }
+                    if (flenght == 1 && !chatFinded.StatMode)
+                    {
+                        chatFinded.RemoveMode = true;
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Удалить игрока по номеру");
+                        return;
+                    }
+                }
 
+                chatFinded.ResetMode();
                 await Bot.SendTextMessageAsync(chatFinded.Id, "Неверная команда, воспользуйтесь /помощь");
             }
         }
