@@ -344,10 +344,12 @@ namespace Aviators
         public void RemovePlayer(int input)
         {
             SqliteCommand cmd = conn.CreateCommand();
-            var player = GetPlayerByNumber(input);
 
             try
             {
+                var player = GetPlayerByNumber(input);
+                if (player == null) return;
+
                 cmd.CommandText = string.Format("DELETE from game_action where player_id={0}", player.Id);
                 cmd.ExecuteNonQuery();
                 cmd.CommandText = string.Format("DELETE from player where number={0}", input);
