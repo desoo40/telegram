@@ -18,7 +18,7 @@ namespace Aviators.Bot
         public static bool End = true;
         public static void Start()
         {
-            Bot = new TelegramBotClient(Config.BotToken.Denis);
+            Bot = new TelegramBotClient(Config.BotToken.Boris);
             Commands = new CommandProcessor(Bot);
 
             var me = Bot.GetMeAsync().Result;

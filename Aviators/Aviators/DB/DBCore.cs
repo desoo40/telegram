@@ -41,6 +41,12 @@ namespace Aviators
             }
         }
 
+        public void Disconnect()
+        {
+            conn.Close();
+            conn.Dispose();
+        }
+
         public void CreateDefaultDB()
         {
             string sql = File.ReadAllText(SQLForCreateon);
@@ -83,11 +89,9 @@ namespace Aviators
             return null;
         }
 
-        public void Disconnect()
-        {
-            conn.Close();
-            conn.Dispose();
-        }
+
+
+        #region Import
 
         public void LoadPlayersFromFile()
         {
@@ -98,8 +102,8 @@ namespace Aviators
                 var playerinfo = player.Split(';');
 
                 SqliteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
-                    playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim());
+                cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname, lastname_lower) VALUES({0}, '{1}', '{2}', '{3}')",
+                    playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim(), playerinfo[1].Trim().ToLower());
 
                 try
                 {
@@ -120,8 +124,8 @@ namespace Aviators
             while (m.Success)
             {
                 SqliteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = string.Format("INSERT INTO team (name, town) VALUES('{0}', '{1}')",
-                    m.Groups["name"].ToString().Trim(), m.Groups["town"].ToString().Trim());
+                cmd.CommandText = string.Format("INSERT INTO team (name, town, name_lower) VALUES('{0}', '{1}', '{2}')",
+                    m.Groups["name"].ToString().Trim(), m.Groups["town"].ToString().Trim(), m.Groups["name"].ToString().Trim().ToLower());
 
                 try
                 {
@@ -162,9 +166,9 @@ namespace Aviators
 
                 SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = string.Format("INSERT INTO game (date, opteam_id, opteamscore,tournament_id) " +
-                                                "VALUES('{0}',(select ID from team where lower(name) = '{1}' )," +
-                                                " {2}, (select ID from tournament where lower(name) = '{3}'))",
-                    newgame.Date, newgame.Team2, newgame.Score.Item2, newgame.Tournament);
+                                                "VALUES('{0}',(select ID from team where name_lower = '{1}' )," +
+                                                " {2}, (select ID from tournament where name_lower = '{3}'))",
+                    newgame.Date, newgame.Team2.ToLower(), newgame.Score.Item2, newgame.Tournament);
 
                 try
                 {
@@ -209,6 +213,9 @@ namespace Aviators
                 }
             }
         }
+
+        #endregion
+
 
         private void AddAction(int newgameId, int playerId, Action action)
         {
@@ -344,15 +351,15 @@ namespace Aviators
         public void RemovePlayer(int input)
         {
             SqliteCommand cmd = conn.CreateCommand();
+            var player = GetPlayerByNumber(input);
+            if (player == null) return;
+
+            cmd.CommandText = string.Format("DELETE from player where number={0}", input);
 
             try
             {
-                var player = GetPlayerByNumber(input);
-                if (player == null) return;
-
-                cmd.CommandText = string.Format("DELETE from game_action where player_id={0}", player.Id);
-                cmd.ExecuteNonQuery();
-                cmd.CommandText = string.Format("DELETE from player where number={0}", input);
+                //cmd.CommandText = string.Format("DELETE from game_action where player_id={0}", player.Id);
+                //cmd.ExecuteNonQuery();
                 cmd.ExecuteNonQuery();
             }
             catch (SqliteException ex)
