@@ -65,6 +65,7 @@ namespace Aviators
                         await Bot.SendTextMessageAsync(chatFinded.Id, playerDescription);
                     }
 
+
                 }
             }
             catch (Exception ex)
@@ -186,7 +187,12 @@ namespace Aviators
                 }
 
                 chatFinded.ResetMode();
-                await Bot.SendTextMessageAsync(chatFinded.Id, "Неверная команда, воспользуйтесь /помощь");
+                var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
+                keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[1][];
+                keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
+                keys.ResizeKeyboard = true;
+                keys.OneTimeKeyboard = true;
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Неверная команда, воспользуйтесь /помощь",false,false,0,keys);
             }
         }
 
@@ -222,6 +228,12 @@ namespace Aviators
 
         public async void Help(Chat chatFinded)
         {
+            var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
+            keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[4][];
+            keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/88"), new Telegram.Bot.Types.KeyboardButton("/статистика") };
+            keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/расписание"), new Telegram.Bot.Types.KeyboardButton("/следующая") };
+            keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/соперник"), new Telegram.Bot.Types.KeyboardButton("/кричалки") };
+            keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
             await Bot.SendTextMessageAsync(chatFinded.Id,
                 "Мною можно управлять с помощью команд:\n" +
                 "(можно вводить без '/') \n" +
@@ -233,7 +245,7 @@ namespace Aviators
                 "/следующая - дата, время, соперник и место следующей игры\n\n" +
                 "/соперник 'название команды' - история встреч\n\n" +
                 "/кричалки - выводит одну из кричалок команды\n\n" +
-                "/помощь - помощь по управлению\n\n");
+                "/помощь - помощь по управлению\n\n", false, false, 0, keys);
         }
     }
 }
