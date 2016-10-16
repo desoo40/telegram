@@ -10,7 +10,8 @@ DROP TABLE IF EXISTS season;
 
 CREATE TABLE team (
     id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL ,
+    name TEXT NOT NULL,
+	name_lower TEXT NOT NULL ,
     logo TEXT NULL,
 	town text null    
 );
@@ -28,6 +29,7 @@ CREATE TABLE player(
     number INTEGER NULL,
     name TEXT NOT NULL,
     lastname TEXT NOT NULL,
+	lastname_lower TEXT NOT NULL,
     photo TEXT NULL,
 	team_id integer null,
 	position_id integer null,
@@ -63,12 +65,13 @@ CREATE TABLE game_action(
     player_id INTEGER NOT NULL,
     action INTEGER NOT NULL,
 	FOREIGN KEY(game_id) REFERENCES game(id),
-	FOREIGN KEY(player_id) REFERENCES player(id)
+	FOREIGN KEY(player_id) REFERENCES player(id) ON DELETE CASCADE
 	);
 
 CREATE TABLE tournament(
     id INTEGER PRIMARY KEY,
     name TEXT NOT NULL,
+	name_lower TEXT NOT NULL,
     season_id INTEGER NOT NULL,    
 	FOREIGN KEY(season_id) REFERENCES season(id)
 	);
