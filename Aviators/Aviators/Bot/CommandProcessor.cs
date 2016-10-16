@@ -230,10 +230,22 @@ namespace Aviators
         {
             var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
             keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[4][];
-            keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/88"), new Telegram.Bot.Types.KeyboardButton("/статистика") };
-            keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/расписание"), new Telegram.Bot.Types.KeyboardButton("/следующая") };
-            keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/соперник"), new Telegram.Bot.Types.KeyboardButton("/кричалки") };
-            keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
+
+            if (chatFinded.Id > 0)
+            {
+                keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("1"), new Telegram.Bot.Types.KeyboardButton("Статистика") };
+                keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Расписание"), new Telegram.Bot.Types.KeyboardButton("Следующая") };
+                keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Соперник"), new Telegram.Bot.Types.KeyboardButton("Кричалки") };
+                keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("Помощь") };
+            }
+            else
+            {
+                keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/1"), new Telegram.Bot.Types.KeyboardButton("/статистика") };
+                keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/расписание"), new Telegram.Bot.Types.KeyboardButton("/следующая") };
+                keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/соперник"), new Telegram.Bot.Types.KeyboardButton("/кричалки") };
+                keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
+            }
+
             await Bot.SendTextMessageAsync(chatFinded.Id,
                 "Мною можно управлять с помощью команд:\n" +
                 "(можно вводить без '/') \n" +
