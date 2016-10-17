@@ -89,6 +89,31 @@ namespace Aviators
             return null;
         }
 
+        public Player GetPlayerById(int id)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT * FROM player WHERE id = " + id;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            while (reader.Read())
+            {
+                var player = new Player(Convert.ToInt32(reader["number"].ToString()),
+                    reader["name"].ToString(),
+                    reader["lastname"].ToString());
+                player.Id = Convert.ToInt32(reader["id"].ToString());
+                return player;
+            }
+            return null;
+        }
+
 
 
         #region Import
@@ -263,18 +288,8 @@ namespace Aviators
             return players;
         }
 
-        public Player GetPlayerStatistic(string input)
+        public Player GetPlayerStatistic(Player player)
         {
-            Player player;
-            Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
-            if (rxNums.IsMatch(input))
-            {
-                player = GetPlayerByNumber(Convert.ToInt32(input));
-            }
-            else
-            {
-                player = GetPlayerByName(input);
-            }
             if (player == null) return null;
 
             SqliteCommand cmd = conn.CreateCommand();
@@ -300,11 +315,55 @@ namespace Aviators
             }
             return player;
         }
+        public Player GetPlayerStatistic(string input)
+        {
+            Player player;
+            Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
+            if (rxNums.IsMatch(input))
+            {
+                player = GetPlayerByNumber(Convert.ToInt32(input));
+            }
+            else
+            {
+                player = GetPlayerByName(input);
+            }
+
+            player = GetPlayerStatistic(player);
+            return player;
+        }
+
+        public List<Player> GetTopPlayers(int input)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText =
+                "SELECT  player_id , count(*) AS num FROM game_action GROUP BY player_id ORDER BY num DESC LIMIT " +
+                input;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            
+            List<Player> players = new List<Player>();
+            while (reader.Read())
+            {
+                var player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
+
+                player = GetPlayerStatistic(player);
+                players.Add(player);
+            }
+            return players;
+        }
 
         private Player GetPlayerByName(string input)
         {
             SqliteCommand cmd = conn.CreateCommand();
-            cmd.CommandText =$"SELECT * FROM player WHERE lastname = '{input}' OR name = '{input}'";
+            cmd.CommandText =$"SELECT * FROM player WHERE lastname_lower = '{input.ToLower()}' OR name = '{input}'";
 
             SqliteDataReader reader = null;
             try

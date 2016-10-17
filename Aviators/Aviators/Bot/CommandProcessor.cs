@@ -121,7 +121,7 @@ namespace Aviators
                 }
                 if (fields[0] == "статистика")
                 {
-                    if(flenght == 2)
+                    if(flenght > 1)
                     {
                         Statistic(chatFinded, fields);
                         chatFinded.ResetMode();
@@ -218,10 +218,37 @@ namespace Aviators
 
         private async void Statistic(Chat chatFinded, string[] fields)
         {
-            var player = DB.GetPlayerStatistic(fields[1]);
-            string outpStr;
-            if (player == null) outpStr = "Игрок не найден";
-            else outpStr = $"{player.Surname} забросил {player.Goals} шайб";
+            string outpStr ="";
+
+            if (fields[1] == "топчик")
+            {
+                var count = 5;
+                if (fields.Length > 2)
+                {
+                    try
+                    {
+                        count = Convert.ToInt32(fields[2]);
+                    }
+                    catch (Exception)
+                    {
+                        outpStr = "Неверно ввели количество\r\n";
+                    }
+                }
+
+                var players = DB.GetTopPlayers(count);
+                foreach (var player in players)
+                {
+                    if (player != null)
+                        outpStr+= $"{player.Surname} забросил {player.Goals} шайб\r\n";
+                }
+            }
+            else
+            {
+                var player = DB.GetPlayerStatistic(fields[1]);
+                if (player == null) outpStr = "Игрок не найден";
+                else outpStr = $"{player.Surname} забросил {player.Goals} шайб";
+            }
+           
 
             await Bot.SendTextMessageAsync(chatFinded.Id, outpStr);
         }
