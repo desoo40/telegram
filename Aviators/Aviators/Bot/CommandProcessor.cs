@@ -22,33 +22,25 @@ namespace Aviators
             DB = new DBCore();
         }
 
-        public async void ShowPlayerByNubmer(string msg, Chat chatFinded)
+        public async void ShowPlayerByNubmer(int playerNumber, Chat chatFinded)
         {
+            if (playerNumber < 0 || playerNumber > 100)
+            {
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный формат, введите корректный номер игрока.");
+                return;
+            }
+
             try
             {
-                int playerNumber = int.Parse(msg);
-
-                if (playerNumber < 0 || playerNumber > 100)
-                {
-                    await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный формат, введите корректный номер игрока.");
-                    return;
-                }
-
-                //var playerByNumber = Players.FindLast(p => p.Number == playerNumber);
                 var player = DB.GetPlayerByNumber(playerNumber);
-
-
                 if (player == null)
                 {
-                    await
-                        Bot.SendTextMessageAsync(chatFinded.Id,
-                            string.Format("Игрок под номером {0} не найден.", playerNumber));
+                    await Bot.SendTextMessageAsync(chatFinded.Id, $"Игрок под номером {playerNumber} не найден.");
                 }
                 else
                 {
                     var playerDescription = Gen.GetPlayerDescr();
-                    playerDescription += string.Format("#{0} {1} {2}", player.Number, player.Name,
-                        player.Surname);
+                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}";
 
                     var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
 
@@ -64,14 +56,12 @@ namespace Aviators
                         Console.WriteLine($"Photo file {photopath} not found.");
                         await Bot.SendTextMessageAsync(chatFinded.Id, playerDescription);
                     }
-
-
                 }
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
-                await Bot.SendTextMessageAsync(chatFinded.Id, "Больше так не делай, мне больно(");
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать.");
 
             }
         }
@@ -81,14 +71,25 @@ namespace Aviators
             if (chatFinded.AddMode)
             {
                 chatFinded.AddMode = false;
-                DB.AddPlayerFromMsg(msg);
-                await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали добавить {msg}.");
-                return;
+                var playerinfo = msg.Split(';');
+                if (playerinfo.Length == 3)
+                {
+                    var player = new Player(int.Parse(playerinfo[0]), playerinfo[1].Trim(), playerinfo[2].Trim());
+                    DB.AddPlayer(player);
+                    await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали добавить {player.Number}.");
+                    return;
+                }
+                else
+                {
+                    await Bot.SendTextMessageAsync(chatFinded.Id, $"Неверный формат запроса: {msg}");
+                    return;
+                }
             }
 
             Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
             if (rxNums.IsMatch(msg))
             {
+                var number = int.Parse(msg);
                 if (chatFinded.StatMode)
                 {
                     chatFinded.StatMode = false;
@@ -99,13 +100,13 @@ namespace Aviators
                 if (chatFinded.RemoveMode)
                 {
                     chatFinded.RemoveMode = false;
-                    DB.RemovePlayer(int.Parse(msg));
-                    await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {int.Parse(msg)}, проверим успешность поиском.");
-                    ShowPlayerByNubmer(msg, chatFinded);                    
+                    DB.RemovePlayerByNumber(number);
+                    await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
+                    ShowPlayerByNubmer(number, chatFinded);                    
                     return;
                 }
 
-                ShowPlayerByNubmer(msg, chatFinded);
+                ShowPlayerByNubmer(number, chatFinded);
             }
             else
             {
@@ -166,7 +167,7 @@ namespace Aviators
                     if (flenght == 1 && !chatFinded.StatMode)
                     {
                         chatFinded.AddMode = true;
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Добавить игрока в формате '99;Залупа;Чистая'");
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Добавить игрока в формате '99;Имя;Фамилия'");
                         return;
                     }                    
                 }
@@ -253,7 +254,7 @@ namespace Aviators
             await Bot.SendTextMessageAsync(chatFinded.Id, outpStr);
         }
 
-        public async void Help(Chat chatFinded)
+        private async void Help(Chat chatFinded)
         {
             var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
             keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[4][];

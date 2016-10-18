@@ -321,11 +321,11 @@ namespace Aviators
             Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
             if (rxNums.IsMatch(input))
             {
-                player = GetPlayerByNumber(Convert.ToInt32(input));
+                player = GetPlayerByNumber(int.Parse(input));
             }
             else
             {
-                player = GetPlayerByName(input);
+                player = GetPlayerByNameOrSurname(input);
             }
 
             player = GetPlayerStatistic(player);
@@ -360,10 +360,10 @@ namespace Aviators
             return players;
         }
 
-        private Player GetPlayerByName(string input)
+        private Player GetPlayerByNameOrSurname(string nameOrSurname)
         {
             SqliteCommand cmd = conn.CreateCommand();
-            cmd.CommandText =$"SELECT * FROM player WHERE lastname_lower = '{input.ToLower()}' OR name = '{input}'";
+            cmd.CommandText =$"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'";
 
             SqliteDataReader reader = null;
             try
@@ -384,18 +384,11 @@ namespace Aviators
             return null;
         }
 
-        public void AddPlayerFromMsg(string input)
+        public void AddPlayer(Player player)
         {
-            var playerinfo = input.Split(';');
-            if(playerinfo.Length != 3)
-            {
-                Console.WriteLine("Wrong input format: " + input);
-                return;
-            }
-
             SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
-                playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim());
+                player.Number, player.Name, player.Surname);
 
             try
             {
@@ -407,18 +400,16 @@ namespace Aviators
             }
         }
 
-        public void RemovePlayer(int input)
+        public void RemovePlayerByNumber(int number)
         {
             SqliteCommand cmd = conn.CreateCommand();
-            var player = GetPlayerByNumber(input);
+            var player = GetPlayerByNumber(number);
             if (player == null) return;
 
-            cmd.CommandText = string.Format("DELETE from player where number={0}", input);
+            cmd.CommandText = string.Format("DELETE from player where number={0}", number);
 
             try
             {
-                //cmd.CommandText = string.Format("DELETE from game_action where player_id={0}", player.Id);
-                //cmd.ExecuteNonQuery();
                 cmd.ExecuteNonQuery();
             }
             catch (SqliteException ex)
