@@ -1,8 +1,7 @@
-﻿using System;
+﻿using Aviators.Configs;
+using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.IO;
 
 namespace Aviators
 {
@@ -32,18 +31,22 @@ namespace Aviators
 
         private void InitializateDescr()
         {
-            playersDescr.Add("Вот красавчик, которого вы искали:\n\n");
-            playersDescr.Add("Бравый авиатор:\n\n");
-            playersDescr.Add("Ну не красавец ли? Это у нас:\n\n");
+            var players = File.ReadAllLines(Config.Descr);
+            foreach (var player in players)
+            {
+                var playerinfo = player.Replace(';','\n');
+                playersDescr.Add(playerinfo);
+            }
         }
 
         private void InitializateSlogans()
         {
-            slogans.Add("КТО МЫ - МЫ МАИ, ДИКОЕ МАИ!");
-            slogans.Add("МАИ - ЭТО Я!\n" +
-                        "МАИ - ЭТО МЫ!\n" +
-                        "МАИ - ЭТО ЛУЧШИЕ ЛЮДИ СТРАНЫ!");
-            slogans.Add("ЗА ВУЗ РОДНОЙ ОДНОЙ СТЕНОЙ!");
+            var sls = File.ReadAllLines(Config.Slogans);
+            foreach (var sl in sls)
+            {
+                var sloginfo = sl.Replace(';','\n');
+                slogans.Add(sloginfo);
+            }
         }
     }
 }

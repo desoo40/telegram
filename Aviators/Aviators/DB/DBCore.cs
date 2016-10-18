@@ -120,7 +120,7 @@ namespace Aviators
 
         public void LoadPlayersFromFile()
         {
-            var players = File.ReadAllLines(@"DB/PlayersInfo.txt");
+            var players = File.ReadAllLines(Config.DBPlayersInfoPath);
 
             foreach (var player in players)
             {
@@ -143,7 +143,7 @@ namespace Aviators
 
         public void LoadTeamsFromFile()
         {
-            var teams = File.ReadAllText(@"DB/TeamsInfo.txt");
+            var teams = File.ReadAllText(Config.DBTeamsInfoPath);
 
             Match m = Regex.Match(teams, "(?<name>.*)\\((?<town>.*)\\)");
             while (m.Success)
@@ -167,7 +167,7 @@ namespace Aviators
 
         public void LoadGamesFromFile()
         {
-            var teams = File.ReadAllText(@"DB/GamesInfo.txt");
+            var teams = File.ReadAllText(Config.DBGamesInfoPath);
             teams = teams.Replace("\r", "").Replace("\n", "");
             var games = teams.Split(new[] {"---"}, StringSplitOptions.RemoveEmptyEntries);
 

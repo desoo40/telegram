@@ -1,12 +1,18 @@
 ﻿using System.IO;
+using System.Configuration;
 
 namespace Aviators.Configs
 {
     public static class Config
     {
-        public static readonly string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + @"/DB/PlayersPhoto/";
-        public static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + @"/DB/PlayersInfo.txt";
-        public static readonly string DBFile = Directory.GetCurrentDirectory() + @"/DB/database.db";
+        public static readonly string DBPlayersPhotoDirPath = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["DBPlayersPhotoDirPath"];
+        public static readonly string DBPlayersInfoPath = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["DBPlayersInfoPath"];
+        public static readonly string DBTeamsInfoPath = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["DBTeamsInfoPath"];
+        public static readonly string DBGamesInfoPath = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["DBGamesInfoPath"];
+        public static readonly string DBFile = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["DBFile"];
+        
+        public static readonly string Slogans = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["Slogans"];
+        public static readonly string Descr = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["Descr"];
 
         public static class BotToken
         {
