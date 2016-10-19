@@ -315,21 +315,15 @@ namespace Aviators
             }
             return player;
         }
-        public Player GetPlayerStatistic(string input)
+        public Player GetPlayerStatisticByNameOrSurname(string nameOrSurname)
         {
-            Player player;
-            Regex rxNums = new Regex(@"^\d+$"); // делаем проверку на число
-            if (rxNums.IsMatch(input))
-            {
-                player = GetPlayerByNumber(int.Parse(input));
-            }
-            else
-            {
-                player = GetPlayerByNameOrSurname(input);
-            }
-
-            player = GetPlayerStatistic(player);
-            return player;
+            var player = GetPlayerByNameOrSurname(nameOrSurname);
+            return GetPlayerStatistic(player);
+        }
+        public Player GetPlayerStatisticByNumber(int number)
+        {
+            var player = GetPlayerByNumber(number);
+            return GetPlayerStatistic(player);
         }
 
         public List<Player> GetTopPlayers(int input)

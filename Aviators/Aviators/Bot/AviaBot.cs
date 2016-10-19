@@ -67,7 +67,7 @@ namespace Aviators.Bot
 
             try
             {
-                Commands.FindCommand(msg, chatFinded, fromId);
+                Commands.FindCommands(msg, chatFinded, fromId);
             }
             catch (Exception ex)
             {
