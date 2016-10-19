@@ -15,6 +15,8 @@ namespace Aviators
         public bool AddMode { get; set; }  = false;
         public bool RemoveMode { get; set; }  = false;
 
+        public Queue<string> CommandsQueue { get; set; }
+
         public Chat(long id)
         {
             Id = id;
@@ -26,6 +28,7 @@ namespace Aviators
             StatMode = false;
             AddMode = false;
             RemoveMode = false;
+            CommandsQueue.Clear();
         }
     }
 }

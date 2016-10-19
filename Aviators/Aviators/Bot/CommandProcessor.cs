@@ -111,52 +111,65 @@ namespace Aviators
             else
             {
                 msg = msg.ToLower();
-                var fields = msg.Split(' ');
-                var flenght = fields.Length;
-                
-                if (fields[0] == "помощь")
+                var commands = msg.Split(' ');
+
+                foreach (var command in commands)
+                {
+                    chatFinded.CommandsQueue.Enqueue(command);
+                }
+
+                var first = chatFinded.CommandsQueue.Dequeue();
+
+                if (first == "помощь")
                 {
                     Help(chatFinded);
                     chatFinded.ResetMode();
                     return;
                 }
-                if (fields[0] == "статистика")
+                if (first == "статистика")
                 {
-                    if(flenght > 1)
+                    chatFinded.StatMode = true;
+
+                    if (chatFinded.CommandsQueue.Count == 0)
                     {
-                        Statistic(chatFinded, fields);
-                        chatFinded.ResetMode();
-                        return;
-                    }
-                    if (flenght == 1 && !chatFinded.StatMode)
-                    {
-                        chatFinded.StatMode = true;
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер игрока, например, /10");
-                        return;
+                        await Bot.SendTextMessageAsync(chatFinded.Id,
+                            "Введите:\n\n" +
+                            "/топ - топ игроков\n" +
+                            "фамилию или номер игрока для просмотра его статистики");
                     }
                 }
-                if (flenght == 2 && fields[0] == "расписание")
+
+                if (chatFinded.StatMode)
                 {
-                    TimeTable(chatFinded, fields);
+                    
+
+
+                    var currСommand = chatFinded.CommandsQueue.Dequeue();
+
+                }
+
+                if (first == "расписание")
+                {
+                    //TimeTable(chatFinded, fields);
                     return;
                 }
-                if (fields[0] == "следующая")
+                if (first == "следующая")
                 {
                     NextGame(chatFinded);
                     return;
                 }
-                if (fields[0] == "соперник")
+                if (first == "соперник")
                 {
-                    EnemyTeam(chatFinded, fields);
+                    //EnemyTeam(chatFinded, fields);
                     return;
                 }
-                if (fields[0] == "кричалки")
+                if (first == "кричалки")
                 {
                     Slogans(chatFinded);
                     chatFinded.ResetMode();
                     return;
                 }
-                if (fields[0] == "add")
+                if (first == "add")
                 {
                     if(!Config.BotAdmin.isAdmin(fromId))
                     {
@@ -171,7 +184,7 @@ namespace Aviators
                         return;
                     }                    
                 }
-                if (fields[0] == "remove")
+                if (first == "remove")
                 {
                     if (!Config.BotAdmin.isAdmin(fromId))
                     {
