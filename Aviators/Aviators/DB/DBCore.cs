@@ -288,6 +288,11 @@ namespace Aviators
             return players;
         }
 
+        public string[] GetTournaments()
+        {
+            return new[] {"товарняки епто"};
+        }
+
         public Player GetPlayerStatistic(Player player)
         {
             if (player == null) return null;

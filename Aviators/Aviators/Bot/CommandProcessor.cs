@@ -3,6 +3,8 @@ using System.IO;
 using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Aviators.Configs;
+using Telegram.Bot.Types;
+using File = System.IO.File;
 
 namespace Aviators
 {
@@ -80,23 +82,60 @@ namespace Aviators
 
                 if (command == "статистика")
                 {
-                    chatFinded.StatMode = true;
+                    chatFinded.PersonalStatMode = true;
                     if (isLastCommand)
                     {
-                        await Bot.SendTextMessageAsync(chatFinded.Id,
-                            "Введите:\n\n" +
-                            "/топ 'число' - топовые игроки;\n\n" +
-                            "'№'|'имя'|'фамилия' игрока");
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер или фамилию игрока"); // рассмотреть возможность однофамильцев
                     }
                     continue;
                 }
 
-                if (command == "топ")
+                if (command == "бомбардиры")
                 {
-                    chatFinded.StatTopMode = true;
+                    chatFinded.Stat.Bomb = true;
                     if (isLastCommand)
                     {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Введите 'число' для топа");
+                        TourAnswer(chatFinded);
+                    }
+                    continue;
+                }
+
+                if (command == "снайперы")
+                {
+                    chatFinded.Stat.Snip = true;
+                    if (isLastCommand)
+                    {
+                        TourAnswer(chatFinded);
+                    }
+                    continue;
+                }
+                
+                if (command == "асистенты")
+                {
+                    chatFinded.Stat.Asist = true;
+                    if (isLastCommand)
+                    {
+                        TourAnswer(chatFinded);
+                    }
+                    continue;
+                }
+
+                if (command == "штрафники")
+                {
+                    chatFinded.Stat.BadBoy = true;
+                    if (isLastCommand)
+                    {
+                        TourAnswer(chatFinded);
+                    }
+                    continue;
+                }
+
+                if (command == "полезность")
+                {
+                    chatFinded.Stat.Usefull = true;
+                    if (isLastCommand)
+                    {
+                        TourAnswer(chatFinded);
                     }
                     continue;
                 }
@@ -123,24 +162,8 @@ namespace Aviators
                     }
                 }
 
-                if (chatFinded.StatMode)
+                if (chatFinded.PersonalStatMode)
                 {
-                    //запрос с топ number
-                    if (chatFinded.StatTopMode)
-                    {
-                        try
-                        {
-                            var number = int.Parse(command);
-                            StatisticByTop(chatFinded, number);
-                            continue;
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionOnCmd(chatFinded, ex);
-                            continue;
-                        }
-                    }
-
                     if (rxNums.IsMatch(command))
                     {
                         //в случае числа показываем стату
@@ -219,6 +242,40 @@ namespace Aviators
                 //иначе пользователь ввёл хуйню
                 WrongCmd(chatFinded);
             }
+        }
+
+        private async void TourAnswer(Chat chatFinded)
+        {
+            var tours = DB.GetTournaments();
+
+            var rowCount = tours.Length % 2 == 0 ? tours.Length / 2 : tours.Length / 2 + 1;
+            ++rowCount; // ибо "официальные" и "все"
+
+            var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+            {
+                Keyboard = new Telegram.Bot.Types.KeyboardButton[rowCount][],
+                OneTimeKeyboard = true
+            };
+
+            
+            keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Все"),
+                                                                          new Telegram.Bot.Types.KeyboardButton("Официальные") }; // помнить о слешах
+            for (var i = 0; i < tours.Length; ++i)
+            {
+                var row = i/2 + 1;
+                var column = i % 2;
+
+                if (keys.Keyboard[row] == null)
+                {
+                    var isLast = (tours.Length - i - 1 == 0);
+                    var c = isLast ? 1 : 2;
+
+                    keys.Keyboard[row] = new KeyboardButton[c]; 
+                }
+                keys.Keyboard[row][column] = new KeyboardButton(chatFinded.Id > 0 ? tours[i] : "/" + tours[i]);
+            }
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Выберете турнир:", false, false, 0, keys);
         }
 
         private async void WrongCmd(Chat chatFinded)
@@ -327,27 +384,9 @@ namespace Aviators
             await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я расписание");
         }
 
-        private async void StatisticByTop(Chat chatFinded, int top)
-        {
-            chatFinded.StatTopMode = false;
-            chatFinded.StatMode = false;
-
-            var players = DB.GetTopPlayers(top);
-            var result = "";
-            foreach (var player in players)
-            {
-                if (player != null)
-                {
-                    result += $"{player.Surname} забросил {player.Goals} шайб\r\n";
-                }
-            }
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, result);
-        }
-
         private async void StatisticByNumber(Chat chatFinded, int number)
         {
-            chatFinded.StatMode = false;
+            chatFinded.PersonalStatMode = false;
             var result = "Игрок не найден";
             var player = DB.GetPlayerStatisticByNumber(number);
             if (player != null)
@@ -360,7 +399,7 @@ namespace Aviators
 
         private async void StatisticByNameOrSurname(Chat chatFinded, string nameOrSurname)
         {
-            chatFinded.StatMode = false;
+            chatFinded.PersonalStatMode = false;
             var result = "Игрок не найден";
             var player = DB.GetPlayerStatisticByNameOrSurname(nameOrSurname);
             if (player != null)
@@ -401,9 +440,16 @@ namespace Aviators
 
 '%номер%' - поиск игрока по номеру
 
-/статистика '№'|'имя'|'фамилия' игрока
+/статистика '№'|'фамилия' игрока
 
-/статистика топ 'n' - список топовых n игроков
+/бомбардиры
+/снайперы
+/асистенты
+/штрафники
+/полезность (+/- показатель)
+
+- топ игроков команды по параметрам
+
 
 /расписание 'n' ближайших n игр
 
