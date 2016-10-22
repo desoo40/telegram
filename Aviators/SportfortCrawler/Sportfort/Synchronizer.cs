@@ -2,21 +2,18 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
-using HockeyBot.Configs;
 
-namespace HockeyBot.Sportfort
+namespace SportfortCrawler
 {
     public class Synchronizer
     {
         public static void InitializateSources()
         {
-            var players = TeamMembersPageParser.ParseTeamMembersPage(new Uri(Config.SportFortTeamMembersPage));
+            var players = TeamMembersPageParser.ParseTeamMembersPage("http://sportfort.ru/WildWoodpeckers/TeamMembersPage");
             foreach(var player in players)
             {
-                Console.WriteLine(player.Name);
+                Console.WriteLine(player);
             }
-
         }
         public static void UpdateSources()
         {

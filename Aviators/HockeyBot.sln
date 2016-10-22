@@ -5,16 +5,22 @@ VisualStudioVersion = 14.0.24720.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "HockeyBot", "HockeyBot\HockeyBot.csproj", "{D9FF2901-EAB8-458F-A7FD-044AAEC07761}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SportfortCrawler", "SportfortCrawler\SportfortCrawler.csproj", "{03C30E0E-BEA2-4748-82CA-ACDE45BDDBDF}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
-		Debug|Any CPU = Debug|Any CPU
-		Release|Any CPU = Release|Any CPU
+		Debug|x86 = Debug|x86
+		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Debug|x86.ActiveCfg = Debug|x86
+		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Debug|x86.Build.0 = Debug|x86
+		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Release|x86.ActiveCfg = Release|x86
+		{D9FF2901-EAB8-458F-A7FD-044AAEC07761}.Release|x86.Build.0 = Release|x86
+		{03C30E0E-BEA2-4748-82CA-ACDE45BDDBDF}.Debug|x86.ActiveCfg = Debug|x86
+		{03C30E0E-BEA2-4748-82CA-ACDE45BDDBDF}.Debug|x86.Build.0 = Debug|x86
+		{03C30E0E-BEA2-4748-82CA-ACDE45BDDBDF}.Release|x86.ActiveCfg = Release|Any CPU
+		{03C30E0E-BEA2-4748-82CA-ACDE45BDDBDF}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

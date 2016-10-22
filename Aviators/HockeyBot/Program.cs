@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Net;
-using HockeyBot.Bot;
-using HockeyBot.Sportfort;
 
 namespace HockeyBot
 {
@@ -24,7 +22,6 @@ namespace HockeyBot
             {
                 try
                 {
-                    Synchronizer.InitializateSources();
                     DBCore.Initialization();
                 }
                     catch(Exception e)
