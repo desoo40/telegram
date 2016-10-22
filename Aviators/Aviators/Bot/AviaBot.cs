@@ -18,7 +18,7 @@ namespace Aviators.Bot
         public static bool End = true;
         public static void Start()
         {
-            Bot = new TelegramBotClient(Config.BotToken.Denis);
+            Bot = new TelegramBotClient(Config.BotToken.Boris);
             Commands = new CommandProcessor(Bot);
 
             var me = Bot.GetMeAsync().Result;
@@ -47,7 +47,7 @@ namespace Aviators.Bot
         {
             var msg = e.Message.Text;
             var cid = e.Message.Chat.Id;
-            var fromId = e.Message.From.Id;
+            var fromId = e.Message.From.Id; //для проверки на права доступа(типа добавления и т.д.)
 
             Console.WriteLine("Incoming request: " + msg);
             Console.WriteLine("Search known chat: " + e.Message.Chat.FirstName + "; " + cid);
@@ -60,7 +60,7 @@ namespace Aviators.Bot
             }
 
             if (msg == null) return;
-
+            msg = msg.ToLower();
             msg = msg.Trim('/');
             msg = msg.Replace(AviaBot.Username, "");
             msg = msg.Replace("@","");
