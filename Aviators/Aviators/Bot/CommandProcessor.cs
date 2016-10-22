@@ -6,6 +6,7 @@ using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Aviators.Configs;
 using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using File = System.IO.File;
 
@@ -78,16 +79,16 @@ namespace Aviators
                     Top(chatFinded, Aviators.Top.Bomb);
                     return;
                 case "снайперы":
-                    Top(chatFinded, Aviators.Top.Bomb);
+                    Top(chatFinded, Aviators.Top.Snip);
                     return;
                 case "асистенты":
-                    Top(chatFinded, Aviators.Top.Bomb);
+                    Top(chatFinded, Aviators.Top.Asist);
                     return;
                 case "штрафники":
-                    Top(chatFinded, Aviators.Top.Bomb);
+                    Top(chatFinded, Aviators.Top.BadBoy);
                     return;
                 case "полезность":
-                    Top(chatFinded, Aviators.Top.Bomb);
+                    Top(chatFinded, Aviators.Top.Usefull);
                     return;
 
             }
@@ -415,19 +416,59 @@ namespace Aviators
 
             if (player != null)
             {
-                result = String.Format("{0:5} забросил {1} шайб", player.Surname, player.Goals);
+                result = String.Format("Статистика игрока\n" +
+                                       "*#{0} {1} {2}*\n\n", player.Number, player.Name, player.Surname);
+
+                result += String.Format("{0, 0} {1, 21}\n", "Игр:", player.Games);
+                result += String.Format("{0, 0} {1, 18}\n", "Голы:", player.Goals);
+                result += String.Format("{0, 0} {1, 18}\n", "Пасы:", player.Pas);
+                result += String.Format("{0, 0} {1, 12}\n", "Гол+Пас:", player.Goals + player.Pas);
+                result += String.Format("{0, 0} {1, 15}\n", "Штраф:", player.Shtraf);
+                result += String.Format("{0, 0} {1, 23}\n", "+/-:", player.PlusMinus);
             }
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, result);
+            await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
         }
 
-        private async void Top(Chat chatFinded, Top type)
+        private async void Top(Chat chatFinded, Top type) // говнокодище Дениса
         {
-            string result = "Игрок не найден";
+            string result = "";
+            var points = 0;
             List<Player> topPlayers = DB.GetTopPlayers(5);
             //TODO сделать Денису тут все
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, result);
+            if (type == Aviators.Top.Bomb)
+            {
+                foreach (var topPlayer in topPlayers)
+                {
+                    
+                }
+            }
+
+            if (type == Aviators.Top.Asist)
+            {
+            }
+
+            if (type == Aviators.Top.Snip)
+            {
+            }
+
+            if (type == Aviators.Top.BadBoy)
+            {
+            }
+
+            if (type == Aviators.Top.Usefull)
+            {
+            }
+
+            result = String.Format("Топ 5 *{0}* ХК \"Авиаторы\":\n\n", args.Arg);
+
+            foreach (var topPlayer in topPlayers)
+            {
+              
+            }
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
         }
 
         private async void Slogans(Chat chatFinded)
@@ -437,7 +478,7 @@ namespace Aviators
 
         private async void EnemyTeam(Chat chatFinded, string team)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я соперник");
+            await Bot.SendTextMessageAsync(chatFinded.Id, "*Привет, я соперник*", parseMode: ParseMode.Markdown);
         }
 
         private async void NextGame(Chat chatFinded)
