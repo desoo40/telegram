@@ -173,7 +173,8 @@ namespace Aviators
 
             var players = GetAllPlayerWitoutStatistic();
 
-            var season = games[0];
+            //var season = games[0];
+            var season = GetSeasonByNameOrInsert(games[0]);
             for (int i = 1; i < games.Length; i++)
             {
                 var game = games[i];
@@ -184,7 +185,9 @@ namespace Aviators
                 DateTime date = DateTime.Now;
                 DateTime.TryParse(gameinfo[0], CultureInfo.CreateSpecificCulture("ru"), DateTimeStyles.None, out date);
                 newgame.Date = date;
-                newgame.Tournament = gameinfo[1];
+                //newgame.Tournament = new Tournament(gameinfo[1]);
+
+                newgame.Tournament = GetTournamentByNameOrInsert(gameinfo[1], season.Id);
                 newgame.Team2 = gameinfo[2];
                 var score = gameinfo[3].Split(':');
                 newgame.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));
@@ -192,8 +195,8 @@ namespace Aviators
                 SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = string.Format("INSERT INTO game (date, opteam_id, opteamscore,tournament_id) " +
                                                 "VALUES('{0}',(select ID from team where name_lower = '{1}' )," +
-                                                " {2}, (select ID from tournament where name_lower = '{3}'))",
-                    newgame.Date, newgame.Team2.ToLower(), newgame.Score.Item2, newgame.Tournament);
+                                                " {2}, {3})",
+                    newgame.Date, newgame.Team2.ToLower(), newgame.Score.Item2, newgame.Tournament.Id);
 
                 try
                 {
@@ -237,6 +240,72 @@ namespace Aviators
                     }
                 }
             }
+        }
+
+        private Tournament GetTournamentByNameOrInsert(string s, int season_id)
+        {
+            Tournament tournament = new Tournament(s);
+
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = string.Format("select ID from tournament where name_lower = '{0}' AND season_id = {1}",
+                 tournament.Name.ToLower(), season_id);
+
+            try
+            {
+                object obj = cmd.ExecuteScalar();
+                if (obj == null)
+                {
+                    cmd.CommandText = $"INSERT INTO tournament(name, name_lower, season_id) VALUES ('{s}', '{s.ToLower()}', {season_id})";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"select last_insert_rowid()";
+                    tournament.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
+                }
+                else
+                {
+                    tournament.Id = Convert.ToInt32(obj);
+                }
+                
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+                
+            }
+            return tournament;
+        }
+
+        private Season GetSeasonByNameOrInsert(string s)
+        {
+            Season season = new Season(s);
+
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = string.Format("select ID from season where name = '{0}'",
+                 season.Name);
+
+            try
+            {
+                object obj = cmd.ExecuteScalar();
+                if (obj == null)
+                {
+                    cmd.CommandText = $"INSERT INTO season(name) VALUES ('{s}')";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"select last_insert_rowid()";
+                    season.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
+                }
+                else
+                {
+                    season.Id = Convert.ToInt32(obj);
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return season;
         }
 
         #endregion
@@ -288,11 +357,45 @@ namespace Aviators
             return players;
         }
 
-        public string[] GetTournaments()
+        public List<Tournament> GetTournaments()
         {
-            return new[] {"товарняки епто"};
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT * FROM tournament";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            var tournaments = new List<Tournament>();
+            while (reader.Read())
+            {
+                string name = reader["name"].ToString();
+
+                var tournament = new Tournament(name);
+                tournament.Id = Convert.ToInt32(reader["id"].ToString());
+                //tournament.Season = reader["season_id"].ToString();
+                tournaments.Add(tournament);
+            }
+            return tournaments;
         }
 
+       
+        public Player GetPlayerStatisticByNameOrSurname(string nameOrSurname)
+        {
+            var player = GetPlayerByNameOrSurname(nameOrSurname);
+            return GetPlayerStatistic(player);
+        }
+        public Player GetPlayerStatisticByNumber(int number)
+        {
+            var player = GetPlayerByNumber(number);
+            return GetPlayerStatistic(player);
+        }
         public Player GetPlayerStatistic(Player player)
         {
             if (player == null) return null;
@@ -312,24 +415,15 @@ namespace Aviators
             //var playeractions = new List<GameAction>();
             while (reader.Read())
             {
-                var game = reader["game_id"].ToString();
-                var action = (Action) Convert.ToInt32(reader["action"].ToString());
-                var gameaction  = new GameAction(player, game, action);
+                var game_id = reader["game_id"].ToString();
+                var action = (Action)Convert.ToInt32(reader["action"].ToString());
+                var gameaction = new GameAction(player, game_id, action);
 
                 player.Actions.Add(gameaction);
             }
             return player;
         }
-        public Player GetPlayerStatisticByNameOrSurname(string nameOrSurname)
-        {
-            var player = GetPlayerByNameOrSurname(nameOrSurname);
-            return GetPlayerStatistic(player);
-        }
-        public Player GetPlayerStatisticByNumber(int number)
-        {
-            var player = GetPlayerByNumber(number);
-            return GetPlayerStatistic(player);
-        }
+
 
         public List<Player> GetTopPlayers(int input)
         {
