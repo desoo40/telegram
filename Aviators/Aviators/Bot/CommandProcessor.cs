@@ -83,7 +83,7 @@ namespace Aviators
                     return;
 
                 case "бомбардиры":
-                    Top(chatFinded, Aviators.Top.Asist);
+                    Top(chatFinded, Aviators.Top.Bomb);
                     return;
                 case "снайперы":
                     Top(chatFinded, Aviators.Top.Snip);
@@ -450,39 +450,78 @@ namespace Aviators
         private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
             string result = "";
-            var points = 0;
             List<Player> topPlayers = DB.GetTopPlayers(5);
             //TODO сделать Денису тут все
 
+            
             if (type == Aviators.Top.Bomb)
             {
+                result = "Топ 5 *бомбардиров* ХК \"Авиаторы\":\n";
+
+
                 foreach (var topPlayer in topPlayers)
                 {
-                    
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas + topPlayer.Goals}*";
                 }
             }
 
             if (type == Aviators.Top.Asist)
             {
+                result = "Топ 5 *асистентов* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  "; 
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas}*";
+                }
             }
 
             if (type == Aviators.Top.Snip)
             {
+                result = "Топ 5 *снайперов* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Goals}*";
+                }
             }
 
             if (type == Aviators.Top.BadBoy)
             {
+                result = "Топ 5 *штрафников* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Shtraf}*";
+                }
             }
 
             if (type == Aviators.Top.Usefull)
             {
-            }
+                result = "Топ 5 *полезных игроков* ХК \"Авиаторы\":\n";
 
-            //result = String.Format("Топ 5 *{0}* ХК \"Авиаторы\":\n\n", args.Arg);
 
-            foreach (var topPlayer in topPlayers)
-            {
-              
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.PlusMinus}*";
+                }
             }
 
             await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
