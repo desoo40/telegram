@@ -21,7 +21,7 @@ CREATE TABLE position_dic (
     name TEXT NOT NULL  
 );
 
-INSERT INTO position_dic (id, name) VALUES (1, 'Нападающий'),(2, 'Защитник'),(3, 'Вратарь'),(4, 'Тренеры');
+INSERT INTO position_dic (id, name) VALUES (1, 'Нападающий'),(2, 'Защитник'),(3, 'Вратарь'),(4, 'Тренер');
 
  
 CREATE TABLE player(

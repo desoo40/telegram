@@ -34,13 +34,13 @@ namespace Aviators
         {
             var inputCommands = msg.Split(' ');
 
-            var command = new Command(inputCommands);//сама команда
+            var command = new Command(inputCommands);//сама команда молодости нашей
 
             if (rxNums.IsMatch(command.Name))
             {
                 //в случае числа показываем игрока
                 var number = int.Parse(command.Name);
-                ShowPlayerByNubmer(chatFinded, number);
+                ShowPlayerByNubmer(chatFinded, command);
                 return;
             }
 
@@ -101,6 +101,16 @@ namespace Aviators
             }
 
             //ProcessCommands(chatFinded, fromId);            
+        }
+
+        public async void ContinueCommand(Chat chatFinded, int msgid)
+        {
+            var command = chatFinded.WaitingCommands.FirstOrDefault(m => m.Message.MessageId == msgid);
+            if(command == null) return;
+
+            var statistic = GetPlayerStatistic(command.Name).Replace("*","");
+
+            await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
         }
 
         private async void ProcessCommands(Chat chatFinded, int fromId)
@@ -285,11 +295,14 @@ namespace Aviators
             chatFinded.RemoveMode = false;
             DB.RemovePlayerByNumber(number);
             await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
-            ShowPlayerByNubmer(chatFinded, number);
+            //ShowPlayerByNubmer(chatFinded, number);
         }
 
-        private async void ShowPlayerByNubmer(Chat chatFinded, int playerNumber)
+        private async void ShowPlayerByNubmer(Chat chatFinded, Command command)
         {
+            var playerNumber = int.Parse(command.Name);
+
+
             if (playerNumber < 0 || playerNumber > 100)
             {
                 await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный формат, введите корректный номер игрока от 0 до 100.");
@@ -315,7 +328,13 @@ namespace Aviators
                     {
                         var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
                             (new StreamReader(photopath)).BaseStream);
-                        await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+
+                        var button  = new InlineKeyboardButton("Статистика");
+                        var keyboard = new InlineKeyboardMarkup(new[]{new[] { button }});
+
+                        Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup:keyboard);
+                        command.Message = mes;
+                        chatFinded.WaitingCommands.Add(command);
                     }
                     else
                     {
@@ -410,7 +429,7 @@ namespace Aviators
             await Bot.SendTextMessageAsync(chatFinded.Id, help, false, false, 0, keys);
         }
 
-        private async void PlayerStatistic(Chat chatFinded, string arg)
+        private string GetPlayerStatistic(string arg)
         {
             string result = "Игрок не найден";
             Player player;
@@ -439,7 +458,11 @@ namespace Aviators
                 result += String.Format("{0, 0} {1, 15}\n", "Штраф:", player.Shtraf);
                 result += String.Format("{0, 0} {1, 23}\n", "+/-:", player.PlusMinus);
             }
-
+            return result;
+        }
+        private async void PlayerStatistic(Chat chatFinded, string arg)
+        {
+            var result = GetPlayerStatistic(arg);
             await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
         }
 
@@ -504,6 +527,8 @@ namespace Aviators
             await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я расписание",parseMode: ParseMode.Markdown);
         }
         #endregion
+
+       
     }
 
     public class Command
@@ -511,6 +536,8 @@ namespace Aviators
         public string Name { get; set; }
         public string Argument => ListArguments.FirstOrDefault();
         public List<string> ListArguments { get; set; }
+
+        public Message Message { get; set; }
 
         public Command(string[] input)
         {

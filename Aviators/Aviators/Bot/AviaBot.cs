@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using Telegram.Bot;
 using Aviators.Configs;
@@ -12,7 +13,6 @@ namespace Aviators.Bot
         private static string Username;
         private static CommandProcessor Commands;
 
-        public static readonly List<Player> Players = new List<Player>();
         public static readonly List<Chat> Chats = new List<Chat>();
 
         public static bool End = true;
@@ -42,11 +42,6 @@ namespace Aviators.Bot
 
             Console.WriteLine("StopReceiving...");
             Bot.StopReceiving();
-        }
-
-        private static void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
-        {
-            //var id = e.CallbackQuery.Id;
         }
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)
@@ -80,5 +75,24 @@ namespace Aviators.Bot
                 Console.WriteLine("Unknown Commands.FindCommand exceprion: " + ex.Message);
             }
         }
+
+        private static void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
+        {
+            Console.WriteLine("Incoming callback from: " + e.CallbackQuery.From);
+
+            int msgid = Convert.ToInt32(e.CallbackQuery.InlineMessageId);
+
+            var chatFinded = Chats.FindLast(chat => chat.WaitingCommands.Any(c=>c.Message.MessageId == e.CallbackQuery.Message.MessageId));
+            if (chatFinded == null)
+            {
+                Console.WriteLine("Cannot find chst for this command: " + e.CallbackQuery.Message);
+
+            }
+            else
+            {
+                Commands.ContinueCommand(chatFinded, e.CallbackQuery.Message.MessageId);
+            }
+        }
+
     }
 }
