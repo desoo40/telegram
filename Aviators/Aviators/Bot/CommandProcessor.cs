@@ -430,7 +430,7 @@ namespace Aviators
             await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
         }
 
-        private async void Top(Chat chatFinded, Top type) // говнокодище Дениса
+        private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
             string result = "";
             var points = 0;
