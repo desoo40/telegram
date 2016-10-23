@@ -359,7 +359,7 @@ namespace HockeyBot
             return players;
         }
 
-        private Player GetPlayerByNameOrSurname(string nameOrSurname)
+        public Player GetPlayerByNameOrSurname(string nameOrSurname)
         {
             SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText =$"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'";
@@ -428,11 +428,12 @@ namespace HockeyBot
 
             Console.WriteLine("FillPlayersFromFile");
             db.LoadPlayersFromFile();
-            Console.WriteLine("FillTeamsFromFile");
-            db.LoadTeamsFromFile();
 
-            Console.WriteLine("FillGamesFromFile");
-            db.LoadGamesFromFile();
+            //Console.WriteLine("FillTeamsFromFile");
+            //db.LoadTeamsFromFile();
+
+            //Console.WriteLine("FillGamesFromFile");
+            //db.LoadGamesFromFile();
 
             db.Disconnect();
             Console.WriteLine("Finish Initialization");

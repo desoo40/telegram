@@ -25,5 +25,57 @@ namespace HockeyBot
                 }
             }
         }
+        static void Commands()
+        {
+            if (command == "бомбардиры")
+            {
+                chatFinded.Stat.Bomb = true;
+                if (isLastCommand)
+                {
+                    TourAnswer(chatFinded);
+                }
+                continue;
+            }
+
+            if (command == "снайперы")
+            {
+                chatFinded.Stat.Snip = true;
+                if (isLastCommand)
+                {
+                    TourAnswer(chatFinded);
+                }
+                continue;
+            }
+
+            if (command == "асистенты")
+            {
+                chatFinded.Stat.Asist = true;
+                if (isLastCommand)
+                {
+                    TourAnswer(chatFinded);
+                }
+                continue;
+            }
+
+            if (command == "штрафники")
+            {
+                chatFinded.Stat.BadBoy = true;
+                if (isLastCommand)
+                {
+                    TourAnswer(chatFinded);
+                }
+                continue;
+            }
+
+            if (command == "полезность")
+            {
+                chatFinded.Stat.Usefull = true;
+                if (isLastCommand)
+                {
+                    TourAnswer(chatFinded);
+                }
+                continue;
+            }
+        }
     }
 }

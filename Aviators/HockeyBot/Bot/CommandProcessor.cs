@@ -24,9 +24,23 @@ namespace HockeyBot
             DB = new DBCore();
         }
 
-        public void FindCommands(string msg, Chat chatFinded, int fromId)
+        public async void FindCommands(string msg, Chat chatFinded, int fromId)
         {
             var commands = msg.Split(' ');
+
+            if(commands.Length > 10)
+            {
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Сорри, но мне лень обрабатывать столько команд.");
+                return;
+            }
+
+            if(chatFinded.CommandsQueue.Count > 20)
+            {
+                Console.WriteLine("Too bug queue. Reset it.");
+                chatFinded.CommandsQueue.Clear();
+                return;
+            }
+
             foreach (var command in commands)
             {
                 chatFinded.CommandsQueue.Enqueue(command);
@@ -86,56 +100,6 @@ namespace HockeyBot
                     if (isLastCommand)
                     {
                         await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер или фамилию игрока"); // рассмотреть возможность однофамильцев
-                    }
-                    continue;
-                }
-
-                if (command == "бомбардиры")
-                {
-                    chatFinded.Stat.Bomb = true;
-                    if (isLastCommand)
-                    {
-                        TourAnswer(chatFinded);
-                    }
-                    continue;
-                }
-
-                if (command == "снайперы")
-                {
-                    chatFinded.Stat.Snip = true;
-                    if (isLastCommand)
-                    {
-                        TourAnswer(chatFinded);
-                    }
-                    continue;
-                }
-                
-                if (command == "асистенты")
-                {
-                    chatFinded.Stat.Asist = true;
-                    if (isLastCommand)
-                    {
-                        TourAnswer(chatFinded);
-                    }
-                    continue;
-                }
-
-                if (command == "штрафники")
-                {
-                    chatFinded.Stat.BadBoy = true;
-                    if (isLastCommand)
-                    {
-                        TourAnswer(chatFinded);
-                    }
-                    continue;
-                }
-
-                if (command == "полезность")
-                {
-                    chatFinded.Stat.Usefull = true;
-                    if (isLastCommand)
-                    {
-                        TourAnswer(chatFinded);
                     }
                     continue;
                 }
@@ -201,21 +165,16 @@ namespace HockeyBot
                     Help(chatFinded);
                     continue;
                 }
-                if (command == "расписание")
+                if (command == "игра")
                 {
-                    TimeTable(chatFinded, 0);
+                    Game(chatFinded);
                     continue;
                 }
-                if (command == "следующая")
+                if (command == "треня")
                 {
-                    NextGame(chatFinded);
+                    Training(chatFinded);
                     continue;
-                }
-                if (command == "соперник")
-                {
-                    EnemyTeam(chatFinded, "соперник");
-                    continue;
-                }
+                }                
                 if (command == "кричалки")
                 {
                     Slogans(chatFinded);
@@ -239,8 +198,20 @@ namespace HockeyBot
                     }
                 }
 
-                //иначе пользователь ввёл хуйню
-                WrongCmd(chatFinded);
+                if (isLastCommand)
+                {
+                    //в случае букв ищем по имени или фамилии 
+                    try
+                    {
+                        ShowPlayerByNameOrSurname(chatFinded, command);
+                        continue;
+                    }
+                    catch (Exception ex)
+                    {
+                        ExceptionOnCmd(chatFinded, ex);
+                        continue;
+                    }
+                }                
             }
         }
 
@@ -364,24 +335,58 @@ namespace HockeyBot
             }
         }
 
+        private async void ShowPlayerByNameOrSurname(Chat chatFinded, string nameOrSurname)
+        {
+            try
+            {
+                var player = DB.GetPlayerByNameOrSurname(nameOrSurname);
+                if (player == null)
+                {
+                    //иначе пользователь ввёл хуйню
+                    WrongCmd(chatFinded);
+                    return;
+                }
+                else
+                {
+                    var playerDescription = Gen.GetPlayerDescr();
+                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}";
+
+                    var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
+
+                    Console.WriteLine($"Send player:{player.Surname}");
+                    if (File.Exists(photopath))
+                    {
+                        var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
+                            (new StreamReader(photopath)).BaseStream);
+                        await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+                    }
+                    else
+                    {
+                        Console.WriteLine($"Photo file {photopath} not found.");
+                        await Bot.SendTextMessageAsync(chatFinded.Id, playerDescription);
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать.");
+            }
+        }
+
         private async void Slogans(Chat chatFinded)
         {
             await Bot.SendTextMessageAsync(chatFinded.Id, Gen.GetSlogan());
         }
 
-        private async void EnemyTeam(Chat chatFinded, string team)
+        private async void Game(Chat chatFinded)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я соперник");
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я ближайшая игра");
         }
 
-        private async void NextGame(Chat chatFinded)
+        private async void Training(Chat chatFinded)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я следующая игра");
-        }
-
-        private async void TimeTable(Chat chatFinded, int n)
-        {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я расписание");
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, мы тренировки");
         }
 
         private async void StatisticByNumber(Chat chatFinded, int number)
