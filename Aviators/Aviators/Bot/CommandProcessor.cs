@@ -306,7 +306,11 @@ namespace Aviators
                 else
                 {
                     var playerDescription = Gen.GetPlayerDescr();
-                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}";
+                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}\n\n" +
+                                         $"{player.Position}\n\n" +
+                                         $"VK: {player.VK}\n" +
+                                         $"Inst: {player.INSTA}";
+
 
                     var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
 
