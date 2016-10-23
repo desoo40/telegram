@@ -39,7 +39,7 @@ namespace Aviators
             if (rxNums.IsMatch(command.Name))
             {
                 //в случае числа показываем игрока
-                var number = int.Parse(command.Argument);
+                var number = int.Parse(command.Name);
                 ShowPlayerByNubmer(chatFinded, number);
                 return;
             }
@@ -474,7 +474,7 @@ namespace Aviators
             {
             }
 
-            result = String.Format("Топ 5 *{0}* ХК \"Авиаторы\":\n\n", args.Arg);
+            //result = String.Format("Топ 5 *{0}* ХК \"Авиаторы\":\n\n", args.Arg);
 
             foreach (var topPlayer in topPlayers)
             {

@@ -12,6 +12,8 @@ namespace Aviators
         public string Surname { get; set; }
         public string PhotoFile { get; set; }
         public string Position { get; set; }
+        public string VK { get; set; }
+        public string INSTA { get; set; }
 
         public List<GameAction> Actions { get; set; }
 
