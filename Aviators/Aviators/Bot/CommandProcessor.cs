@@ -34,9 +34,15 @@ namespace Aviators
         {
             var inputCommands = msg.Split(' ');
 
-
             var command = new Command(inputCommands);//сама команда
-             //аргумент
+
+            if (rxNums.IsMatch(command.Name))
+            {
+                //в случае числа показываем игрока
+                var number = int.Parse(command.Argument);
+                ShowPlayerByNubmer(chatFinded, number);
+                return;
+            }
 
             switch (command.Name)
             {
@@ -52,6 +58,7 @@ namespace Aviators
                     }
                     else
                     {
+                        TourAnswer(chatFinded);
                         //chatFinded.PersonalStatMode = true;
                         //if (isLastCommand)
                         // {
@@ -202,34 +209,40 @@ namespace Aviators
         {
             var tours = DB.GetTournaments();
 
-            var rowCount = tours.Count % 2 == 0 ? tours.Count / 2 : tours.Count / 2 + 1;
+            var rowCount = tours.Count%2 == 0 ? tours.Count/2 : tours.Count/2 + 1;
             ++rowCount; // ибо "официальные" и "все"
 
-            var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-            {
-                Keyboard = new Telegram.Bot.Types.KeyboardButton[rowCount][],
-                OneTimeKeyboard = true
-            };
+            var keys2 = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup();
+            keys2.InlineKeyboard = new InlineKeyboardButton[1][];
+            keys2.InlineKeyboard[0] = new InlineKeyboardButton[1];
+            keys2.InlineKeyboard[0][0] = new InlineKeyboardButton("ГОГОУ!");
 
-            
-            keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Все"),
-                                                                          new Telegram.Bot.Types.KeyboardButton("Официальные") }; // помнить о слешах
-            for (var i = 0; i < tours.Count; ++i)
-            {
-                var row = i/2 + 1;
-                var column = i % 2;
 
-                if (keys.Keyboard[row] == null)
-                {
-                    var isLast = (tours.Count - i - 1 == 0);
-                    var c = isLast ? 1 : 2;
+            //var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+            //    {
+            //        Keyboard = new Telegram.Bot.Types.KeyboardButton[rowCount][],
+            //        OneTimeKeyboard = true
+            //    };
 
-                    keys.Keyboard[row] = new KeyboardButton[c]; 
-                }
-                keys.Keyboard[row][column] = new KeyboardButton(chatFinded.Id > 0 ? tours[i].Name : "/" + tours[i].Name);
-            }
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Выберете турнир:", false, false, 0, keys);
+            //    keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Все"),
+            //                                                                  new Telegram.Bot.Types.KeyboardButton("Официальные") }; // помнить о слешах
+            //    for (var i = 0; i < tours.Count; ++i)
+            //    {
+            //        var row = i/2 + 1;
+            //        var column = i % 2;
+
+            //        if (keys.Keyboard[row] == null)
+            //        {
+            //            var isLast = (tours.Count - i - 1 == 0);
+            //            var c = isLast ? 1 : 2;
+
+            //            keys.Keyboard[row] = new KeyboardButton[c]; 
+            //        }
+            //        keys.Keyboard[row][column] = new KeyboardButton(chatFinded.Id > 0 ? tours[i].Name : "/" + tours[i].Name);
+            //    }
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Выберете турнир:", false, false, 0, keys2);
         }
 
         private async void WrongCmd(Chat chatFinded)

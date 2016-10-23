@@ -27,9 +27,10 @@ namespace Aviators.Bot
             Console.WriteLine("Press ctrl+c to kill me.");
 
             Bot.OnMessage += Bot_OnMessage;
+            Bot.OnCallbackQuery += Bot_OnCallbackQuery;
             AviaBot.Username = me.Username;
 
-            Console.WriteLine("StartReceiving...");
+            Console.WriteLine("StartReceiving..."); 
             Bot.StartReceiving();
 
             while (End)
@@ -41,6 +42,11 @@ namespace Aviators.Bot
 
             Console.WriteLine("StopReceiving...");
             Bot.StopReceiving();
+        }
+
+        private static void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
+        {
+            //var id = e.CallbackQuery.Id;
         }
 
         private static async void Bot_OnMessage(object sender, Telegram.Bot.Args.MessageEventArgs e)

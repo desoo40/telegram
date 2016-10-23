@@ -125,10 +125,16 @@ namespace Aviators
             foreach (var player in players)
             {
                 var playerinfo = player.Split(';');
+                if (playerinfo.Length < 5)
+                {
+                    Console.WriteLine(playerinfo + " - неверный формат сторки");
+                    continue;
+                }
 
                 SqliteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname, lastname_lower) VALUES({0}, '{1}', '{2}', '{3}')",
-                    playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim(), playerinfo[1].Trim().ToLower());
+                cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname, lastname_lower,position_id,vk_href,insta_href) " +
+                                                "VALUES({0}, '{1}', '{2}', '{3}', (select ID from position_dic where name = '{4}'), '{5}','{6}')",
+                    playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim(), playerinfo[1].Trim().ToLower(), playerinfo[3],playerinfo[4], playerinfo[5]);
 
                 try
                 {
