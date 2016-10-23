@@ -26,6 +26,6 @@
 28;Флотский;Артём;Нападающий;vk.com/id128000542;-;
 1;Черненков;Николай;Вратарь;vk.com/gofcsmgo;instagram.com/kolka20;;
 11;Шрейдер;Вадим;Нападающий;vk.com/dynamik282;instagram.com/shreyder11;
-100;Данилин;Алексей;Руководитель;vk.com/id345386;instagram.com/alexdanni;
+100;Данилин;Алексей;Тренер;vk.com/id345386;instagram.com/alexdanni;
 71;Ружицкий;Илья;Нападающий;vk.com/ruzhik99;instagram.com/mr.ilya_1771;
 4;Морозов;Евгений;Защитник;vk.com/pekin29;-;
