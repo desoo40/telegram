@@ -320,11 +320,7 @@ namespace HockeyBot
             }
             return player;
         }
-        public Player GetPlayerStatisticByNameOrSurname(string nameOrSurname)
-        {
-            var player = GetPlayerByNameOrSurname(nameOrSurname);
-            return GetPlayerStatistic(player);
-        }
+
         public Player GetPlayerStatisticByNumber(int number)
         {
             var player = GetPlayerByNumber(number);
@@ -359,8 +355,10 @@ namespace HockeyBot
             return players;
         }
 
-        public Player GetPlayerByNameOrSurname(string nameOrSurname)
+        public List<Player> GetPlayersByNameOrSurname(string nameOrSurname)
         {
+            var players = new List<Player>();
+
             SqliteCommand cmd = conn.CreateCommand();
             cmd.CommandText =$"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'";
 
@@ -375,12 +373,15 @@ namespace HockeyBot
             }
             while (reader.Read())
             {
-                var player = new Player(Convert.ToInt32(reader["number"].ToString()), reader["name"].ToString(),
+                var player = new Player(
+                    Convert.ToInt32(reader["number"].ToString()), 
+                    reader["name"].ToString(),
                     reader["lastname"].ToString());
                 player.Id = Convert.ToInt32(reader["id"].ToString());
-                return player;
+                players.Add(player);
             }
-            return null;
+
+            return players;
         }
 
         public void AddPlayer(Player player)

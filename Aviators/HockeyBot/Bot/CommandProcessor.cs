@@ -99,7 +99,7 @@ namespace HockeyBot
                     chatFinded.PersonalStatMode = true;
                     if (isLastCommand)
                     {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер или фамилию игрока"); // рассмотреть возможность однофамильцев
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер игрока");
                     }
                     continue;
                 }
@@ -135,20 +135,6 @@ namespace HockeyBot
                         {
                             var number = int.Parse(command);
                             StatisticByNumber(chatFinded, number);
-                            continue;
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionOnCmd(chatFinded, ex);
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        //в случае букв ищем по имени или фамилии
-                        try
-                        {
-                            StatisticByNameOrSurname(chatFinded, command);
                             continue;
                         }
                         catch (Exception ex)
@@ -203,7 +189,7 @@ namespace HockeyBot
                     //в случае букв ищем по имени или фамилии 
                     try
                     {
-                        ShowPlayerByNameOrSurname(chatFinded, command);
+                        ShowPlayersByNameOrSurname(chatFinded, command);
                         continue;
                     }
                     catch (Exception ex)
@@ -213,40 +199,6 @@ namespace HockeyBot
                     }
                 }                
             }
-        }
-
-        private async void TourAnswer(Chat chatFinded)
-        {
-            var tours = DB.GetTournaments();
-
-            var rowCount = tours.Length % 2 == 0 ? tours.Length / 2 : tours.Length / 2 + 1;
-            ++rowCount; // ибо "официальные" и "все"
-
-            var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-            {
-                Keyboard = new Telegram.Bot.Types.KeyboardButton[rowCount][],
-                OneTimeKeyboard = true
-            };
-
-            
-            keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Все"),
-                                                                          new Telegram.Bot.Types.KeyboardButton("Официальные") }; // помнить о слешах
-            for (var i = 0; i < tours.Length; ++i)
-            {
-                var row = i/2 + 1;
-                var column = i % 2;
-
-                if (keys.Keyboard[row] == null)
-                {
-                    var isLast = (tours.Length - i - 1 == 0);
-                    var c = isLast ? 1 : 2;
-
-                    keys.Keyboard[row] = new KeyboardButton[c]; 
-                }
-                keys.Keyboard[row][column] = new KeyboardButton(chatFinded.Id > 0 ? tours[i] : "/" + tours[i]);
-            }
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Выберете турнир:", false, false, 0, keys);
         }
 
         private async void WrongCmd(Chat chatFinded)
@@ -335,12 +287,12 @@ namespace HockeyBot
             }
         }
 
-        private async void ShowPlayerByNameOrSurname(Chat chatFinded, string nameOrSurname)
+        private async void ShowPlayersByNameOrSurname(Chat chatFinded, string nameOrSurname)
         {
             try
             {
-                var player = DB.GetPlayerByNameOrSurname(nameOrSurname);
-                if (player == null)
+                var players = DB.GetPlayersByNameOrSurname(nameOrSurname);
+                if (players.Count == 0)
                 {
                     //иначе пользователь ввёл хуйню
                     WrongCmd(chatFinded);
@@ -348,22 +300,30 @@ namespace HockeyBot
                 }
                 else
                 {
-                    var playerDescription = Gen.GetPlayerDescr();
-                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}";
-
-                    var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
-
-                    Console.WriteLine($"Send player:{player.Surname}");
-                    if (File.Exists(photopath))
+                    if(players.Count > 1)
                     {
-                        var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                            (new StreamReader(photopath)).BaseStream);
-                        await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "По вашему запросу найдено несколько игроков, сейчас их покажу.");
                     }
-                    else
+
+                    foreach (var player in players)
                     {
-                        Console.WriteLine($"Photo file {photopath} not found.");
-                        await Bot.SendTextMessageAsync(chatFinded.Id, playerDescription);
+                        var playerDescription = Gen.GetPlayerDescr();
+                        playerDescription += $"#{player.Number} {player.Name} {player.Surname}";
+
+                        var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
+
+                        Console.WriteLine($"Send player:{player.Surname}");
+                        if (File.Exists(photopath))
+                        {
+                            var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
+                                (new StreamReader(photopath)).BaseStream);
+                            await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+                        }
+                        else
+                        {
+                            Console.WriteLine($"Photo file {photopath} not found.");
+                            await Bot.SendTextMessageAsync(chatFinded.Id, playerDescription);
+                        }
                     }
                 }
             }
@@ -402,69 +362,40 @@ namespace HockeyBot
             await Bot.SendTextMessageAsync(chatFinded.Id, result);
         }
 
-        private async void StatisticByNameOrSurname(Chat chatFinded, string nameOrSurname)
-        {
-            chatFinded.PersonalStatMode = false;
-            var result = "Игрок не найден";
-            var player = DB.GetPlayerStatisticByNameOrSurname(nameOrSurname);
-            if (player != null)
-            {
-                result = $"{player.Surname} забросил {player.Goals} шайб";
-            }
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, result);
-        }
-
         private async void Help(Chat chatFinded)
         {
             var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
-            keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[4][];
+            keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[3][];
             keys.OneTimeKeyboard = true;
 
             var p = DB.GetAllPlayerWitoutStatistic();
             var n = p[(new Random()).Next(p.Count - 1)].Number;
 
-            if (chatFinded.Id > 0)
-            {
-                keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("" + n), new Telegram.Bot.Types.KeyboardButton("Статистика") };
-                keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Расписание"), new Telegram.Bot.Types.KeyboardButton("Следующая") };
-                keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Соперник"), new Telegram.Bot.Types.KeyboardButton("Кричалки") };
-                keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("Помощь") };
-            }
-            else
-            {
-                keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/" + n), new Telegram.Bot.Types.KeyboardButton("/статистика") };
-                keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/расписание"), new Telegram.Bot.Types.KeyboardButton("/следующая") };
-                keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/соперник"), new Telegram.Bot.Types.KeyboardButton("/кричалки") };
-                keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
-            }
+            keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] {
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + n),
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "статистика") };
+            keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] {
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "треня"),
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "игра") };
+            keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] {
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "кричалки"),
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "помощь") };
 
-            var help = 
+            var help =
 @"Управляй мною:
-(в личке можно без /)
 
-'%номер%' - поиск игрока по номеру
+'%номер%' 
+'имя'
+'фамилия' - поиск игрока
 
-/статистика '№'|'фамилия' игрока
+/треня - встречи на неделе
+/игра
 
-/бомбардиры
-/снайперы
-/асистенты
-/штрафники
-/полезность (+/- показатель)
+/статистика '№'|'фамилия'
 
-- топ игроков команды по параметрам
+/кричалки для бодрости духа!
 
-
-/расписание 'n' ближайших n игр
-
-/следующая игра: дата, время, соперник и место
-
-/соперник 'команда' - история встреч
-
-/кричалки - выводит одну из кричалок команды
-
-/помощь - помощь по управлению";
+/помощь";
 
             help = help.Replace("'%номер%'", $"{n}");
 
