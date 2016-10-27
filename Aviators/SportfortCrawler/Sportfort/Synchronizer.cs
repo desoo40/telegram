@@ -12,7 +12,18 @@ namespace SportfortCrawler
         public static readonly string UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36";
         public static void InitializateSources()
         {
-            var members = TeamMembersPageParser.ParseTeamMembersPage(Configs.Config.SportFortTeamMembersPage);
+            PageParsers.Initializate();
+            //InitializatePlayersInfo();
+            InitializateGamesTrainingInfo();
+        }
+        public static void InitializateGamesTrainingInfo()
+        {
+            var events = PageParsers.ParseHomePage(Configs.Config.SportFortHomePage);
+        }
+
+        public static void InitializatePlayersInfo()
+        {
+            var members = PageParsers.ParseTeamMembersPage(Configs.Config.SportFortTeamMembersPage);
             var players = "";
             foreach (var member in members)
             {
@@ -39,9 +50,9 @@ namespace SportfortCrawler
                 {
                     try
                     {
-                            web.DownloadFile(photoUrl, Path.Combine(Configs.Config.DBPlayersPhotoDirPath, $"{number}_{surname.ToLower()}.jpg"));
+                        web.DownloadFile(photoUrl, Path.Combine(Configs.Config.DBPlayersPhotoDirPath, $"{number}_{surname.ToLower()}.jpg"));
                     }
-                    catch(Exception ex)
+                    catch (Exception ex)
                     {
                         Console.WriteLine("Can't download photo of member: " + ex.Message + "\n" + ex.InnerException);
                     }
@@ -52,6 +63,7 @@ namespace SportfortCrawler
                 stream.Write(players);
             }
         }
+
         public static void UpdateSources()
         {
 
