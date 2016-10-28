@@ -114,150 +114,6 @@ namespace HockeyBot
             return null;
         }
 
-
-
-        #region Import
-
-        public void LoadPlayersFromFile()
-        {
-            var players = File.ReadAllLines(Config.DBPlayersInfoPath);
-
-            foreach (var player in players)
-            {
-                var playerinfo = player.Split(';');
-
-                SqliteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname, lastname_lower) VALUES({0}, '{1}', '{2}', '{3}')",
-                    playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim(), playerinfo[1].Trim().ToLower());
-
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                }
-                catch (SqliteException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
-        }
-
-        public void LoadTeamsFromFile()
-        {
-            var teams = File.ReadAllText(Config.DBTeamsInfoPath);
-
-            Match m = Regex.Match(teams, "(?<name>.*)\\((?<town>.*)\\)");
-            while (m.Success)
-            {
-                SqliteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = string.Format("INSERT INTO team (name, town, name_lower) VALUES('{0}', '{1}', '{2}')",
-                    m.Groups["name"].ToString().Trim(), m.Groups["town"].ToString().Trim(), m.Groups["name"].ToString().Trim().ToLower());
-
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                }
-                catch (SqliteException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-
-                m = m.NextMatch();
-            }
-        }
-
-        public void LoadGamesFromFile()
-        {
-            var teams = File.ReadAllText(Config.DBGamesInfoPath);
-            teams = teams.Replace("\r", "").Replace("\n", "");
-            var games = teams.Split(new[] {"---"}, StringSplitOptions.RemoveEmptyEntries);
-
-            var players = GetAllPlayerWitoutStatistic();
-
-            var season = games[0];
-            for (int i = 1; i < games.Length; i++)
-            {
-                var game = games[i];
-
-                var gameinfo = game.Split(';');
-
-                Game newgame = new Game();
-                DateTime date = DateTime.Now;
-                DateTime.TryParse(gameinfo[0], CultureInfo.CreateSpecificCulture("ru"), DateTimeStyles.None, out date);
-                newgame.Date = date;
-                newgame.Tournament = gameinfo[1];
-                newgame.Team2 = gameinfo[2];
-                var score = gameinfo[3].Split(':');
-                newgame.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));
-
-                SqliteCommand cmd = conn.CreateCommand();
-                cmd.CommandText = string.Format("INSERT INTO game (date, opteam_id, opteamscore,tournament_id) " +
-                                                "VALUES('{0}',(select ID from team where name_lower = '{1}' )," +
-                                                " {2}, (select ID from tournament where name_lower = '{3}'))",
-                    newgame.Date, newgame.Team2.ToLower(), newgame.Score.Item2, newgame.Tournament);
-
-                try
-                {
-                    cmd.ExecuteNonQuery();
-
-                    cmd.CommandText = @"select last_insert_rowid()";
-                    newgame.Id = Convert.ToInt32((long) cmd.ExecuteScalar());
-                }
-                catch (SqliteException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    continue;
-                }
-
-
-                var goals = gameinfo[4].Split(':')[1];
-                var playergoal = goals.Split(',');
-                foreach (var pg in playergoal)
-                {
-                    string name;
-                    var num = 1;
-
-                    Regex re = new Regex(@"(?<name>.*)\((?<num>\d+)\)");
-                    if (re.IsMatch(pg))
-                    {
-                        var m = re.Match(pg);
-                        name = m.Groups["name"].ToString().Trim();
-                        num = Convert.ToInt32(m.Groups["num"].ToString());
-                    }
-                    else
-                    {
-                        name = pg.Trim();
-                    }
-
-                    var player = players.Find(p => p.Surname == name);
-                    if (player == null) continue;
-
-                    for (int j = 0; j < num; j++)
-                    {
-                        AddAction(newgame.Id, player.Id, Action.Гол);
-                    }
-                }
-            }
-        }
-
-        #endregion
-
-
-        private void AddAction(int newgameId, int playerId, Action action)
-        {
-            SqliteCommand cmd = conn.CreateCommand();
-            cmd.CommandText = string.Format("INSERT INTO game_action (game_id, player_id, action) VALUES({0}, {1}, {2})",
-                newgameId, playerId, (int)action);
-
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
         public List<Player> GetAllPlayerWitoutStatistic()
         {
             SqliteCommand cmd = conn.CreateCommand();
@@ -282,42 +138,14 @@ namespace HockeyBot
 
                 var player = new Player(number, name, lastname);
                 player.Id = Convert.ToInt32(reader["id"].ToString());
-                player.Position = reader["position_id"].ToString();
+                player.Position = reader["position"].ToString();
                 players.Add(player);
             }
             return players;
         }
 
-        public string[] GetTournaments()
-        {
-            return new[] {"товарняки епто"};
-        }
-
         public Player GetPlayerStatistic(Player player)
-        {
-            if (player == null) return null;
-
-            SqliteCommand cmd = conn.CreateCommand();
-            cmd.CommandText = "SELECT * FROM game_action WHERE player_id = " + player.Id;
-
-            SqliteDataReader reader = null;
-            try
-            {
-                reader = cmd.ExecuteReader();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            //var playeractions = new List<GameAction>();
-            while (reader.Read())
-            {
-                var game = reader["game_id"].ToString();
-                var action = (Action) Convert.ToInt32(reader["action"].ToString());
-                var gameaction  = new GameAction(player, game, action);
-
-                player.Actions.Add(gameaction);
-            }
+        {                       
             return player;
         }
 
@@ -325,14 +153,14 @@ namespace HockeyBot
         {
             var player = GetPlayerByNumber(number);
             return GetPlayerStatistic(player);
-        }
+        }       
 
-        public List<Player> GetTopPlayers(int input)
+        public List<HockeyBot.Event> GetEventsByType(string type)
         {
+            var events = new List<HockeyBot.Event>();
+
             SqliteCommand cmd = conn.CreateCommand();
-            cmd.CommandText =
-                "SELECT  player_id , count(*) AS num FROM game_action GROUP BY player_id ORDER BY num DESC LIMIT " +
-                input;
+            cmd.CommandText = $"SELECT * FROM event WHERE type = '{type}'";
 
             SqliteDataReader reader = null;
             try
@@ -343,16 +171,22 @@ namespace HockeyBot
             {
                 Console.WriteLine(ex.Message);
             }
-            
-            List<Player> players = new List<Player>();
             while (reader.Read())
             {
-                var player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
+                var even = new HockeyBot.Event();
+                even.Id = int.Parse(reader["id"].ToString());
+                even.Type = reader["type"].ToString();
+                even.Date = reader["date"].ToString();
+                even.Time = reader["time"].ToString();
+                even.Place = reader["place"].ToString();
+                even.Address = reader["address"].ToString();
+                even.Details = reader["details"].ToString();
+                even.Members = reader["members"].ToString();
 
-                player = GetPlayerStatistic(player);
-                players.Add(player);
+                events.Add(even);
             }
-            return players;
+
+            return events;
         }
 
         public List<Player> GetPlayersByNameOrSurname(string nameOrSurname)
@@ -430,14 +264,96 @@ namespace HockeyBot
             Console.WriteLine("FillPlayersFromFile");
             db.LoadPlayersFromFile();
 
-            //Console.WriteLine("FillTeamsFromFile");
-            //db.LoadTeamsFromFile();
-
-            //Console.WriteLine("FillGamesFromFile");
-            //db.LoadGamesFromFile();
-
+            Console.WriteLine("FillEventsFromFile");
+            db.LoadEventsFromFile();
+                        
             db.Disconnect();
             Console.WriteLine("Finish Initialization");
         }
-}
+
+        #region Import
+
+        public void LoadPlayersFromFile()
+        {
+            var players = File.ReadAllLines(Config.DBPlayersInfoPath);
+
+            foreach (var player in players)
+            {
+                var playerinfo = player.Split(';');
+
+                SqliteCommand cmd = conn.CreateCommand();
+                cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname, lastname_lower) VALUES({0}, '{1}', '{2}', '{3}')",
+                    playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim(), playerinfo[1].Trim().ToLower());
+
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqliteException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+        }
+
+        struct Event
+        {
+            public string type;
+            public string date;
+            public string time;
+            public string place;
+            public string address;
+            public string details;
+            public string be;
+            public string maybe;
+            public string notbe;
+        }
+
+        public void LoadEventsFromFile()
+        {
+
+            var events = File.ReadAllLines(Config.DBEventsInfoPath);
+
+            foreach (var even in events)
+            {
+                var fields = even.Split(';');
+                //type=Игра;date=30 октября;time=11:00;place=Янтарь;address=г.Москва, ул.Маршала Катукова, д.26;details=Сезон 2016-2017 дивизион КБЧ-Восток%Янтарь-2 Wild Woodpeckers%Будут:1 Возможно:1 Не будут:1;be=Игорь Смирнов;maybe=Латохин Дмитрий;notbe=Скалин Петр
+                var ev = new Event();
+                ev.be = "Будут:\n";
+                ev.maybe = "Возможно:\n";
+                ev.notbe = "Не будут:\n";
+                foreach (var field in fields)
+                {
+                    var keyvalue = field.Split('=');
+                    if (keyvalue[0] == "type") ev.type = keyvalue[1];
+                    if (keyvalue[0] == "date") ev.date = keyvalue[1];
+                    if (keyvalue[0] == "time") ev.time = keyvalue[1];
+                    if (keyvalue[0] == "place") ev.place = keyvalue[1];
+                    if (keyvalue[0] == "address") ev.address = keyvalue[1];
+                    if (keyvalue[0] == "details") ev.details = keyvalue[1];
+                    if (keyvalue[0] == "be") ev.be += keyvalue[1] + "\n";
+                    if (keyvalue[0] == "maybe") ev.maybe += keyvalue[1] + "\n";
+                    if (keyvalue[0] == "notbe") ev.notbe += keyvalue[1] + "\n";
+                }
+
+                ev.details = ev.details.Replace('%', '\n');
+
+                    SqliteCommand cmd = conn.CreateCommand();
+                cmd.CommandText = $"INSERT INTO event (type, date, time, place, address, details, members) VALUES('{ev.type}', '{ev.date}', '{ev.time}', '{ev.place}', '{ev.address}', '{ev.details}', '{ev.be + ev.maybe + ev.notbe}')";                
+
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqliteException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+
+            
+        }
+        #endregion
+
+    }
 }

@@ -8,7 +8,10 @@ namespace SportfortCrawler
 {
     public class Event
     {
-        public string Name { get; set; }
-        public List<string> Members { get; set; }
+        public string Type { get; set; }
+        public string Data { get; set; }
+        public List<string> MembersBe { get; set; }
+        public List<string> MembersMayBe { get; set; }
+        public List<string> MembersNotBe { get; set; }
     }
 }

@@ -159,7 +159,7 @@ namespace SportfortCrawler
                 var doc = new HtmlDocument();
                 doc.LoadHtml(view.HTML);
 
-                var games = doc.DocumentNode.SelectNodes("//div[@id='nextGamesBlock']").First();
+                var games = doc.DocumentNode.SelectNodes("//div[@id='nextGamesBlock']")?.First();
                 if (games != null)
                 {
                     var hgames = new HtmlDocument();
@@ -174,6 +174,7 @@ namespace SportfortCrawler
                         if(attr != null && attr.Value == "sf_game sf_text_center" && (i+4) < nodes.Count)
                         {
                             var even = new Event();
+                            even.Type = "Игра";
 
                             var gameData = "";
                             var gameDataSource = (nodes[i].InnerText + nodes[i+4].InnerText).Split('\n');
@@ -185,65 +186,30 @@ namespace SportfortCrawler
                                 }
                                 gameData += data + "\n";
                             }
-                            even.Name += gameData + "________________________\n";
+                            even.Data = gameData;
 
+                            var membersGoBe = nodes[i + 4].Descendants("a").
+                                Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class") && x.Attributes.Contains("title") && x.ParentNode.InnerText.Contains("Будут:")).
+                                Select(x => x.Attributes["title"].Value).ToArray();
+                            var membersGoMayBe = nodes[i + 4].Descendants("a").
+                                Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class") && x.Attributes.Contains("title") && x.ParentNode.InnerText.Contains("Возможно:")).
+                                Select(x => x.Attributes["title"].Value).ToArray();
+                            var membersGoNotBe = nodes[i + 4].Descendants("a").
+                                Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class") && x.Attributes.Contains("title") && x.ParentNode.InnerText.Contains("Не будут:")).
+                                Select(x => x.Attributes["title"].Value).ToArray();
 
-                            //var membersGoData = "";
-                            //var membersGoDataSource = nodes[i+4].InnerText.Split('\n');
-                            //foreach (var data in membersGoDataSource)
-                            //{
-                            //    if (data == null || data == "" || data == " " || data == "?" || data == "&nbsp;" || data.Contains("Распечатать"))
-                            //    {
-                            //        continue;
-                            //    }
-                            //    membersGoData += data + "\n";
-                            //}
-                            //even.Name += membersGoData + "\n";
+                            even.MembersBe = membersGoBe.ToList();
+                            even.MembersMayBe = membersGoMayBe.ToList();
+                            even.MembersNotBe = membersGoNotBe.ToList();
 
                             events.Add(even);
                             i += 4;
                             continue;
                         }
                     }
+                }
 
-                    
-
-                        //var htmlGames = hgames.DocumentNode.Descendants("div").Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class")).Select(x => x.Attributes["class"].Value == "sf_game sf_text_center" ? x.InnerText : null).Where(x => x != null).ToArray();
-                        ////h.DocumentNode.Descendants("div").Select(x => x.Attributes["class"].Value == "sf_game sf_text_center" ? x.InnerText.Trim('\n').Trim() : null)?.ToArray().First(x => x != null);
-                        ////"\n \n\n\n\n\n \n \n \n \n \n \n \n \n \n \n \n \n \n Распечатать состав на игру\n \n Распечатать бланк протокола\n \n \n\n \n \n \n 30 октября, 11:00\n \n \n Янтарь\n \n\n г.Москва, ул.Маршала Катукова, д.26\n\n \n \n \n \n \n Сезон 2016-2017 дивизион КБЧ-Восток\n \n \n \n \n \n \n \n\n \n \n \n \n \n \n \n Янтарь-2\n \n \n \n \n \n?\n?\n\n\n \n \n \n \n \n\n \n \n \n \n \n \n \n Wild Woodpeckers\n \n \n\n\n&nbsp;\n\n \n\n\n\n \n Будут: 10\n \n \n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n\n \n \n \n Возможно: 2\n \n \n \n\n \n\n \n \n \n Не будут: 0\n \n \n \n \n\n\n\n\n\n\n\n\n\n\n\n\n\n "
-                        //var gameData = "";
-                        //foreach (var htmlGame in htmlGames)
-                        //{
-                        //    var gameDataSource = htmlGame.Split('\n');
-                        //    foreach (var data in gameDataSource)
-                        //    {
-                        //        if (data == null || data == "" || data == " " || data == "?" || data == "&nbsp;" || data.Contains("Распечатать"))
-                        //        {
-                        //            continue;
-                        //        }
-                        //        gameData += data + "\n";
-                        //    }
-                        //}
-
-                        //var membersGo = h.DocumentNode.Descendants("div").Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class")).Select(x => x.Attributes["class"].Value == "sf_block_who_go" ? x.InnerText : null).Where(x => x != null).ToArray();
-                        //var membersGoData = "";
-                        //foreach (var memberGo in membersGo)
-                        //{
-                        //    var members = memberGo.Split('\n');
-                        //    foreach (var member in members)
-                        //    {
-                        //        if (member == null || member == "" || member == " " || member == "&nbsp;" || member.Contains("Возможно") || member.Contains("Будет") || member.Contains("Не будет"))
-                        //        {
-                        //            continue;
-                        //        }
-                        //        membersGoData += member + "\n";
-                        //    }
-                        //}
-
-                        //even.Name += gameData + "\n" + membersGoData;
-                    }
-
-                var trains = doc.DocumentNode.SelectNodes("//div[@id='trainingsBlock']").First();
+                var trains = doc.DocumentNode.SelectNodes("//div[@id='trainingsBlock']")?.First();
                 if (trains != null)
                 {
                     var hgames = new HtmlDocument();
@@ -258,6 +224,7 @@ namespace SportfortCrawler
                         if (attr != null && attr.Value == "sf_game sf_text_center" && (i + 2) < nodes.Count)
                         {
                             var even = new Event();
+                            even.Type = "Треня";
 
                             var gameData = "";                            
                             var gameDataSource = (nodes[i].InnerText + "\n" + nodes[i+2].InnerText).Split('\n');
@@ -277,20 +244,21 @@ namespace SportfortCrawler
                                 }
                                 gameData += data + "\n";
                             }
-                            even.Name += gameData + "________________________\n";
+                            even.Data = gameData;
 
+                            var membersGoBe = nodes[i + 2].Descendants("a").
+                                                Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class") && x.Attributes.Contains("title") && x.ParentNode.InnerText.Contains("Будут:")).
+                                                Select(x => x.Attributes["title"].Value).ToArray();
+                            var membersGoMayBe = nodes[i + 2].Descendants("a").
+                                Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class") && x.Attributes.Contains("title") && x.ParentNode.InnerText.Contains("Возможно:")).
+                                Select(x => x.Attributes["title"].Value).ToArray();
+                            var membersGoNotBe = nodes[i + 2].Descendants("a").
+                                Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class") && x.Attributes.Contains("title") && x.ParentNode.InnerText.Contains("Не будут:")).
+                                Select(x => x.Attributes["title"].Value).ToArray();
 
-                            //var membersGoData = "";
-                            //var membersGoDataSource = nodes[i + 2].InnerText.Split('\n');
-                            //foreach (var data in membersGoDataSource)
-                            //{
-                            //    if (data == null || data == "" || data == " " || data == "?" || data == "&nbsp;" || data.Contains("Распечатать"))
-                            //    {
-                            //        continue;
-                            //    }
-                            //    membersGoData += data + "\n";
-                            //}
-                            //even.Name += membersGoData + "\n";
+                            even.MembersBe = membersGoBe.ToList();
+                            even.MembersMayBe = membersGoMayBe.ToList();
+                            even.MembersNotBe = membersGoNotBe.ToList();
 
                             events.Add(even);
                             i += 5;
@@ -299,56 +267,20 @@ namespace SportfortCrawler
                     }
                 }
 
-                //var trainings = doc.DocumentNode.SelectNodes("//div[@id='trainingsBlock']");
-                //if (trainings != null)
-                //{
-                //    foreach (HtmlNode HN in trainings)
-                //    {
-                //        var h = new HtmlDocument();
-                //        var even = new Event();
-                //        h.LoadHtml(HN.InnerHtml);
-
-                //        var htmlTrains = h.DocumentNode.Descendants("div").Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class")).Select(x => x.Attributes["class"].Value == "sf_game sf_text_center" ? x.InnerText : null).Where(x => x != null).ToArray();
-                //        var trainData = "";
-                //        foreach (var htmlTrain in htmlTrains)
-                //        {
-                //            var trainDataSource = htmlTrain.Split('\n');
-                //            foreach (var data in trainDataSource)
-                //            {
-                //                if (data == null || data == "" || data == " " || data == "?" || data == "&nbsp;" || data.Contains("Распечатать"))
-                //                {
-                //                    continue;
-                //                }
-                //                trainData += data + "\n";
-                //            }
-                //        }
-
-                //        var membersGo = h.DocumentNode.Descendants("div").Where(x => x.Attributes.Count > 0 && x.Attributes.Contains("class")).Select(x => x.Attributes["class"].Value == "sf_block_who_go" ? x.InnerText : null).Where(x => x != null).ToArray();
-                //        var membersGoData = "";
-                //        foreach (var memberGo in membersGo)
-                //        {
-                //            var members = memberGo.Split('\n');
-                //            foreach (var member in members)
-                //            {
-                //                if (member == null || member == "" || member == " " || member == "&nbsp;" || member.Contains("Возможно") || member.Contains("Будет") || member.Contains("Не будет"))
-                //                {
-                //                    continue;
-                //                }
-                //                membersGoData += member + "\n";
-                //            }
-                //        }
-
-                //        even.Name += trainData + "\n" + membersGoData + "\n";
-                //        events.Add(even);
-                //    }
-                //}
-
                 using (var stream = new StreamWriter("parsedEvents"))
                 {
                     var result = "";
                     foreach (var even in events)
                     {
-                        result += even.Name + "\n";
+                        result += "----------------\n";
+                        result += even.Type + ":\n";
+                        result += even.Data + "\n";
+                        result += "Будут:\n";
+                        foreach(var member in even.MembersBe) result += member + "\n";
+                        result += "Возможно:\n";
+                        foreach (var member in even.MembersMayBe) result += member + "\n";
+                        result += "Не будут:\n";
+                        foreach (var member in even.MembersNotBe) result += member + "\n";
                     }
 
                     stream.Write(result);

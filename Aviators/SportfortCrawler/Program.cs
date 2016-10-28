@@ -17,9 +17,6 @@ namespace SportfortCrawler
             {
                 Directory.CreateDirectory(Configs.Config.DBPlayersPhotoDirPath);
             }
-
-            //var web = new Thread(new ThreadStart( () => { WebCore.Run(); }));
-            //web.Start();
             
             Synchronizer.InitializateSources();
         }

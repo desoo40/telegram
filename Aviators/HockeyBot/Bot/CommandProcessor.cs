@@ -341,7 +341,32 @@ namespace HockeyBot
 
         private async void Game(Chat chatFinded)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я ближайшая игра");
+            try
+            {
+                var games = DB.GetEventsByType("Игра");
+                if (games.Count == 0)
+                {
+                    await Bot.SendTextMessageAsync(chatFinded.Id, "Ближайших игр не найдено.");
+                    return;
+                }
+                else
+                {
+                    if (games.Count > 1)
+                    {
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "По вашему запросу найдено несколько игр, сейчас их покажу.");
+                    }
+
+                    foreach (var game in games)
+                    {
+                        await Bot.SendTextMessageAsync(chatFinded.Id, $"{game.Date} {game.Time}\n{game.Place}\n\n{game.Address}\n\n{game.Details}\n\n{game.Members}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать.");
+            }
         }
 
         private async void Training(Chat chatFinded)
@@ -356,7 +381,7 @@ namespace HockeyBot
             var player = DB.GetPlayerStatisticByNumber(number);
             if (player != null)
             {
-                result = $"{player.Surname} забросил {player.Goals} шайб";
+                result = "Пока не закодили :(";
             }
 
             await Bot.SendTextMessageAsync(chatFinded.Id, result);
@@ -388,7 +413,7 @@ namespace HockeyBot
 'имя'
 'фамилия' - поиск игрока
 
-/треня - встречи на неделе
+/треня - события
 /игра
 
 /статистика '№'|'фамилия'
