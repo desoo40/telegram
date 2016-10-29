@@ -13,7 +13,7 @@ namespace SportfortCrawler
         public static void InitializateSources()
         {
             PageParsers.Initializate();
-            //InitializatePlayersInfo();
+            InitializatePlayersInfo();
             InitializateGamesTrainingInfo();
         }
         public static void InitializateGamesTrainingInfo()

@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Telegram.Bot.Types;
 
 namespace HockeyBot
 {
@@ -10,39 +11,20 @@ namespace HockeyBot
     {
         public long Id { get; set; }
 
-        public bool WhoMode { get; set; }  = false;
-        public bool PersonalStatMode { get; set; }  = false;
-        public struct Statistic
-        {
-            public bool Bomb;
-            public bool Snip;
-            public bool Asist;
-            public bool BadBoy;
-            public bool Usefull;
-        }
-
-        public Statistic Stat;
-        public bool AddMode { get; set; }  = false;
-        public bool RemoveMode { get; set; }  = false;
+        public bool WhoMode { get; set; } = false;
+        public bool PersonalStatMode { get; set; } = false;
+        public bool AddMode { get; set; } = false;
+        public bool RemoveMode { get; set; } = false;
 
         public Queue<string> CommandsQueue { get; set; } = new Queue<string>();
+        public List<WaitingStatistic> WaitingStatistics { get; set; }
+        public List<WaitingEvent> WaitingEvents { get; set; }
 
         public Chat(long id)
         {
             Id = id;
-            Stat = DefaultStat();
-        }
-
-        private Statistic DefaultStat()
-        {
-            return new Statistic()
-            {
-                Asist = false,
-                BadBoy = false,
-                Bomb = false,
-                Snip = false,
-                Usefull = false
-            };
+            WaitingStatistics = new List<WaitingStatistic>();
+            WaitingEvents = new List<WaitingEvent>();
         }
 
         internal void ResetMode()
@@ -51,8 +33,19 @@ namespace HockeyBot
             PersonalStatMode = false;
             AddMode = false;
             RemoveMode = false;
-            Stat = DefaultStat();
             CommandsQueue.Clear();
         }
+    }
+
+    public class WaitingStatistic
+    {
+        public Message Msg { get; set; }
+        public Player Plr { get; set; }
+    }
+
+    public class WaitingEvent
+    {
+        public Message Msg { get; set; }
+        public Event Even { get; set; }
     }
 }

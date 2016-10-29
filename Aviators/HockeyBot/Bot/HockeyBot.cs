@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Threading;
 using Telegram.Bot;
 using HockeyBot.Configs;
+using System.Linq;
 
 namespace HockeyBot.Bot
 {
@@ -27,6 +28,7 @@ namespace HockeyBot.Bot
             Console.WriteLine("Press ctrl+c to kill me.");
 
             Bot.OnMessage += Bot_OnMessage;
+            Bot.OnCallbackQuery += Bot_OnCallbackQuery;
             HockeyBot.Username = me.Username;
 
             Console.WriteLine("StartReceiving...");
@@ -72,6 +74,33 @@ namespace HockeyBot.Bot
             catch (Exception ex)
             {
                 Console.WriteLine("Unknown Commands.FindCommand exceprion: " + ex.Message);
+            }
+        }
+
+        private static void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
+        {
+            Console.WriteLine("Incoming callback from: " + e.CallbackQuery.From);
+
+            int msgid = Convert.ToInt32(e.CallbackQuery.InlineMessageId);
+
+            var chatFindedStatistic = Chats.FindLast(chat => chat.WaitingStatistics.Any(stat => stat.Msg.MessageId == e.CallbackQuery.Message.MessageId));
+            if (chatFindedStatistic == null)
+            {
+                Console.WriteLine("Cannot find chatFindedStatistic for: " + e.CallbackQuery.Message);
+            }
+            else
+            {
+                Commands.ContinueWaitingPlayerStatistic(chatFindedStatistic, e.CallbackQuery.Message.MessageId);
+            }
+
+            var chatFindedEventMore = Chats.FindLast(chat => chat.WaitingEvents.Any(ev => ev.Msg.MessageId == e.CallbackQuery.Message.MessageId));
+            if (chatFindedEventMore == null)
+            {
+                Console.WriteLine("Cannot find chatFindedEventMore for: " + e.CallbackQuery.Message);
+            }
+            else
+            {
+                Commands.ContinueWaitingEvent(chatFindedEventMore, e.CallbackQuery.Message.MessageId);
             }
         }
     }
