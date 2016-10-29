@@ -19,6 +19,85 @@ namespace SportfortCrawler
         public static void InitializateGamesTrainingInfo()
         {
             var events = PageParsers.ParseHomePage(Configs.Config.SportFortHomePage);
+            var eventsTxt = "";
+
+            foreach(var even in events)
+            {
+                //type= Игра; 
+                var type = even.Type.Trim();
+
+                //date= 30 октября;
+                //time= 11:00;
+                var date = even.Data.Split('\n')[0].Split(',')[0].Trim();
+                var time = even.Data.Split('\n')[0].Split(',')[1].Trim();
+                eventsTxt += $"type={type};date={date};time={time};";
+
+                var other = even.Data.Split('\n');
+                 //дата, время
+                 //Янтарь
+                 //г.Москва, ул.Маршала Катукова, д.26
+                 //Сезон 2016 - 2017 дивизион КБЧ-Восток
+                 //Янтарь - 2
+                 //Wild Woodpeckers
+                 //Будут: 10
+                 //Возможно: 2
+                 //Не будут: 0
+                 //
+                //place= Янтарь;
+                //address= г.Москва, ул.Маршала Катукова, д.26; details = Сезон 2016 - 2017 дивизион КБЧ-Восток % Янтарь - 2 Wild Woodpeckers%% Будут:1 % Возможно:1 % Не будут: 1;
+                for(var i=0; i<other.Length;++i)
+                {
+                    if (other[i] == "") continue;
+                    if (i == 0) continue;
+                    if (i == 1)
+                    {
+                        eventsTxt += $"place={other[i].Trim()};";
+                        continue;
+                    }
+                    if (i == 2)
+                    {
+                        eventsTxt += $"address={other[i].Trim()};details=";
+                        continue;
+                    }
+
+                    if (i == other.Length - 4)
+                    {
+                        eventsTxt += $"%";
+                    }
+
+                    if (i >= other.Length - 4)
+                    {
+                        eventsTxt += $"{other[i].Trim()}%";
+                        continue;
+                    }
+
+                    eventsTxt += $"{other[i].Trim()}%";
+                }
+                eventsTxt += $";";
+                
+                //be= Игорь Смирнов;
+                foreach(var be in even.MembersBe)
+                {
+                    eventsTxt += $"be={be.Trim()};";
+                }
+                //maybe= Латохин Дмитрий;
+                foreach (var be in even.MembersMayBe)
+                {
+                    eventsTxt += $"maybe={be.Trim()};";
+                }
+                //notbe= Скалин Петр
+                foreach (var be in even.MembersNotBe)
+                {
+                    eventsTxt += $"notbe={be.Trim()};";
+                }
+
+                eventsTxt += $"\n";
+            }
+
+            using (var stream = new StreamWriter(Configs.Config.DBEventsInfoPath))
+            {
+                stream.Write(eventsTxt);
+            }
         }
 
         public static void InitializatePlayersInfo()

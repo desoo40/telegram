@@ -319,9 +319,15 @@ namespace HockeyBot
                 var fields = even.Split(';');
                 //type=Игра;date=30 октября;time=11:00;place=Янтарь;address=г.Москва, ул.Маршала Катукова, д.26;details=Сезон 2016-2017 дивизион КБЧ-Восток%Янтарь-2 Wild Woodpeckers%Будут:1 Возможно:1 Не будут:1;be=Игорь Смирнов;maybe=Латохин Дмитрий;notbe=Скалин Петр
                 var ev = new Event();
+                ev.type = "";
+                ev.date = "";
+                ev.time = "";
+                ev.place = "";
+                ev.address = "";
+                ev.details = "";
                 ev.be = "Будут:\n";
-                ev.maybe = "Возможно:\n";
-                ev.notbe = "Не будут:\n";
+                ev.maybe = "\nВозможно:\n";
+                ev.notbe = "\nНе будут:\n";
                 foreach (var field in fields)
                 {
                     var keyvalue = field.Split('=');
@@ -338,7 +344,11 @@ namespace HockeyBot
 
                 ev.details = ev.details.Replace('%', '\n');
 
-                    SqliteCommand cmd = conn.CreateCommand();
+                if (ev.be == "Будут:\n") ev.be = "";
+                if (ev.maybe == "\nВозможно:\n") ev.maybe = "";
+                if (ev.notbe == "\nНе будут:\n") ev.notbe = "";
+
+                SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = $"INSERT INTO event (type, date, time, place, address, details, members) VALUES('{ev.type}', '{ev.date}', '{ev.time}', '{ev.place}', '{ev.address}', '{ev.details}', '{ev.be + ev.maybe + ev.notbe}')";                
 
                 try

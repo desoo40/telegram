@@ -358,7 +358,7 @@ namespace HockeyBot
 
                     foreach (var game in games)
                     {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, $"{game.Date} {game.Time}\n{game.Place}\n\n{game.Address}\n\n{game.Details}\n\n{game.Members}");
+                        await Bot.SendTextMessageAsync(chatFinded.Id, $"{game.Date} {game.Time}\n{game.Place}\n\n{game.Address}\n\n{game.Details}\n{game.Members}");
                     }
                 }
             }
@@ -371,7 +371,27 @@ namespace HockeyBot
 
         private async void Training(Chat chatFinded)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, мы тренировки");
+            try
+            {
+                var games = DB.GetEventsByType("Треня");
+                if (games.Count == 0)
+                {
+                    await Bot.SendTextMessageAsync(chatFinded.Id, "Ближайших трень не найдено.");
+                    return;
+                }
+                else
+                {                   
+                    foreach (var game in games)
+                    {
+                        await Bot.SendTextMessageAsync(chatFinded.Id, $"{game.Date} {game.Time}\n{game.Place}\n\n{game.Address}\n\n{game.Details}\n\n{game.Members}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать.");
+            }
         }
 
         private async void StatisticByNumber(Chat chatFinded, int number)
