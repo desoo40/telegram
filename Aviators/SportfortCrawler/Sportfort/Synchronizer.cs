@@ -9,19 +9,48 @@ namespace SportfortCrawler
 {
     public class Synchronizer
     {
-        public static readonly string UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36";
         public static void InitializateSources()
         {
+            Console.WriteLine("PageParsers.Initializate...");
             PageParsers.Initializate();
-            InitializatePlayersInfo();
-            InitializateGamesTrainingInfo();
+
+            Console.WriteLine("InitializatePlayersInfo...");
+            //InitializatePlayersInfo();
+
+            Console.WriteLine("InitializateGamesTrainingInfo...");
+            //InitializateGamesTrainingInfo();
+
+            Console.WriteLine("InitializateLastGamesInfo...");
+            InitializateLastGamesInfo();
         }
+        public static void InitializateLastGamesInfo()
+        {
+            Console.WriteLine("ParseLastGamesHomePage...");
+            var games = PageParsers.ParseLastGamesHomePage(Configs.Config.SportFortHomePage);
+            var gamesTxt = "";
+
+            Console.WriteLine("Parsed " + games.Count + " games");
+            foreach (var game in games)
+            {
+                gamesTxt += $"{game}\n";
+            }
+
+            if (gamesTxt == "") return;
+
+            using (var stream = new StreamWriter(Configs.Config.DBGamesInfoPath))
+            {
+                stream.Write(gamesTxt);
+            }
+        }
+
         public static void InitializateGamesTrainingInfo()
         {
+            Console.WriteLine("ParseHomePage...");
             var events = PageParsers.ParseHomePage(Configs.Config.SportFortHomePage);
             var eventsTxt = "";
 
-            foreach(var even in events)
+            Console.WriteLine("Parsed " + events.Count + " events");
+            foreach (var even in events)
             {
                 //type= Игра; 
                 var type = even.Type.Trim();
@@ -94,16 +123,22 @@ namespace SportfortCrawler
                 eventsTxt += $"\n";
             }
 
+            if (eventsTxt == "") return;
+
+
             using (var stream = new StreamWriter(Configs.Config.DBEventsInfoPath))
             {
                 stream.Write(eventsTxt);
             }
         }
 
-        public static void InitializatePlayersInfo()
+    public static void InitializatePlayersInfo()
         {
+            Console.WriteLine("ParseTeamMembersPage...");
             var members = PageParsers.ParseTeamMembersPage(Configs.Config.SportFortTeamMembersPage);
             var players = "";
+
+            Console.WriteLine("Parsed " + members.Count + " members");
             foreach (var member in members)
             {
                 Console.WriteLine(member);
@@ -137,6 +172,9 @@ namespace SportfortCrawler
                     }
                 }
             }
+
+            if (players == "") return;
+
             using (var stream = new StreamWriter(Configs.Config.DBPlayersInfoPath))
             {
                 stream.Write(players);

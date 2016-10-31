@@ -325,9 +325,9 @@ namespace HockeyBot
                 ev.place = "";
                 ev.address = "";
                 ev.details = "";
-                ev.be = "Будут:\n";
-                ev.maybe = "\nВозможно:\n";
-                ev.notbe = "\nНе будут:\n";
+                ev.be = "*Будут:*\n";
+                ev.maybe = "\n*Возможно:*\n";
+                ev.notbe = "\n*Не будут:*\n";
                 foreach (var field in fields)
                 {
                     var keyvalue = field.Split('=');
@@ -344,9 +344,9 @@ namespace HockeyBot
 
                 ev.details = ev.details.Replace('%', '\n');
 
-                if (ev.be == "Будут:\n") ev.be = "";
-                if (ev.maybe == "\nВозможно:\n") ev.maybe = "";
-                if (ev.notbe == "\nНе будут:\n") ev.notbe = "";
+                if (ev.be == "*Будут:*\n") ev.be = "";
+                if (ev.maybe == "\n*Возможно:*\n") ev.maybe = "";
+                if (ev.notbe == "\n*Не будут:*\n") ev.notbe = "";
 
                 SqliteCommand cmd = conn.CreateCommand();
                 cmd.CommandText = $"INSERT INTO event (type, date, time, place, address, details, members) VALUES('{ev.type}', '{ev.date}', '{ev.time}', '{ev.place}', '{ev.address}', '{ev.details}', '{ev.be + ev.maybe + ev.notbe}')";                

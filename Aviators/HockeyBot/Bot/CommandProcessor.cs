@@ -124,6 +124,11 @@ namespace HockeyBot
                     Help(chatFinded);
                     continue;
                 }
+                if (command == "новости")
+                {
+                    News(chatFinded);
+                    continue;
+                }
                 if (command == "игры")
                 {
                     Game(chatFinded);
@@ -179,7 +184,7 @@ namespace HockeyBot
             var stat = chatFinded.WaitingStatistics.FindLast(x => x.Msg.MessageId == msgid);
             if (stat== null) return;
 
-            var statistic = "Статистика:\n\nПривет! Я Статистика. :)";
+            var statistic = $"*Статистика по #{stat.Plr.Number}:*\n\nПривет! Я - статистика 💥";
 
             await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, stat.Msg.Caption);
             await Bot.SendTextMessageAsync(chatFinded.Id, statistic, parseMode: ParseMode.Markdown);
@@ -194,7 +199,7 @@ namespace HockeyBot
             var more = $"\n\n{even.Even.Address}\n\n{even.Even.Details}";
             var who = $"{even.Even.Members}";
 
-            await Bot.EditMessageTextAsync(chatFinded.Id, msgid, even.Msg.Text + more);
+            await Bot.EditMessageTextAsync(chatFinded.Id, msgid, $"*{even.Msg.Text}*{more}", parseMode: ParseMode.Markdown);
             if (who != "")
             {
                 await Bot.SendTextMessageAsync(chatFinded.Id, who, parseMode: ParseMode.Markdown);
@@ -218,6 +223,26 @@ namespace HockeyBot
             chatFinded.ResetMode();
             Console.WriteLine(ex.Message);
             await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать. Запрос отменён.");
+        }
+
+        private async void News(Chat chatFinded)
+        {
+            var events = File.ReadAllLines(Config.DBGamesInfoPath);
+            var result = "";
+            foreach (var even in events)
+            {
+                result += even.Replace('%', '\n');
+                result += "\n\n";
+            }
+            if (result == "")
+            {
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Нет новостей :(");
+            }
+            else
+            {
+                result = "*Прошедшие игры:*\n\n" + result;
+                await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
+            }
         }
 
         private async void AddPlayer(Chat chatFinded, string argv)
@@ -372,7 +397,7 @@ namespace HockeyBot
                         var button = new InlineKeyboardButton("Подробнее");
                         var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
                                                 
-                        var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"{game.Date} {game.Time}\n{game.Place}", replyMarkup: keyboard);
+                        var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"*{game.Date} {game.Time}*\n{game.Place}", replyMarkup: keyboard);
                         chatFinded.WaitingEvents.Add(new WaitingEvent() { Msg = msg, Even = game });
                     }
                 }
@@ -401,7 +426,7 @@ namespace HockeyBot
                         var button = new InlineKeyboardButton("Подробнее");
                         var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
-                        var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"{game.Date} {game.Time}\n{game.Place}", replyMarkup: keyboard);
+                        var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"*{game.Date} {game.Time}*\n{game.Place}", parseMode: ParseMode.Markdown, replyMarkup: keyboard);
                         chatFinded.WaitingEvents.Add(new WaitingEvent() { Msg = msg, Even = game });
                     }
                 }
@@ -434,12 +459,12 @@ namespace HockeyBot
 
             var p = DB.GetAllPlayerWitoutStatistic();
             var num = p[(new Random()).Next(p.Count - 1)].Number;
-            var name = p[(new Random()).Next(p.Count - 1)].Number;
+            var name = p[(new Random()).Next(p.Count - 1)].Name;
             var surname = p[(new Random()).Next(p.Count - 1)].Surname;
 
             keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] {
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + num),
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + surname) };
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + surname),
+                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "новости") };
             keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] {
                 new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "трени"),
                 new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "игры") };
@@ -448,24 +473,27 @@ namespace HockeyBot
                 new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "помощь") };
 
             var help =
-@"Бот умеет:
+@"*Бот умеет*:
 
-Поискать игрока по
-№|'имени'|'фамилии'
-'%номер%'|'%имя%'|'%фамилия%'
+*Поискать* игрока по
+'%номер%'
+'%имя%'
+'%фамилия%'
 
-Показать
+*Показать*
 /игры
 /трени
 /кричалки
+/новости
+/помощь
 
-/помощь";
+💥Удачи!💥";
 
             help = help.Replace("'%номер%'", $"{num}");
             help = help.Replace("'%имя%'", $"{name}");
             help = help.Replace("'%фамилия%'", $"{surname}");
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, help, false, false, 0, keys);
+            await Bot.SendTextMessageAsync(chatFinded.Id, help, false, false, 0, keys, ParseMode.Markdown);
         }
     }
 }
