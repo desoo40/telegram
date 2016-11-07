@@ -423,5 +423,63 @@ namespace SportfortCrawler
             return events;
         }
 
+        internal static  List<string> ParseStats(string sportFortStat)
+        {
+            var stats = new List<string>();
+
+            Console.WriteLine("Start downloading...");
+            view.SynchronousMessageTimeout = 0;
+            view.Source = new Uri(sportFortStat);
+
+            view.LoadingFrameComplete += (s, e) =>
+            {
+                if (e.IsMainFrame)
+                    finishedLoading = true;
+            };
+
+            while (!finishedLoading)
+            {
+                Console.WriteLine("Currectly Document Ready is " + view.IsDocumentReady);
+                Thread.Sleep(1000);
+                WebCore.Update();
+            }
+
+            finishedLoading = false;
+            Console.WriteLine("Finished");
+            Console.WriteLine("Check view Error: " + view.GetLastError().ToString());
+
+            using (var stream = new StreamWriter("stats"))
+            {
+                stream.Write(view.HTML);
+            }
+
+            var doc = new HtmlDocument();
+            doc.LoadHtml(view.HTML);
+
+            var statTable = doc.DocumentNode.SelectNodes("//*[@id='tournamentContent']/div/table")?.First();
+
+            if (statTable != null)
+            {
+                var hstat = new HtmlDocument();
+                hstat.LoadHtml(statTable.InnerHtml);
+
+                var nodes = hstat.DocumentNode.ChildNodes;
+                for (int i = 0; i < nodes.Count; ++i)
+                {
+                    foreach(var ch in nodes[i].ChildNodes)
+                    {
+                        if(ch.Name == "tr")
+                        {
+                            var txt = ch.InnerText;
+                            if (txt.Contains("Wild Woodpeckers"))
+                                stats.Add(txt);
+                        }
+                    }
+                }
+            }
+
+            return stats;
+        }
+
     }
 }

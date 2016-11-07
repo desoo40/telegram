@@ -21,8 +21,40 @@ namespace SportfortCrawler
             //InitializateGamesTrainingInfo();
 
             Console.WriteLine("InitializateLastGamesInfo...");
-            InitializateLastGamesInfo();
+            //InitializateLastGamesInfo();
+
+            Console.WriteLine("InitializateStatsInfo...");
+            InitializateStatsInfo();
         }
+
+        public static void InitializateStatsInfo()
+        {
+            Console.WriteLine("ParseLastTurnamentStats...");
+            var stats = PageParsers.ParseStats(Configs.Config.SportFortTournamentsStatsPage);
+            var statsTxt = "";
+
+            Console.WriteLine("Parsed " + stats.Count + " stats");
+            foreach (var stat in stats)
+            {
+                var result = "";
+                var ss = stat.Split('\n');
+                foreach(var s in ss)
+                {
+                    if (s != "" && s != " " && !s.Contains("Wild"))
+                        result += s.Trim() + ";";
+                }
+
+                if(result != "") statsTxt += $"{result}\n";
+            }
+
+            if (statsTxt == "") return;
+
+            using (var stream = new StreamWriter(Configs.Config.DBStatsInfoPath))
+            {
+                stream.Write(statsTxt);
+            }
+        }
+
         public static void InitializateLastGamesInfo()
         {
             Console.WriteLine("ParseLastGamesHomePage...");
