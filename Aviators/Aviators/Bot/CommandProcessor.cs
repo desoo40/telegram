@@ -390,71 +390,32 @@ namespace Aviators
         /// </summary>
         private async void Help(Chat chatFinded)
         {
-            var keys = new ReplyKeyboardMarkup();
-            keys.Keyboard = new KeyboardButton[4][];
-            keys.OneTimeKeyboard = true;
-
             var p = DB.GetAllPlayerWitoutStatistic();
             var n = p[(new Random()).Next(p.Count - 1)].Number;
 
-            if (chatFinded.Id > 0)
-            {
-                keys.Keyboard[0] = new KeyboardButton[2]
-                {new KeyboardButton("" + n), new KeyboardButton("Статистика")};
-                keys.Keyboard[1] = new KeyboardButton[2]
-                {
-                    new KeyboardButton("Расписание"), new KeyboardButton("Следующая")
-                };
-                keys.Keyboard[2] = new KeyboardButton[2]
-                {new KeyboardButton("Соперник"), new KeyboardButton("Кричалки")};
-                keys.Keyboard[3] = new KeyboardButton[1]
-                {new KeyboardButton("Помощь")};
-            }
-            else
-            {
-                keys.Keyboard[0] = new KeyboardButton[2]
-                {new KeyboardButton("/" + n), new KeyboardButton("/статистика")};
-                keys.Keyboard[1] = new KeyboardButton[2]
-                {
-                    new KeyboardButton("/расписание"),
-                    new KeyboardButton("/следующая")
-                };
-                keys.Keyboard[2] = new KeyboardButton[2]
-                {new KeyboardButton("/соперник"), new KeyboardButton("/кричалки")};
-                keys.Keyboard[3] = new KeyboardButton[1]
-                {new KeyboardButton("/помощь")};
-            }
-
             var help =
-                @"Управляй мною:
-(в личке можно без /)
+@"Управление:
 
-'%номер%' - поиск игрока по номеру
-
-/статистика '№'|'фамилия' игрока
-
+Топ игроков команды:
+--------------------
 /бомбардиры
 /снайперы
 /асистенты
 /штрафники
-/полезность (+/- показатель)
+/полезность (+/-)
+--------------------
 
-- топ игроков команды по параметрам
-
-
-/расписание 'n' ближайших n игр
-
+/статистика игрока
+/расписание - ближайшие 3 игры
 /следующая игра: дата, время, соперник и место
-
-/соперник 'команда' - история встреч
-
+/соперник - история встреч
 /кричалки - выводит одну из кричалок команды
 
-/помощь - помощь по управлению";
+💥Также попробуйте ввести номер любимого игрока💥";
 
             help = help.Replace("'%номер%'", $"{n}");
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, help, false, false, 0, keys);
+            await Bot.SendTextMessageAsync(chatFinded.Id, help);
         }
 
         private string GetPlayerStatistic(string arg)
