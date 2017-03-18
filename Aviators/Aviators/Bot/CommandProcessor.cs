@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
@@ -330,8 +332,30 @@ namespace Aviators
                     Console.WriteLine($"Send player:{player.Surname}");
                     if (File.Exists(photopath))
                     {
+
+                        var str = (new StreamReader(photopath)).BaseStream;
+                        Bitmap bitmap = new Bitmap(str);
+
+                        var ssss = @"Говно, залупа, пенис, хер, давалка, хуй, блядина,
+Головка, шлюха, жопа, член, еблан, петух, мудила,
+Рукоблуд, ссанина, очко, блядун, вагина,
+Сука, ебланище, влагалище, пердун, дрочила,
+Пидор, пизда, туз, малафья, гомик, мудила, пилотка, манда,
+Анус, вагина, путана, педрила, шалава, хуила, мошонка, елда";
+
+                        var spl = ssss.Split(',');
+
+                        Random r = new Random();
+                        int i = r.Next(spl.Length);
+
+                        using (Graphics g = Graphics.FromImage(bitmap))
+                        {
+                            g.DrawString(spl[i].Trim().ToUpper(), new Font(FontFamily.GenericSansSerif, 30), Brushes.Chartreuse, 50, 600);
+                        }
+
+                        bitmap.Save("temp.jpg", ImageFormat.Jpeg);
                         var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                            (new StreamReader(photopath)).BaseStream);
+                            (new StreamReader("temp.jpg")).BaseStream);
 
                         var button  = new InlineKeyboardButton("Статистика");
                         var keyboard = new InlineKeyboardMarkup(new[]{new[] { button }});

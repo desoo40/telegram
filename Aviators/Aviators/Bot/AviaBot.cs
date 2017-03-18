@@ -63,7 +63,7 @@ namespace Aviators.Bot
             if (msg == null) return;
             msg = msg.ToLower();
             msg = msg.Trim('/');
-            msg = msg.Replace(AviaBot.Username, "");
+            msg = msg.Replace(AviaBot.Username.ToLower(), "");
             msg = msg.Replace("@","");
 
             try
