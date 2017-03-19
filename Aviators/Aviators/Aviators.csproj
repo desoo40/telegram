@@ -77,6 +77,7 @@
     <Compile Include="Bot\Chat.cs" />
     <Compile Include="Bot\CommandProcessor.cs" />
     <Compile Include="Configs\Config.cs" />
+    <Compile Include="Data\ParseTXT.cs" />
     <Compile Include="DB\DBCore.cs" />
     <None Include="Obsolete\Utils.cs" />
     <Compile Include="Bot\Randomiser.cs" />
