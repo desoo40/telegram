@@ -21,7 +21,7 @@ namespace Aviators
     {
         private TelegramBotClient Bot;
         private readonly Randomiser Gen;
-        private DBCore DB;
+        //private DBCore DB;
         Regex rxNums = new Regex(@"^\d+$"); // проверка на число
 
 
@@ -29,7 +29,7 @@ namespace Aviators
         {
             Bot = bot;
             Gen = new Randomiser();
-            DB = new DBCore();
+            //DB = new DBCore();
         }
 
         public void FindCommands(string msg, Chat chatFinded, int fromId)
@@ -219,7 +219,7 @@ namespace Aviators
 
         private async void TourAnswer(Chat chatFinded)
         {
-            var tours = DB.GetTournaments();
+            var tours = DB.DBCommands.GetTournaments();
 
             var rowCount = tours.Count%2 == 0 ? tours.Count/2 : tours.Count/2 + 1;
             ++rowCount; // ибо "официальные" и "все"
@@ -283,7 +283,7 @@ namespace Aviators
             if (playerinfo.Length == 3)
             {
                 var player = new Player(int.Parse(playerinfo[0]), playerinfo[1].Trim(), playerinfo[2].Trim());
-                DB.AddPlayer(player);
+                DB.DBCommands.AddPlayer(player);
                 await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали добавить {player.Number}.");
             }
             else
@@ -295,7 +295,7 @@ namespace Aviators
         private async void RemovePlayer(Chat chatFinded, int number)
         {
             chatFinded.RemoveMode = false;
-            DB.RemovePlayerByNumber(number);
+            DB.DBCommands.RemovePlayerByNumber(number);
             await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
             //ShowPlayerByNubmer(chatFinded, number);
         }
@@ -313,7 +313,7 @@ namespace Aviators
 
             try
             {
-                var player = DB.GetPlayerByNumber(playerNumber);
+                var player = DB.DBCommands.GetPlayerByNumber(playerNumber);
                 if (player == null)
                 {
                     await Bot.SendTextMessageAsync(chatFinded.Id, $"Игрок под номером {playerNumber} не найден.");
@@ -390,7 +390,7 @@ namespace Aviators
         /// </summary>
         private async void Help(Chat chatFinded)
         {
-            var p = DB.GetAllPlayerWitoutStatistic();
+            var p = DB.DBCommands.GetAllPlayerWitoutStatistic();
             var n = p[(new Random()).Next(p.Count - 1)].Number;
 
             var help =
@@ -427,12 +427,12 @@ namespace Aviators
             {
                 //в случае числа показываем стату
                 var number = int.Parse(arg);
-                player = DB.GetPlayerStatisticByNumber(number);
+                player = DB.DBCommands.GetPlayerStatisticByNumber(number);
             }
             else
             {
                 //в случае букв ищем по имени или фамилии
-                player = DB.GetPlayerStatisticByNameOrSurname(arg);
+                player = DB.DBCommands.GetPlayerStatisticByNameOrSurname(arg);
             }
 
             if (player != null)
@@ -458,7 +458,7 @@ namespace Aviators
         private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
             string result = "";
-            List<Player> topPlayers = DB.GetTopPlayers(5);
+            List<Player> topPlayers = DB.DBCommands.GetTopPlayers(5);
             //TODO сделать Денису тут все
 
             

@@ -4,8 +4,8 @@
     <Position X="0.5" Y="2.25" Width="1.5" />
     <AssociationLine Name="Actions" Type="Aviators.GameAction" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="2" Y="4.697" />
-        <Point X="4.76" Y="4.697" />
+        <Point X="2" Y="4.813" />
+        <Point X="4.76" Y="4.813" />
         <Point X="4.76" Y="1.559" />
         <Point X="5.75" Y="1.559" />
         <Point X="5.75" Y="1.688" />
@@ -15,8 +15,8 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AAACAAAAIAAAAAAgAEAEAAQABAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>DataStruct\Data.cs</FileName>
+      <HashCode>QAACAAAAIAAIAgAsAEAEAAUABAAAAAAAAABAAgAAIAA=</HashCode>
+      <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Property Name="Actions" />
@@ -30,8 +30,8 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AgACAAAAIQAAAAgAAAAAAAAAAgAAAAABAUAAAAAAQAA=</HashCode>
-      <FileName>DataStruct\Data.cs</FileName>
+      <HashCode>AgACAAAAIQAAAAgAAAAAAAAAAgAAAAABAEAAAAAAQAA=</HashCode>
+      <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
       <Property Name="Actions" />
@@ -41,14 +41,14 @@
     <Position X="0.5" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAA=</HashCode>
-      <FileName>DataStruct\Data.cs</FileName>
+      <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
   </Class>
   <Class Name="Aviators.GameAction">
     <Position X="5.75" Y="0.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAQAAAAQ=</HashCode>
-      <FileName>DataStruct\Data.cs</FileName>
+      <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
     <ShowAsAssociation>
       <Property Name="Action" />
@@ -58,7 +58,7 @@
     <Position X="5.25" Y="2.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAgAEAAAAAAAAAAAJAAAAAgAAAAAAAAAAACAAAA=</HashCode>
-      <FileName>DataStruct\Data.cs</FileName>
+      <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
   </Enum>
   <Font Name="Segoe UI" Size="9" />

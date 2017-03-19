@@ -8,8 +8,11 @@ namespace Aviators
     {
         public int Id { get; set; }
         public int Number { get; set; }
+
         public string Name { get; set; }
         public string Surname { get; set; }
+        public string Lastname { get; set; }
+
         public string PhotoFile { get; set; }
         public string Position { get; set; }
         public string VK { get; set; }
@@ -67,7 +70,6 @@ namespace Aviators
         public string Place { get; set; }
         public Tournament Tournament { get; set; }
         public string Season { get; set; }
-        public string Type { get; set; }
 
         public List<GameAction> Actions { get; set; }
 
@@ -123,6 +125,18 @@ namespace Aviators
         public Action Action{ get; set; }
 
 }
+
+    public class Goal
+    {
+        public int Id { get; set; }
+        public Player Author { get; set; }
+        public Player Assistant1 { get; set; }
+        public Player Assistant2 { get; set; }
+
+        public bool PowerPlay { get; set; }
+        public bool ShortHand { get; set; }
+
+    }
 
     public enum Action
     {
