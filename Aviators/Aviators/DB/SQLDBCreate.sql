@@ -1,83 +1,169 @@
-﻿DROP TABLE IF EXISTS team;
-DROP TABLE IF EXISTS position_dic;
-DROP TABLE IF EXISTS player;
-DROP TABLE IF EXISTS place;
-DROP TABLE IF EXISTS game;
-DROP TABLE IF EXISTS game_action;
-DROP TABLE IF EXISTS tournament;
-DROP TABLE IF EXISTS season;
-
-
-CREATE TABLE team (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-	name_lower TEXT NOT NULL ,
-    logo TEXT NULL,
-	town text null    
+﻿/*==============================================================*/
+/* Table: place                                                 */
+/*==============================================================*/
+create table place (
+   id                   SERIAL               not null,
+   name                 TEXT                 null,
+   geoposition          TEXT                 null,
+   adress               TEXT                 null,
+   constraint PK_PLACE primary key (id)
 );
 
-CREATE TABLE position_dic (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL  
+/*==============================================================*/
+/* Table: tournament                                            */
+/*==============================================================*/
+create table tournament (
+   id                   SERIAL               not null,
+   name                 TEXT                 null,
+   constraint PK_TOURNAMENT primary key (id)
 );
 
-INSERT INTO position_dic (id, name) VALUES (1, 'Нападающий'),(2, 'Защитник'),(3, 'Вратарь'),(4, 'Тренер');
-
- 
-CREATE TABLE player(
-    id INTEGER PRIMARY KEY,
-    number INTEGER NULL,
-    name TEXT NOT NULL,
-    lastname TEXT NOT NULL,
-	lastname_lower TEXT NOT NULL,
-    photo TEXT NULL,
-	team_id integer null,
-	position_id integer null,
-	vk_href TEXT NULL,
-	insta_href TEXT NULL,
-	FOREIGN KEY(team_id) REFERENCES team(id),
-	FOREIGN KEY(position_id) REFERENCES position_dic(id)
+/*==============================================================*/
+/* Table: season                                                */
+/*==============================================================*/
+create table season (
+   id                   SERIAL               not null,
+   name                 TEXT                 null,
+   constraint PK_SEASON primary key (id)
 );
 
-CREATE TABLE place (
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-    adress TEXT NULL ,
-	location  TEXT NULL 
+/*==============================================================*/
+/* Table: game                                                  */
+/*==============================================================*/
+create table game (
+   id                   INT4                 not null,
+   place_id             INT4                 null,
+   op_team_id           INT4                 null,
+   score                INT4                 null,
+   op_score             INT4                 null,
+   tournament_id        INT4                 null,
+   season_id            INT4                 null,
+   viewers_count        INT4                 null,
+   constraint PK_GAME primary key (id),
+   constraint FK_GAME_REFERENCE_PLACE foreign key (place_id)
+      references place (id)
+      on delete restrict on update restrict,
+   constraint FK_GAME_REFERENCE_TOURNAME foreign key (tournament_id)
+      references tournament (id)
+      on delete restrict on update restrict,
+   constraint FK_GAME_REFERENCE_SEASON foreign key (season_id)
+      references season (id)
+      on delete restrict on update restrict
 );
 
+/*==============================================================*/
+/* Table: player                                                */
+/*==============================================================*/
+create table player (
+   id                   SERIAL               not null,
+   name                 TEXT                 null,
+   lastname             TEXT                 null,
+   number               INT4                 null,
+   positionid           INT4                 null,
+   constraint PK_PLAYER primary key (id)
+);
 
-CREATE TABLE game(
-    id INTEGER PRIMARY KEY,
-    date TEXT NOT NULL,
-    opteam_id INTEGER NOT NULL,
-    opteamscore INTEGER NULL,
-    place_id INTEGER NULL,	
-    tournament_id INTEGER NULL,	
-	FOREIGN KEY(opteam_id) REFERENCES team(id),
-	FOREIGN KEY(place_id) REFERENCES place(id),
-	FOREIGN KEY(tournament_id) REFERENCES tournament(id)
-	);
+/*==============================================================*/
+/* Table: game_action                                           */
+/*==============================================================*/
+create table game_action (
+   id                   INT4                 not null,
+   game_id              INT4                 null,
+   player_id            INT4                 null,
+   action               INT4                 null,
+   constraint PK_GAME_ACTION primary key (id),
+   constraint FK_GAME_ACT_REFERENCE_PLAYER foreign key (player_id)
+      references player (id)
+      on delete restrict on update restrict,
+   constraint FK_GAME_ACT_REFERENCE_GAME foreign key (game_id)
+      references game (id)
+      on delete restrict on update restrict
+);
 
-CREATE TABLE game_action(
-    id INTEGER PRIMARY KEY,
-    game_id INTEGER NOT NULL,
-    player_id INTEGER NOT NULL,
-    action INTEGER NOT NULL,
-	FOREIGN KEY(game_id) REFERENCES game(id),
-	FOREIGN KEY(player_id) REFERENCES player(id) ON DELETE CASCADE
-	);
+/*==============================================================*/
+/* Table: teams                                                 */
+/*==============================================================*/
+create table teams (
+   id                   SERIAL               not null,
+   name                 TEXT                 null,
+   logo                 PATH                 null,
+   town                 TEXT                 null,
+   constraint PK_TEAMS primary key (id)
+);
 
-CREATE TABLE tournament(
-    id INTEGER PRIMARY KEY,
-    name TEXT NOT NULL,
-	name_lower TEXT NOT NULL,
-    season_id INTEGER NOT NULL,    
-	FOREIGN KEY(season_id) REFERENCES season(id)
-	);
+/*==============================================================*/
+/* Table: game_stat                                             */
+/*==============================================================*/
+create table game_stat (
+   id                   INT4                 not null,
+   game_id              INT4                 null,
+   team_id              INT4                 null,
+   shots                INT4                 null,
+   shots_in             INT4                 null,
+   faceoff              INT4                 null,
+   hits                 INT4                 null,
+   block_shoots         INT4                 null,
+   penalty              INT4                 null,
+   constraint PK_GAME_STAT primary key (id),
+   constraint FK_GAME_STA_REFERENCE_GAME foreign key (game_id)
+      references game (id)
+      on delete cascade on update cascade,
+   constraint FK_GAME_STA_REFERENCE_TEAMS foreign key (team_id)
+      references teams (id)
+      on delete restrict on update restrict
+);
 
-CREATE TABLE season(
-    id INTEGER PRIMARY KEY,
-    name INTEGER NOT NULL    
-	);
+/*==============================================================*/
+/* Table: goalies                                               */
+/*==============================================================*/
+create table goalies (
+   id                   INT4                 not null,
+   player_id            INT4                 null,
+   shots                INT4                 null,
+   saves                INT4                 null,
+   percent              INT4                 null,
+   GAA                  INT4                 null,
+   wins                 INT4                 null,
+   shotout              INT4                 null,
+   constraint PK_GOALIES primary key (id),
+   constraint FK_GOALIES_REFERENCE_PLAYER foreign key (player_id)
+      references player (id)
+      on delete restrict on update restrict
+);
 
+/*==============================================================*/
+/* Table: player_info                                           */
+/*==============================================================*/
+create table player_info (
+   id                   SERIAL               not null,
+   player_id            INT4                 null,
+   vk                   TEXT                 null,
+   insta                TEXT                 null,
+   photo                TEXT                 null,
+   constraint PK_PLAYER_INFO primary key (id),
+   constraint FK_PLAYER_I_REFERENCE_PLAYER foreign key (player_id)
+      references player (id)
+      on delete restrict on update restrict
+);
+
+/*==============================================================*/
+/* Table: players_stat                                          */
+/*==============================================================*/
+create table players_stat (
+   id                   INT4                 not null,
+   player_id            INT4                 null,
+   rating               INT4                 null,
+   goals                INT4                 null,
+   assist               INT4                 null,
+   shots                INT4                 null,
+   shots_in             INT4                 null,
+   win_faceoff          INT4                 null,
+   lose_faceoff         INT4                 null,
+   hits                 INT4                 null,
+   block_shoots         INT4                 null,
+   penalty              INT4                 null,
+   constraint PK_PLAYERS_STAT primary key (id),
+   constraint FK_PLAYERS__REFERENCE_PLAYER foreign key (player_id)
+      references player (id)
+      on delete restrict on update restrict
+);
