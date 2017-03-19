@@ -1,8 +1,16 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Drawing;
+using System.Drawing.Imaging;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Telegram.Bot;
 using Aviators.Configs;
+using Telegram.Bot.Types;
+using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.ReplyMarkups;
+using File = System.IO.File;
 
 namespace Aviators
 {
@@ -14,6 +22,8 @@ namespace Aviators
         private TelegramBotClient Bot;
         private readonly Randomiser Gen;
         private DBCore DB;
+        Regex rxNums = new Regex(@"^\d+$"); // проверка на число
+
 
         public CommandProcessor(TelegramBotClient bot)
         {
@@ -24,201 +34,227 @@ namespace Aviators
 
         public void FindCommands(string msg, Chat chatFinded, int fromId)
         {
-            var commands = msg.Split(' ');
-            foreach (var command in commands)
+            var inputCommands = msg.Split(' ');
+
+            var command = new Command(inputCommands);//сама команда молодости нашей
+
+            if (rxNums.IsMatch(command.Name))
             {
-                chatFinded.CommandsQueue.Enqueue(command);
+                //в случае числа показываем игрока
+                var number = int.Parse(command.Name);
+                ShowPlayerByNubmer(chatFinded, command);
+                return;
             }
 
-            ProcessCommands(chatFinded, fromId);            
+            switch (command.Name)
+            {
+                case "помощь":
+                    Help(chatFinded);
+                    return;
+
+                case "статистика":
+                    if (command.Argument != null)
+                    {
+                        PlayerStatistic(chatFinded, command.Argument);
+                        return;
+                    }
+                    else
+                    {
+                        TourAnswer(chatFinded);
+                        //chatFinded.PersonalStatMode = true;
+                        //if (isLastCommand)
+                        // {
+                        // await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер или фамилию игрока"); // рассмотреть возможность однофамильцев
+                        //}
+                        return;
+                    }
+                case "расписание":
+                    TimeTable(chatFinded, 0);
+                    return;
+
+                case "следующая":
+                    NextGame(chatFinded);
+                    return;
+
+                case "соперник":
+                    EnemyTeam(chatFinded, "соперник");
+                    return;
+
+                case "кричалки":
+                    Slogans(chatFinded);
+                    return;
+
+                case "бомбардиры":
+                    Top(chatFinded, Aviators.Top.Bomb);
+                    return;
+                case "снайперы":
+                    Top(chatFinded, Aviators.Top.Snip);
+                    return;
+                case "асистенты":
+                    Top(chatFinded, Aviators.Top.Asist);
+                    return;
+                case "штрафники":
+                    Top(chatFinded, Aviators.Top.BadBoy);
+                    return;
+                case "полезность":
+                    Top(chatFinded, Aviators.Top.Usefull);
+                    return;
+
+            }
+
+            //ProcessCommands(chatFinded, fromId);            
+        }
+
+        public async void ContinueCommand(Chat chatFinded, int msgid)
+        {
+            var command = chatFinded.WaitingCommands.FirstOrDefault(m => m.Message.MessageId == msgid);
+            if(command == null) return;
+
+            var statistic = GetPlayerStatistic(command.Name).Replace("*","");
+
+            await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
         }
 
         private async void ProcessCommands(Chat chatFinded, int fromId)
         {
-            var commands = chatFinded.CommandsQueue;
-            var rxNums = new Regex(@"^\d+$"); // проверка на число
+            //var commands = chatFinded.CommandsQueue;
 
-            while (commands.Count > 0)
-            {
-                var command = commands.Dequeue();
-                var isLastCommand = (commands.Count == 0);                
+            //while (commands.Count > 0)
+            //{
+            //    var command = commands.Dequeue();
+            //    var isLastCommand = (commands.Count == 0);                
 
-                //set modes
-                if (command == "add")
-                {
-                    if (!Config.BotAdmin.isAdmin(fromId))
-                    {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой add. Запрос отменён.");
-                        chatFinded.ResetMode();
-                        continue;
-                    }
+            //    //set modes
+            //    if (command == "add")
+            //    {
+            //        if (!Config.BotAdmin.isAdmin(fromId))
+            //        {
+            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой add. Запрос отменён.");
+            //            chatFinded.ResetMode();
+            //            continue;
+            //        }
 
-                    chatFinded.AddMode = true;
-                    if (isLastCommand)
-                    {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Добавьте игрока в формате '99;Имя;Фамилия'");
-                    }
-                    continue;
-                }
+            //        chatFinded.AddMode = true;
+            //        if (isLastCommand)
+            //        {
+            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Добавьте игрока в формате '99;Имя;Фамилия'");
+            //        }
+            //        continue;
+            //    }
 
-                if (command == "remove")
-                {
-                    if (!Config.BotAdmin.isAdmin(fromId))
-                    {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой remove. Запрос отменён.");
-                        chatFinded.ResetMode();
-                        continue;
-                    }
+            //    if (command == "remove")
+            //    {
+            //        if (!Config.BotAdmin.isAdmin(fromId))
+            //        {
+            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой remove. Запрос отменён.");
+            //            chatFinded.ResetMode();
+            //            continue;
+            //        }
 
-                    chatFinded.RemoveMode = true;
-                    if (isLastCommand)
-                    {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Удалите игрока по 'номеру'");
-                    }
-                    continue;
-                }
+            //        chatFinded.RemoveMode = true;
+            //        if (isLastCommand)
+            //        {
+            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Удалите игрока по 'номеру'");
+            //        }
+            //        continue;
+            //    }
 
-                if (command == "статистика")
-                {
-                    chatFinded.StatMode = true;
-                    if (isLastCommand)
-                    {
-                        await Bot.SendTextMessageAsync(chatFinded.Id,
-                            "Введите:\n\n" +
-                            "/топ 'число' - топовые игроки;\n\n" +
-                            "'№'|'имя'|'фамилия' игрока");
-                    }
-                    continue;
-                }
 
-                if (command == "топ")
-                {
-                    chatFinded.StatTopMode = true;
-                    if (isLastCommand)
-                    {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Введите 'число' для топа");
-                    }
-                    continue;
-                }
 
-                //check modes
-                if (chatFinded.AddMode)
-                {
-                    AddPlayer(chatFinded, command);
-                    continue;
-                }
 
-                if (chatFinded.RemoveMode)
-                {
-                    try
-                    {
-                        var number = int.Parse(command);
-                        RemovePlayer(chatFinded, number);
-                        continue;
-                    }
-                    catch (Exception ex)
-                    {
-                        ExceptionOnCmd(chatFinded, ex);
-                        continue;
-                    }
-                }
 
-                if (chatFinded.StatMode)
-                {
-                    //запрос с топ number
-                    if (chatFinded.StatTopMode)
-                    {
-                        try
-                        {
-                            var number = int.Parse(command);
-                            StatisticByTop(chatFinded, number);
-                            continue;
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionOnCmd(chatFinded, ex);
-                            continue;
-                        }
-                    }
 
-                    if (rxNums.IsMatch(command))
-                    {
-                        //в случае числа показываем стату
-                        try
-                        {
-                            var number = int.Parse(command);
-                            StatisticByNumber(chatFinded, number);
-                            continue;
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionOnCmd(chatFinded, ex);
-                            continue;
-                        }
-                    }
-                    else
-                    {
-                        //в случае букв ищем по имени или фамилии
-                        try
-                        {
-                            StatisticByNameOrSurname(chatFinded, command);
-                            continue;
-                        }
-                        catch (Exception ex)
-                        {
-                            ExceptionOnCmd(chatFinded, ex);
-                            continue;
-                        }
-                    }
-                }
+            //    //check modes
+            //    if (chatFinded.AddMode)
+            //    {
+            //        AddPlayer(chatFinded, command);
+            //        continue;
+            //    }
 
-                //do command
-                if (command == "помощь")
-                {
-                    Help(chatFinded);
-                    continue;
-                }
-                if (command == "расписание")
-                {
-                    TimeTable(chatFinded, 0);
-                    continue;
-                }
-                if (command == "следующая")
-                {
-                    NextGame(chatFinded);
-                    continue;
-                }
-                if (command == "соперник")
-                {
-                    EnemyTeam(chatFinded, "соперник");
-                    continue;
-                }
-                if (command == "кричалки")
-                {
-                    Slogans(chatFinded);
-                    continue;
-                }
+            //    if (chatFinded.RemoveMode)
+            //    {
+            //        try
+            //        {
+            //            var number = int.Parse(command);
+            //            RemovePlayer(chatFinded, number);
+            //            continue;
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            ExceptionOnCmd(chatFinded, ex);
+            //            continue;
+            //        }
+            //    }
 
-                //если не в режиме, не установили режим, не выполнили команду сразу, может пользователь ввёл число для поиска игрока
-                if (rxNums.IsMatch(command))
-                {
-                    //в случае числа показываем игрока
-                    try
-                    {
-                        var number = int.Parse(command);
-                        ShowPlayerByNubmer(chatFinded, number);
-                        continue;
-                    }
-                    catch (Exception ex)
-                    {
-                        ExceptionOnCmd(chatFinded, ex);
-                        continue;
-                    }
-                }
+            //    if (chatFinded.PersonalStatMode)
+            //    {
 
-                //иначе пользователь ввёл хуйню
-                WrongCmd(chatFinded);
-            }
+            //    }
+
+            //    //do command
+                
+                
+
+            //    //если не в режиме, не установили режим, не выполнили команду сразу, может пользователь ввёл число для поиска игрока
+            //    if (rxNums.IsMatch(command))
+            //    {
+            //        //в случае числа показываем игрока
+            //        try
+            //        {
+            //            var number = int.Parse(command);
+            //            ShowPlayerByNubmer(chatFinded, number);
+            //            continue;
+            //        }
+            //        catch (Exception ex)
+            //        {
+            //            ExceptionOnCmd(chatFinded, ex);
+            //            continue;
+            //        }
+            //    }
+
+            //    //иначе пользователь ввёл хуйню
+            //    WrongCmd(chatFinded);
+            //}
+        }
+
+        private async void TourAnswer(Chat chatFinded)
+        {
+            var tours = DB.GetTournaments();
+
+            var rowCount = tours.Count%2 == 0 ? tours.Count/2 : tours.Count/2 + 1;
+            ++rowCount; // ибо "официальные" и "все"
+
+            var keys2 = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup();
+            keys2.InlineKeyboard = new InlineKeyboardButton[1][];
+            keys2.InlineKeyboard[0] = new InlineKeyboardButton[1];
+            keys2.InlineKeyboard[0][0] = new InlineKeyboardButton("ГОГОУ!");
+
+
+            //var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+            //    {
+            //        Keyboard = new Telegram.Bot.Types.KeyboardButton[rowCount][],
+            //        OneTimeKeyboard = true
+            //    };
+
+
+            //    keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Все"),
+            //                                                                  new Telegram.Bot.Types.KeyboardButton("Официальные") }; // помнить о слешах
+            //    for (var i = 0; i < tours.Count; ++i)
+            //    {
+            //        var row = i/2 + 1;
+            //        var column = i % 2;
+
+            //        if (keys.Keyboard[row] == null)
+            //        {
+            //            var isLast = (tours.Count - i - 1 == 0);
+            //            var c = isLast ? 1 : 2;
+
+            //            keys.Keyboard[row] = new KeyboardButton[c]; 
+            //        }
+            //        keys.Keyboard[row][column] = new KeyboardButton(chatFinded.Id > 0 ? tours[i].Name : "/" + tours[i].Name);
+            //    }
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Выберете турнир:", false, false, 0, keys2);
         }
 
         private async void WrongCmd(Chat chatFinded)
@@ -261,11 +297,14 @@ namespace Aviators
             chatFinded.RemoveMode = false;
             DB.RemovePlayerByNumber(number);
             await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
-            ShowPlayerByNubmer(chatFinded, number);
+            //ShowPlayerByNubmer(chatFinded, number);
         }
 
-        private async void ShowPlayerByNubmer(Chat chatFinded, int playerNumber)
+        private async void ShowPlayerByNubmer(Chat chatFinded, Command command)
         {
+            var playerNumber = int.Parse(command.Name);
+
+
             if (playerNumber < 0 || playerNumber > 100)
             {
                 await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный формат, введите корректный номер игрока от 0 до 100.");
@@ -282,16 +321,48 @@ namespace Aviators
                 else
                 {
                     var playerDescription = Gen.GetPlayerDescr();
-                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}";
+                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}\n\n" +
+                                         $"{player.Position}\n\n" +
+                                         $"VK: {player.VK}\n" +
+                                         $"Inst: {player.INSTA}";
+
 
                     var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
 
                     Console.WriteLine($"Send player:{player.Surname}");
                     if (File.Exists(photopath))
                     {
+
+                        var str = (new StreamReader(photopath)).BaseStream;
+                        Bitmap bitmap = new Bitmap(str);
+
+                        var ssss = @"Говно, залупа, пенис, хер, давалка, хуй, блядина,
+Головка, шлюха, жопа, член, еблан, петух, мудила,
+Рукоблуд, ссанина, очко, блядун, вагина,
+Сука, ебланище, влагалище, пердун, дрочила,
+Пидор, пизда, туз, малафья, гомик, мудила, пилотка, манда,
+Анус, вагина, путана, педрила, шалава, хуила, мошонка, елда";
+
+                        var spl = ssss.Split(',');
+
+                        Random r = new Random();
+                        int i = r.Next(spl.Length);
+
+                        using (Graphics g = Graphics.FromImage(bitmap))
+                        {
+                            g.DrawString(spl[i].Trim().ToUpper(), new Font(FontFamily.GenericSansSerif, 30), Brushes.Chartreuse, 50, 600);
+                        }
+
+                        bitmap.Save("temp.jpg", ImageFormat.Jpeg);
                         var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                            (new StreamReader(photopath)).BaseStream);
-                        await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription);
+                            (new StreamReader("temp.jpg")).BaseStream);
+
+                        var button  = new InlineKeyboardButton("Статистика");
+                        var keyboard = new InlineKeyboardMarkup(new[]{new[] { button }});
+
+                        Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup:keyboard);
+                        command.Message = mes;
+                        chatFinded.WaitingCommands.Add(command);
                     }
                     else
                     {
@@ -307,6 +378,163 @@ namespace Aviators
             }
         }
 
+
+
+      
+
+
+        #region Исполнение команд
+
+        /// <summary>
+        /// Выводит помощь по командам
+        /// </summary>
+        private async void Help(Chat chatFinded)
+        {
+            var p = DB.GetAllPlayerWitoutStatistic();
+            var n = p[(new Random()).Next(p.Count - 1)].Number;
+
+            var help =
+@"Управление:
+
+Топ игроков команды:
+--------------------
+/бомбардиры
+/снайперы
+/асистенты
+/штрафники
+/полезность (+/-)
+--------------------
+
+/статистика игрока
+/расписание - ближайшие 3 игры
+/следующая игра: дата, время, соперник и место
+/соперник - история встреч
+/кричалки - выводит одну из кричалок команды
+
+💥Также попробуйте ввести номер любимого игрока💥";
+
+            help = help.Replace("'%номер%'", $"{n}");
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, help);
+        }
+
+        private string GetPlayerStatistic(string arg)
+        {
+            string result = "Игрок не найден";
+            Player player;
+
+            if (rxNums.IsMatch(arg))
+            {
+                //в случае числа показываем стату
+                var number = int.Parse(arg);
+                player = DB.GetPlayerStatisticByNumber(number);
+            }
+            else
+            {
+                //в случае букв ищем по имени или фамилии
+                player = DB.GetPlayerStatisticByNameOrSurname(arg);
+            }
+
+            if (player != null)
+            {
+                result = String.Format("Статистика игрока\n" +
+                                       "*#{0} {1} {2}*\n\n", player.Number, player.Name, player.Surname);
+
+                result += String.Format("{0, 0} {1, 21}\n", "Игр:", player.Games);
+                result += String.Format("{0, 0} {1, 18}\n", "Голы:", player.Goals);
+                result += String.Format("{0, 0} {1, 18}\n", "Пасы:", player.Pas);
+                result += String.Format("{0, 0} {1, 12}\n", "Гол+Пас:", player.Goals + player.Pas);
+                result += String.Format("{0, 0} {1, 15}\n", "Штраф:", player.Shtraf);
+                result += String.Format("{0, 0} {1, 23}\n", "+/-:", player.PlusMinus);
+            }
+            return result;
+        }
+        private async void PlayerStatistic(Chat chatFinded, string arg)
+        {
+            var result = GetPlayerStatistic(arg);
+            await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
+        }
+
+        private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
+        {
+            string result = "";
+            List<Player> topPlayers = DB.GetTopPlayers(5);
+            //TODO сделать Денису тут все
+
+            
+            if (type == Aviators.Top.Bomb)
+            {
+                result = "Топ 5 *бомбардиров* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas + topPlayer.Goals}*";
+                }
+            }
+
+            if (type == Aviators.Top.Asist)
+            {
+                result = "Топ 5 *асистентов* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  "; 
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas}*";
+                }
+            }
+
+            if (type == Aviators.Top.Snip)
+            {
+                result = "Топ 5 *снайперов* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Goals}*";
+                }
+            }
+
+            if (type == Aviators.Top.BadBoy)
+            {
+                result = "Топ 5 *штрафников* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Shtraf}*";
+                }
+            }
+
+            if (type == Aviators.Top.Usefull)
+            {
+                result = "Топ 5 *полезных игроков* ХК \"Авиаторы\":\n";
+
+
+                foreach (var topPlayer in topPlayers)
+                {
+                    result += $"\n`#{topPlayer.Number}` ";
+                    if (topPlayer.Number < 10)
+                        result += "  ";  
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.PlusMinus}*";
+                }
+            }
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
+        }
+
         private async void Slogans(Chat chatFinded)
         {
             await Bot.SendTextMessageAsync(chatFinded.Id, Gen.GetSlogan());
@@ -314,7 +542,7 @@ namespace Aviators
 
         private async void EnemyTeam(Chat chatFinded, string team)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я соперник");
+            await Bot.SendTextMessageAsync(chatFinded.Id, "*Привет, я соперник*", parseMode: ParseMode.Markdown);
         }
 
         private async void NextGame(Chat chatFinded)
@@ -324,100 +552,44 @@ namespace Aviators
 
         private async void TimeTable(Chat chatFinded, int n)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я расписание");
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я расписание",parseMode: ParseMode.Markdown);
         }
+        #endregion
 
-        private async void StatisticByTop(Chat chatFinded, int top)
+       
+    }
+
+    public class Command
+    {
+        public string Name { get; set; }
+        public string Argument => ListArguments.FirstOrDefault();
+        public List<string> ListArguments { get; set; }
+
+        public Message Message { get; set; }
+
+        public Command(string[] input)
         {
-            chatFinded.StatTopMode = false;
-            chatFinded.StatMode = false;
-
-            var players = DB.GetTopPlayers(top);
-            var result = "";
-            foreach (var player in players)
+            ListArguments = new List<string>();
+            if (input.Length > 0)
             {
-                if (player != null)
-                {
-                    result += $"{player.Surname} забросил {player.Goals} шайб\r\n";
-                }
-            }
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, result);
-        }
-
-        private async void StatisticByNumber(Chat chatFinded, int number)
-        {
-            chatFinded.StatMode = false;
-            var result = "Игрок не найден";
-            var player = DB.GetPlayerStatisticByNumber(number);
-            if (player != null)
-            {
-                result = $"{player.Surname} забросил {player.Goals} шайб";
-            }
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, result);
-        }
-
-        private async void StatisticByNameOrSurname(Chat chatFinded, string nameOrSurname)
-        {
-            chatFinded.StatMode = false;
-            var result = "Игрок не найден";
-            var player = DB.GetPlayerStatisticByNameOrSurname(nameOrSurname);
-            if (player != null)
-            {
-                result = $"{player.Surname} забросил {player.Goals} шайб";
-            }
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, result);
-        }
-
-        private async void Help(Chat chatFinded)
-        {
-            var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
-            keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[4][];
-            keys.OneTimeKeyboard = true;
-
-            var p = DB.GetAllPlayerWitoutStatistic();
-            var n = p[(new Random()).Next(p.Count - 1)].Number;
-
-            if (chatFinded.Id > 0)
-            {
-                keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("" + n), new Telegram.Bot.Types.KeyboardButton("Статистика") };
-                keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Расписание"), new Telegram.Bot.Types.KeyboardButton("Следующая") };
-                keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Соперник"), new Telegram.Bot.Types.KeyboardButton("Кричалки") };
-                keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("Помощь") };
+                Name = input[0];
+                if (input.Length > 1)  ListArguments.AddRange(input.Skip(1));
             }
             else
             {
-                keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/" + n), new Telegram.Bot.Types.KeyboardButton("/статистика") };
-                keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/расписание"), new Telegram.Bot.Types.KeyboardButton("/следующая") };
-                keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("/соперник"), new Telegram.Bot.Types.KeyboardButton("/кричалки") };
-                keys.Keyboard[3] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
+                Name = ""; //хз
             }
-
-            var help = 
-@"Управляй мною:
-(в личке можно без /)
-
-'%номер%' - поиск игрока по номеру
-
-/статистика '№'|'имя'|'фамилия' игрока
-
-/статистика топ 'n' - список топовых n игроков
-
-/расписание 'n' ближайших n игр
-
-/следующая игра: дата, время, соперник и место
-
-/соперник 'команда' - история встреч
-
-/кричалки - выводит одну из кричалок команды
-
-/помощь - помощь по управлению";
-
-            help = help.Replace("'%номер%'", $"{n}");
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, help, false, false, 0, keys);
         }
+
+    }
+
+    public enum Top
+    {
+        All,
+        Asist,
+        BadBoy,
+        Bomb,
+        Snip,
+        Usefull
     }
 }

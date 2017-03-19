@@ -12,6 +12,8 @@ namespace Aviators
         public string Surname { get; set; }
         public string PhotoFile { get; set; }
         public string Position { get; set; }
+        public string VK { get; set; }
+        public string INSTA { get; set; }
 
         public List<GameAction> Actions { get; set; }
 
@@ -63,7 +65,7 @@ namespace Aviators
         public Tuple<int, int> Score { get; set; }
 
         public string Place { get; set; }
-        public string Tournament { get; set; }
+        public Tournament Tournament { get; set; }
         public string Season { get; set; }
         public string Type { get; set; }
 
@@ -75,6 +77,30 @@ namespace Aviators
         }
     }
 
+    public class Tournament
+    {
+        public Tournament(string s)
+        {
+            Name = s;
+        }
+
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public Season Season { get; set; }
+    }
+
+    public class Season
+    {
+        public Season(string s)
+        {
+            Name = s;
+        }
+
+        public int Id { get; set; }
+        public string Name { get; set; }
+    }
+
     public class Team
     {
         public int Id { get; set; }
@@ -84,10 +110,10 @@ namespace Aviators
     public class GameAction
     {
 
-        public GameAction(Player player, string game, Action action)
+        public GameAction(Player player, string game_id, Action action)
         {
             Player = player;
-            Game = new Game {Id = Convert.ToInt32(game)};
+            Game = new Game {Id = Convert.ToInt32(game_id)};
             Action = action;
         }
 

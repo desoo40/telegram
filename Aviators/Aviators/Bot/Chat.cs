@@ -11,26 +11,26 @@ namespace Aviators
         public long Id { get; set; }
 
         public bool WhoMode { get; set; }  = false;
-        public bool StatMode { get; set; }  = false;
-        public bool StatTopMode { get; set; }  = false;
+        public bool PersonalStatMode { get; set; }  = false;
+
         public bool AddMode { get; set; }  = false;
         public bool RemoveMode { get; set; }  = false;
+        public List<Command> WaitingCommands { get; set; }
 
-        public Queue<string> CommandsQueue { get; set; } = new Queue<string>();
 
         public Chat(long id)
         {
             Id = id;
-        }
+            WaitingCommands = new List<Command>();
 
+
+        }
         internal void ResetMode()
         {
             WhoMode = false;
-            StatMode = false;
-            StatTopMode = false;
+            PersonalStatMode = false;
             AddMode = false;
             RemoveMode = false;
-            CommandsQueue.Clear();
         }
     }
 }
