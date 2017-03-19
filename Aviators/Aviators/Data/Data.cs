@@ -13,6 +13,7 @@ namespace Aviators
         public string Surname { get; set; }
         public string Lastname { get; set; }
 
+
         public string PhotoFile { get; set; }
         public string Position { get; set; }
         public string VK { get; set; }
@@ -57,6 +58,19 @@ namespace Aviators
         }
     }
 
+    public class PlayerStat
+    {
+        public int PlusMinus { get; set; }
+        public int Goals { get; set; }
+        public int Assist { get; set; }
+        public int Shots { get; set; }
+        public int ShotsIn { get; set; }
+        public int WinFaceoff { get; set; }
+        public int LoseFaceoff { get; set; }
+        public int BlockShots { get; set; }
+        public int Hits { get; set; }
+        public int Penalty { get; set; }
+    }
     public class Game
     {
         public int Id { get; set; }
@@ -64,7 +78,10 @@ namespace Aviators
 
         public string Team1 { get; set; }
         public string Team2 { get; set; }
+        public TeamStat Stat1 { get; set; }
+        public TeamStat Stat2 { get; set; }
 
+        public int Viewers { get; set; }
         public Tuple<int, int> Score { get; set; }
 
         public string Place { get; set; }
@@ -77,6 +94,16 @@ namespace Aviators
         {
             Actions= new List<GameAction>();
         }
+    }
+
+    public class TeamStat
+    {
+        public int Shots { get; set; }
+        public int ShotsIn { get; set; }
+        public int Faceoff { get; set; }
+        public int BlockShots { get; set; }
+        public int Hits { get; set; }
+        public int Penalty { get; set; }
     }
 
     public class Tournament
