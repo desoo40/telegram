@@ -10,7 +10,7 @@ namespace Aviators
         /// Флаг для создания базы и табличек, что бы из кода.
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
-        private static bool InitFromCode = true;
+        private static bool InitFromCode = false;
 
         static void Main(string[] args)
         {
@@ -30,6 +30,8 @@ namespace Aviators
                         Console.WriteLine("Unknown DBCore exception: " + e.Message);
                 }
             }
+
+            Parse.ProcessFiles();
 
             Console.WriteLine("Starting Bot...");
             try

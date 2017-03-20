@@ -8,24 +8,31 @@ using System.Threading.Tasks;
 
 namespace Aviators
 {
-    class ParseTXT
+    static class Parse
     {
-        List<Player> Roster = new List<Player>();
-        Game game = new Game();
-
-        public void ParseFile()
+        public static void ProcessFiles()
         {
-            DirectoryInfo di = new DirectoryInfo("/Incoming");
+            Console.WriteLine("Обрабатываем файлы во входящей папке");
+
+            DirectoryInfo di = new DirectoryInfo("Incoming");
             var files = di.GetFiles();
+
+            if (files.Length == 0)
+                Console.WriteLine("Входящих файлов не обнаружено");
 
             foreach (var fileInfo in files)
             {
-                fillData(fileInfo.FullName);
+                Console.Write("Обрабатываем файл: " + fileInfo.Name + " ...");
+                ParseTXTFile(fileInfo.FullName);
             }
         }
 
-        private void fillData(string file)
+        private static void ParseTXTFile(string file)
         {
+            //ростер - это состав
+            List<Player> Roster = new List<Player>();
+            Game game = new Game();
+
             var lines = File.ReadAllLines(file);
 
             game.Date = Convert.ToDateTime(lines[0]);
@@ -34,27 +41,28 @@ namespace Aviators
             game.Stat2 = new TeamStat();
             game.Team2 = lines[3];
             int i = 5;
-            while(lines[i] != "Счет")
+            while (lines[i] != "Счет")
             {
-                var player = lines[i].Split(' ');
-                Roster[i - 5].Number = Convert.ToInt32(player[0]);
-                Roster[i - 5].Surname = player[1];
-                Roster[i - 5].Name = player[2];
+                var s = lines[i].Replace("\t", " ");
+                var playerInfo = s.Split();
+                var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[1], playerInfo[2]);
+                Roster.Add(newplayer);
+
                 ++i;
             }
 
-           while(lines[i].Length != 0)
+            while (i < lines.Length-1)
             {
                 if (lines[i] == "Счет")
                 {
                     var score = lines[++i].Split('-');
 
-                    game.Score = new Tuple<int, int>(Convert.ToInt32(score[1]), Convert.ToInt32(score[2]));
+                    game.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));
                 }
 
                 if (lines[i] == "Голы") // Боря допишет
                 {
-                    
+
                 }
 
                 if (lines[i] == "Броски")
@@ -113,7 +121,7 @@ namespace Aviators
 
                 if (lines[i] == "Вратарь") // что делать?
                 {
-                    
+
 
                 }
 
@@ -126,6 +134,8 @@ namespace Aviators
                 {
                     game.Viewers = Convert.ToInt32(lines[++i]);
                 }
+
+                i++;
             }
 
         }
