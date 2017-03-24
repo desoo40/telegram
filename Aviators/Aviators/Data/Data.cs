@@ -89,10 +89,15 @@ namespace Aviators
         public string Season { get; set; }
 
         public List<GameAction> Actions { get; set; }
+        public List<Goal> Goal { get; set; }
 
         public Game()
         {
             Actions= new List<GameAction>();
+            Goal = new List<Goal>();
+
+            Stat1 = new TeamStat();
+            Stat2 = new TeamStat();
         }
     }
 

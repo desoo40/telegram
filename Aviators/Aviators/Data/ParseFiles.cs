@@ -31,112 +31,170 @@ namespace Aviators
         {
             //ростер - это состав
             List<Player> Roster = new List<Player>();
-            Game game = new Game();
+            Game Game = new Game();
 
             var lines = File.ReadAllLines(file);
 
-            game.Date = Convert.ToDateTime(lines[0]);
-            game.Tournament = new Tournament(lines[1]);
-            game.Stat1 = new TeamStat();
-            game.Stat2 = new TeamStat();
-            game.Team2 = lines[3];
+            if (lines.Length == 0)
+            {
+                Console.WriteLine("ERROR(файл не содержит строк)");
+                return;
+            }
+
+            Game.Date = Convert.ToDateTime(lines[0]);
+            Game.Tournament = new Tournament(lines[1]);
+
+            Game.Team2 = lines[2];
+
             int i = 5;
             while (lines[i] != "Счет")
             {
                 var s = lines[i].Replace("\t", " ");
                 var playerInfo = s.Split();
-                var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[1], playerInfo[2]);
+                var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[2], playerInfo[1]);
                 Roster.Add(newplayer);
 
                 ++i;
             }
 
-            while (i < lines.Length-1)
+            #region такое
+
+            while (i < lines.Length - 1)
             {
                 if (lines[i] == "Счет")
                 {
                     var score = lines[++i].Split('-');
 
-                    game.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));
+                    Game.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));
                 }
 
                 if (lines[i] == "Голы") // Боря допишет
                 {
+                    var goals = lines[++i].Split(';');
+                    foreach (var goal in goals)
+                    {
+                        var g = new Goal();
+                        //TODO по тупому, переделать на регекс
+                        if (goal.Contains("("))
+                        {
+                            var a = goal.Split('(');
+                            int a_num = Convert.ToInt32(a[0]);
+                            var author = Roster.Find(p => p.Number == a_num);
+                            if (author == null) continue;
 
+                            g.Author = author;
+
+                            if (goal.Contains(","))
+                            {
+                                var ass = a[1].Split(',');
+                                int a1_num = Convert.ToInt32(ass[0]);
+                                var as1 = Roster.Find(p => p.Number == a1_num);
+                                if (as1 == null) continue;
+                                g.Assistant1 = as1;
+
+                                int a2_num = Convert.ToInt32(ass[1].Replace(')',' '));
+                                var as2 = Roster.Find(p => p.Number == a2_num);
+                                if (as2 == null) continue;
+                                g.Assistant2 = as2;
+
+                            }
+                            else
+                            {
+                                int a1_num = Convert.ToInt32(a[1].Replace(')', ' '));
+                                var as1 = Roster.Find(p => p.Number == a1_num);
+                                if (as1 == null) continue;
+                                g.Assistant1 = as1;
+                            }
+                        }
+                        else
+                        {
+                            var author = Roster.Find(p => p.Number == Convert.ToInt32(goal));
+                            if (author == null) continue;
+                            g.Author = author;
+                        }
+                        Game.Goal.Add(g);
+                    }
                 }
 
-                if (lines[i] == "Броски")
+                if (lines[i] == "Броски" && lines[i + 1].Contains("-"))
                 {
                     var shots = lines[++i].Split('-');
 
-                    game.Stat1.Shots = Convert.ToInt32(shots[0]);
-                    game.Stat2.Shots = Convert.ToInt32(shots[1]);
+                    Game.Stat1.Shots = Convert.ToInt32(shots[0]);
+                    Game.Stat2.Shots = Convert.ToInt32(shots[1]);
 
                 }
 
-                if (lines[i] == "В створ")
+                if (lines[i] == "В створ" && lines[i + 1].Contains("-"))
                 {
                     var shotsIn = lines[++i].Split('-');
 
-                    game.Stat1.ShotsIn = Convert.ToInt32(shotsIn[0]);
-                    game.Stat2.ShotsIn = Convert.ToInt32(shotsIn[1]);
+                    Game.Stat1.ShotsIn = Convert.ToInt32(shotsIn[0]);
+                    Game.Stat2.ShotsIn = Convert.ToInt32(shotsIn[1]);
 
                 }
 
-                if (lines[i] == "Заблокированные")
+                if (lines[i] == "Заблокированные" && lines[i + 1].Contains("-"))
                 {
                     var block = lines[++i].Split('-');
 
-                    game.Stat1.BlockShots = Convert.ToInt32(block[0]);
-                    game.Stat2.BlockShots = Convert.ToInt32(block[1]);
+                    Game.Stat1.BlockShots = Convert.ToInt32(block[0]);
+                    Game.Stat2.BlockShots = Convert.ToInt32(block[1]);
 
                 }
 
-                if (lines[i] == "Вбрасывания")
+                if (lines[i] == "Вбрасывания" && lines[i + 1].Contains("-"))
                 {
                     var faceoff = lines[++i].Split('-');
 
-                    game.Stat1.Faceoff = Convert.ToInt32(faceoff[0]);
-                    game.Stat2.Faceoff = Convert.ToInt32(faceoff[1]);
+                    Game.Stat1.Faceoff = Convert.ToInt32(faceoff[0]);
+                    Game.Stat2.Faceoff = Convert.ToInt32(faceoff[1]);
 
                 }
 
-                if (lines[i] == "Силовые")
+                if (lines[i] == "Силовые" && lines[i + 1].Contains("-"))
                 {
                     var hits = lines[++i].Split('-');
 
-                    game.Stat1.Hits = Convert.ToInt32(hits[0]);
-                    game.Stat2.Hits = Convert.ToInt32(hits[1]);
+                    Game.Stat1.Hits = Convert.ToInt32(hits[0]);
+                    Game.Stat2.Hits = Convert.ToInt32(hits[1]);
 
                 }
 
-                if (lines[i] == "Штрафы")
+                if (lines[i] == "Штрафы" && lines[i + 1].Contains("-"))
                 {
                     var pen = lines[++i].Split('-');
 
-                    game.Stat1.Penalty = Convert.ToInt32(pen[0]);
-                    game.Stat2.Penalty = Convert.ToInt32(pen[1]);
+                    Game.Stat1.Penalty = Convert.ToInt32(pen[0]);
+                    Game.Stat2.Penalty = Convert.ToInt32(pen[1]);
 
                 }
 
-                if (lines[i] == "Вратарь") // что делать?
+                if (lines[i] == "Вратарь" && lines[i + 1].Contains("-")) // что делать?
                 {
 
 
                 }
 
-                if (lines[i] == "Лучший") // MVP ++
+                if (lines[i] == "Лучший" && lines[i + 1].Contains("-")) // MVP ++
                 {
 
                 }
 
-                if (lines[i] == "Зрители")
+                if (lines[i] == "Зрители" && lines[i + 1].Contains("-"))
                 {
-                    game.Viewers = Convert.ToInt32(lines[++i]);
+                    Game.Viewers = Convert.ToInt32(lines[++i]);
                 }
 
                 i++;
             }
+
+            #endregion
+
+            DB.DBCommands.AddNewGameAndPlayers(Game, Roster);
+
+
+            Console.WriteLine("OK");
 
         }
     }

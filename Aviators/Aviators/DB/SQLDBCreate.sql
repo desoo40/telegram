@@ -13,9 +13,9 @@ create table place (
 /* Table: tournament                                            */
 /*==============================================================*/
 create table tournament (
-   id                   SERIAL               not null,
+   id                   INTEGER PRIMARY KEY,
    name                 TEXT                 null,
-   constraint PK_TOURNAMENT primary key (id)
+   name_lower                 TEXT                 null
 );
 
 /*==============================================================*/
@@ -31,47 +31,43 @@ create table season (
 /* Table: game                                                  */
 /*==============================================================*/
 create table game (
-   id                   INT4                 not null,
+   id                    INTEGER PRIMARY KEY,
    place_id             INT4                 null,
+   date                 TEXT                 null,
    op_team_id           INT4                 null,
    score                INT4                 null,
    op_score             INT4                 null,
    tournament_id        INT4                 null,
    season_id            INT4                 null,
-   viewers_count        INT4                 null,
-   constraint PK_GAME primary key (id),
+   viewers_count        INT4                 null,   
    constraint FK_GAME_REFERENCE_PLACE foreign key (place_id)
       references place (id)
       on delete restrict on update restrict,
    constraint FK_GAME_REFERENCE_TOURNAME foreign key (tournament_id)
       references tournament (id)
-      on delete restrict on update restrict,
-   constraint FK_GAME_REFERENCE_SEASON foreign key (season_id)
-      references season (id)
       on delete restrict on update restrict
+
 );
 
 /*==============================================================*/
 /* Table: player                                                */
 /*==============================================================*/
 create table player (
-   id                   SERIAL               not null,
+   id                   INTEGER PRIMARY KEY,
    name                 TEXT                 null,
    lastname             TEXT                 null,
    number               INT4                 null,
-   positionid           INT4                 null,
-   constraint PK_PLAYER primary key (id)
+   positionid           INT4                 null
 );
 
 /*==============================================================*/
 /* Table: game_action                                           */
 /*==============================================================*/
 create table game_action (
-   id                   INT4                 not null,
+   id                    INTEGER PRIMARY KEY,
    game_id              INT4                 null,
    player_id            INT4                 null,
-   action               INT4                 null,
-   constraint PK_GAME_ACTION primary key (id),
+   action               INT4                 null,   
    constraint FK_GAME_ACT_REFERENCE_PLAYER foreign key (player_id)
       references player (id)
       on delete restrict on update restrict,
@@ -81,14 +77,14 @@ create table game_action (
 );
 
 /*==============================================================*/
-/* Table: teams                                                 */
+/* Table: team                                               */
 /*==============================================================*/
-create table teams (
-   id                   SERIAL               not null,
+create table team (
+   id                    INTEGER PRIMARY KEY,
    name                 TEXT                 null,
-   logo                 PATH                 null,
-   town                 TEXT                 null,
-   constraint PK_TEAMS primary key (id)
+   name_lower                 TEXT                 null,
+   logo                 TEXT                 null,
+   town                 TEXT                 null
 );
 
 /*==============================================================*/

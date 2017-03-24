@@ -191,6 +191,7 @@ namespace Aviators
 
         //            Regex re = new Regex(@"(?<name>.*)\((?<num>\d+)\)");
         //            if (re.IsMatch(pg))
+
         //            {
         //                var m = re.Match(pg);
         //                name = m.Groups["name"].ToString().Trim();
@@ -497,12 +498,173 @@ namespace Aviators
             }
         }
 
+        
+     
+
+
+
+        public void AddNewGameAndPlayers(Game game, List<Player> roster)
+        {
+            //Добавляем игроков
+            foreach (var player in roster)
+            {
+                GetPlayerOrInsert(player);
+            }
+            //получаем ид турнира //TODO как то тупо, видимо надо просто по ссылке
+            game.Tournament = GetTournamentByNameOrInsert(game.Tournament.Name,0);
+
+            var opteam_id = GetTeamId(game.Team2);
+
+            #region Добавляем игру
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format(
+                "INSERT INTO game " +
+                "(date, op_team_id, score, op_score,tournament_id, viewers_count) " +
+                "VALUES('{0}',{1}, {2}, {3}, {4},{5})",
+                game.Date, opteam_id, game.Score.Item1, game.Score.Item2, game.Tournament.Id, game.Viewers);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"select last_insert_rowid()";
+                game.Id = Convert.ToInt32((long) cmd.ExecuteScalar());
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            #endregion
+
+            //Добавляем игроков в игру(пока сделаем через Action)
+            foreach (var player in roster)
+            {
+                //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
+                AddAction(game.Id, player.Id, Action.Игра);
+;           }
+
+            foreach (var goal in game.Goal)
+            {
+                AddGoal(goal, game.Id);
+            }
+        }
+
+        private void AddGoal(Goal goal, int game_id)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format(
+                "INSERT INTO goal " +
+                "(game_id, pp, sh) " +
+                "VALUES({0},{1}, {2})",
+                game_id, goal.PowerPlay, goal.ShortHand);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+
+                cmd.CommandText = @"select last_insert_rowid()";
+                goal.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            cmd.CommandText = string.Format(
+                "INSERT INTO goal_player " +
+                "(goal_id, player_id, assist1_id, assist2_id) " +
+                "VALUES({0},{1}, {2},{3})",
+                 goal.Id, goal.Author.Id, goal.Assistant1.Id, goal.Assistant2.Id);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        #region SelectOrInsert
+
+        private Player GetPlayerOrInsert(Player player)
+        {
+            //TODO сделать, что бы первую большую букву делал
+            //player.Name = player.Name.ToLowerInvariant()[0].
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select ID from player where name = '{0}' AND " +
+                                            "lastname = '{1}' AND number = {2}",
+                 player.Name, player.Surname, player.Number);
+
+            try
+            {
+                object obj = cmd.ExecuteScalar();
+                if (obj == null)
+                {
+                    cmd.CommandText = String.Format(
+                        "INSERT INTO player(name, lastname, number) VALUES ('{0}', '{1}', {2})",
+                        player.Name, player.Surname, player.Number);
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"select last_insert_rowid()";
+                    player.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
+                }
+                else
+                {
+                    player.Id = Convert.ToInt32(obj);
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return player;
+        }
+
+        private int GetTeamId(string teamname)
+        {
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"select ID from team where name_lower = '{teamname}' ";
+
+            try
+            {
+                object obj = cmd.ExecuteScalar();
+                if (obj == null)
+                {
+                    cmd.CommandText =
+                        $"INSERT INTO team(name, name_lower) VALUES ('{teamname}', '{teamname.ToLower()}')";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"select last_insert_rowid()";
+                    return Convert.ToInt32((long) cmd.ExecuteScalar());
+                }
+                else
+                {
+                    return Convert.ToInt32(obj);
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return 0;
+        }
+
         private Tournament GetTournamentByNameOrInsert(string s, int season_id)
         {
             Tournament tournament = new Tournament(s);
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("select ID from tournament where name_lower = '{0}' AND season_id = {1}",
+            cmd.CommandText = string.Format("select ID from tournament where name_lower = '{0}'",
                  tournament.Name.ToLower(), season_id);
 
             try
@@ -510,7 +672,7 @@ namespace Aviators
                 object obj = cmd.ExecuteScalar();
                 if (obj == null)
                 {
-                    cmd.CommandText = $"INSERT INTO tournament(name, name_lower, season_id) VALUES ('{s}', '{s.ToLower()}', {season_id})";
+                    cmd.CommandText = $"INSERT INTO tournament(name, name_lower) VALUES ('{s}', '{s.ToLower()}')";
                     cmd.ExecuteNonQuery();
 
                     cmd.CommandText = @"select last_insert_rowid()";
@@ -562,5 +724,7 @@ namespace Aviators
             }
             return season;
         }
+        #endregion
+
     }
 }
