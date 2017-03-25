@@ -22,7 +22,7 @@ namespace Aviators
 
             foreach (var fileInfo in files)
             {
-                Console.Write("Обрабатываем файл: " + fileInfo.Name + " ...");
+                Console.Write("Обрабатываем файл: " + fileInfo.Name + " ... ");
                 ParseTXTFile(fileInfo.FullName);
             }
         }
@@ -49,10 +49,13 @@ namespace Aviators
             int i = 5;
             while (lines[i] != "Счет")
             {
-                var s = lines[i].Replace("\t", " ");
-                var playerInfo = s.Split();
-                var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[2], playerInfo[1]);
-                Roster.Add(newplayer);
+                if (lines[i] != "")
+                {
+                    var s = lines[i].Replace("\t", " ");
+                    var playerInfo = s.Split();
+                    var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[2], playerInfo[1]);
+                    Roster.Add(newplayer);
+                }
 
                 ++i;
             }

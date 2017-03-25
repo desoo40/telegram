@@ -77,6 +77,35 @@ create table game_action (
 );
 
 /*==============================================================*/
+/* Table: goal                                           */
+/*==============================================================*/
+create table goal (
+   id                    INTEGER PRIMARY KEY,
+   game_id              INT4                 null,
+   pp            BOOL                 null,
+   sh               BOOL                 null,   
+   constraint FK_GAME_ACT_REFERENCE_GAME foreign key (game_id)
+      references game (id)
+      on delete restrict on update restrict
+);
+
+/*==============================================================*/
+/* Table: goal_player                                           */
+/*==============================================================*/
+create table goal_player (
+   id                    INTEGER PRIMARY KEY,
+   goal_id              INT4                 null,
+	player_id            INT4                 null,
+	asist            bool                 null,	
+	constraint FK_GAME_ACT_REFERENCE_PLAYER foreign key (player_id)
+      references player (id)
+      on delete restrict on update restrict,	   
+   constraint FK_GAME_ACT_REFERENCE_goME foreign key (goal_id)
+      references goal (id)
+      on delete restrict on update restrict
+);
+
+/*==============================================================*/
 /* Table: team                                               */
 /*==============================================================*/
 create table team (

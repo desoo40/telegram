@@ -14,6 +14,12 @@ namespace Aviators
         public string Lastname { get; set; }
 
 
+        //Временная хуйня наверное
+        public int StatGoal { get; set; }
+        public int StatAssist { get; set; }
+        public int StatBomb { get; set; }
+
+
         public string PhotoFile { get; set; }
         public string Position { get; set; }
         public string VK { get; set; }
@@ -167,6 +173,7 @@ namespace Aviators
 
         public bool PowerPlay { get; set; }
         public bool ShortHand { get; set; }
+
 
     }
 

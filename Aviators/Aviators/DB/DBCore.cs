@@ -440,6 +440,42 @@ namespace Aviators
             return players;
         }
 
+        internal List<Player> GetTopPlayers(Top type, int count)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+
+            var typestring = "";
+            if (type == Top.Asist) typestring += " WHERE asist = 'True'";
+            if (type == Top.Snip) typestring += " WHERE asist = 'False'";
+
+            cmd.CommandText =
+                "SELECT  player_id , count(*) AS num FROM goal_player "+ typestring + " GROUP BY player_id ORDER BY num DESC LIMIT " +
+                count;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            List<Player> players = new List<Player>();
+            while (reader.Read())
+            {
+                var player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
+
+                if (type == Top.Asist) player.StatAssist = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Snip) player.StatGoal = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Bomb) player.StatBomb = Convert.ToInt32(reader["num"].ToString());
+
+                players.Add(player);
+            }
+            return players;
+        }
+
         private Player GetPlayerByNameOrSurname(string nameOrSurname)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -498,11 +534,6 @@ namespace Aviators
             }
         }
 
-        
-     
-
-
-
         public void AddNewGameAndPlayers(Game game, List<Player> roster)
         {
             //Добавляем игроков
@@ -557,7 +588,7 @@ namespace Aviators
             cmd.CommandText = string.Format(
                 "INSERT INTO goal " +
                 "(game_id, pp, sh) " +
-                "VALUES({0},{1}, {2})",
+                "VALUES({0},'{1}', '{2}')",
                 game_id, goal.PowerPlay, goal.ShortHand);
 
             try
@@ -572,11 +603,24 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
 
-            cmd.CommandText = string.Format(
-                "INSERT INTO goal_player " +
-                "(goal_id, player_id, assist1_id, assist2_id) " +
-                "VALUES({0},{1}, {2},{3})",
-                 goal.Id, goal.Author.Id, goal.Assistant1.Id, goal.Assistant2.Id);
+            var sql = string.Format("INSERT INTO goal_player " +
+                "(goal_id, player_id, asist) " +
+                "VALUES ({0},{1}, '{2}');",
+                 goal.Id, goal.Author.Id, false);
+
+            if (goal.Assistant1!= null)
+                sql += string.Format("INSERT INTO goal_player " +
+                "(goal_id, player_id,asist) " +
+                "VALUES ({0},{1}, '{2}');",
+                 goal.Id, goal.Assistant1.Id, true);
+            if (goal.Assistant2 != null)
+                sql += string.Format("INSERT INTO goal_player " +
+                "(goal_id, player_id, asist) " +
+                "VALUES ({0},{1}, '{2}');",
+                 goal.Id, goal.Assistant2.Id, true);
+
+
+            cmd.CommandText = sql;
 
             try
             {

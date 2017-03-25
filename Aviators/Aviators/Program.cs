@@ -11,6 +11,7 @@ namespace Aviators
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
         private static bool InitFromCode = true;
+        private static bool LoadIncome = true;
 
         static void Main(string[] args)
         {
@@ -31,7 +32,7 @@ namespace Aviators
                 }
             }
 
-            Parse.ProcessFiles();
+            if(LoadIncome) Parse.ProcessFiles();
 
             Console.WriteLine("Starting Bot...");
             try
