@@ -458,12 +458,14 @@ namespace Aviators
         private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
             string result = "";
-            List<Player> topPlayers = DB.DBCommands.GetTopPlayers(5);
+            List<Player> topPlayers = new List<Player>();// = DB.DBCommands.GetTopPlayers(5);
             //TODO сделать Денису тут все
 
             
             if (type == Aviators.Top.Bomb)
             {
+                topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
+
                 result = "Топ 5 *бомбардиров* ХК \"Авиаторы\":\n";
 
 
@@ -471,13 +473,17 @@ namespace Aviators
                 {
                     result += $"\n`#{topPlayer.Number}` ";
                     if (topPlayer.Number < 10)
-                        result += "  ";  
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas + topPlayer.Goals}*";
+                        result += "  ";
+                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas + topPlayer.Goals}*";
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatBomb}*";
+
                 }
             }
 
             if (type == Aviators.Top.Asist)
             {
+                topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
+
                 result = "Топ 5 *асистентов* ХК \"Авиаторы\":\n";
 
 
@@ -486,12 +492,16 @@ namespace Aviators
                     result += $"\n`#{topPlayer.Number}` ";
                     if (topPlayer.Number < 10)
                         result += "  "; 
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas}*";
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatAssist}*";
+                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas}*";
+
                 }
             }
 
             if (type == Aviators.Top.Snip)
             {
+                topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
+
                 result = "Топ 5 *снайперов* ХК \"Авиаторы\":\n";
 
 
@@ -499,8 +509,10 @@ namespace Aviators
                 {
                     result += $"\n`#{topPlayer.Number}` ";
                     if (topPlayer.Number < 10)
-                        result += "  ";  
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Goals}*";
+                        result += "  ";
+                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Goals}*";
+                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatGoal}*";
+
                 }
             }
 
