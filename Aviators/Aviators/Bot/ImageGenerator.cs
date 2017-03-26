@@ -12,12 +12,6 @@ namespace Aviators
 {
     public class ImageGenerator
     {
-        struct PairOfRectangle
-        {
-            public Rectangle Left;
-            public Rectangle Right;
-        }
-
         public string GenOxy(string pathToPhoto)
         {
             var str = (new StreamReader(pathToPhoto)).BaseStream;
@@ -47,10 +41,14 @@ namespace Aviators
 
         public string GameStat(Game game)
         {
-            Image bitmap = Image.FromFile("Images\\stata_blank.jpg");
+            Image bitmap = Image.FromFile("Images\\stata_shl.jpg");
 
+            var Segoe56 = new Font("Segoe UI", 56);
             var Segoe = new Font("Segoe UI Semibold", 42);
+
             var Myraid = new Font("Myriad Pro", 42);
+            var Segoe36 = new Font("Segoe UI Semibold", 34, FontStyle.Regular);
+
 
             using (Graphics g = Graphics.FromImage(bitmap))
             {
@@ -66,16 +64,24 @@ namespace Aviators
                 rightFormat.Alignment = StringAlignment.Far;
                 rightFormat.LineAlignment = StringAlignment.Far;
 
-                var score = new PairOfRectangle();
+                var viewers = new Rectangle(740, 165, 100, 25);
 
-                score.Left = new Rectangle(167, 75, 90, 90); // Х У вернего левого, ширина высота
-                score.Right = new Rectangle(300, 75, 90, 90);
+                g.DrawString("300", Segoe36, Brushes.White, viewers, rightFormat);
 
-                g.DrawString("1", Segoe, Brushes.White, score.Left, centerFormat);
-                g.DrawString("2", Segoe, Brushes.White, score.Right, centerFormat);
+                var aviPucks = new Rectangle(167, 75, 90, 90); // Х У вернего левого, ширина высота
+                var enemyPucks= new Rectangle(300, 75, 90, 90);
+
+
+                if (game.Score != null)
+                {
+                    g.DrawString(game.Score.Item1.ToString(), Segoe56, Brushes.White, aviPucks, centerFormat);
+                    g.DrawString(game.Score.Item2.ToString(), Segoe56, Brushes.White, enemyPucks, centerFormat);
+                }
+                g.DrawString("56", Segoe56, Brushes.White, aviPucks, centerFormat);
+                g.DrawString("0", Segoe56, Brushes.White, enemyPucks, centerFormat);
 
                 var statY = 240;
-                var statX = 14;
+                var statX = 15;
 
                 var arrOfStat = new int[6, 2]
                 {
@@ -93,7 +99,7 @@ namespace Aviators
                     for (int j = 0; j < 2; j++)
                     {
                         var tmp = new Rectangle(statX + j * 399, statY + i * 96, 80, 80);
-                        g.DrawString(Convert.ToString(arrOfStat[i, j]), Segoe, Brushes.Black, tmp, centerFormat);
+                        g.DrawString(arrOfStat[i, j].ToString(), Segoe, Brushes.Black, tmp, centerFormat);
 
                     }
                 }
