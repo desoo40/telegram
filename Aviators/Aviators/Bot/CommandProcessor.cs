@@ -546,12 +546,12 @@ namespace Aviators
 
         private async void LastGame(Chat chatFinded)
         {
-            var file = ImageGen.GameStat(new Game {Id = 99});
+            var file = ImageGen.GameStat(DB.DBCommands.GetGame());
 
-            //var photo = new Telegram.Bot.Types.FileToSend("gamestat",
-            //    (new StreamReader(file)).BaseStream);
+            var photo = new Telegram.Bot.Types.FileToSend("gamestat",
+                (new StreamReader(file)).BaseStream);
 
-            //Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
+            Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
         }
         private async void NextGame(Chat chatFinded)
         {

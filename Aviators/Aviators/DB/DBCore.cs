@@ -500,6 +500,116 @@ namespace Aviators
             return null;
         }
 
+        public Game GetGame(int backId = 0)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM game WHERE id =(SELECT MAX(id) FROM game) -"+ backId;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Game game = new Game();
+
+            while (reader.Read())
+            {
+
+                game.Id = Convert.ToInt32(reader["id"].ToString());
+                game.Date = Convert.ToDateTime(reader["date"].ToString());
+
+                game.Team1 = "Авиаторы";
+                var opteam_id = Convert.ToInt32(reader["op_team_id"].ToString());
+                game.Team2 = GetTeam(opteam_id);
+
+                game.Score = new Tuple<int, int>(
+                    Convert.ToInt32(reader["score"].ToString()),
+                    Convert.ToInt32(reader["op_score"].ToString()));
+
+                var tournamentId = Convert.ToInt32(reader["tournament_id"].ToString());
+                game.Tournament = GetTournament(tournamentId);
+
+                game.Stat1 = GetGameStat(game.Id, 1);
+                game.Stat2 = GetGameStat(game.Id, opteam_id);
+            }
+
+            return game;
+        }
+
+        private TeamStat GetGameStat(int gameId, int teamId)
+        {
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM game_stat WHERE game_id = {gameId} AND team_id = {teamId}";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            TeamStat stat = new TeamStat();
+
+            while (reader.Read())
+            {
+                stat.Shots = Convert.ToInt32(reader["shots"].ToString());
+                stat.ShotsIn = Convert.ToInt32(reader["shots_in"].ToString());
+                stat.Faceoff = Convert.ToInt32(reader["faceoff"].ToString());
+                stat.Hits = Convert.ToInt32(reader["hits"].ToString());
+                stat.BlockShots = Convert.ToInt32(reader["block_shots"].ToString());
+                stat.Penalty = Convert.ToInt32(reader["penalty"].ToString());
+            }
+
+            return stat;
+        }
+
+        private Tournament GetTournament(int tournamentId)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select name from tournament where id = {0}", tournamentId);
+
+            try
+            {
+                return new Tournament(cmd.ExecuteScalar().ToString());
+
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return null;
+        }
+
+        private string GetTeam(int opteam_id)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select name from team where id = {0}", opteam_id);
+
+            try
+            {
+                return cmd.ExecuteScalar().ToString();
+
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return "";
+        }
+
         public void AddPlayer(Player player)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -542,12 +652,53 @@ namespace Aviators
                 GetPlayerOrInsert(player);
             }
             //получаем ид турнира //TODO как то тупо, видимо надо просто по ссылке
-            game.Tournament = GetTournamentByNameOrInsert(game.Tournament.Name,0);
+            game.Tournament = GetTournamentByNameOrInsert(game.Tournament.Name, 0);
 
             var opteam_id = GetTeamId(game.Team2);
 
             #region Добавляем игру
 
+            AddGame(game, opteam_id);
+
+            AddGameStat(game.Id, game.Stat1, 1);
+            AddGameStat(game.Id, game.Stat2, opteam_id);
+
+            #endregion
+
+            //Добавляем игроков в игру(пока сделаем через Action)
+            foreach (var player in roster)
+            {
+                //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
+                AddAction(game.Id, player.Id, Action.Игра);
+            }
+
+            foreach (var goal in game.Goal)
+            {
+                AddGoal(goal, game.Id);
+            }
+        }
+
+        private void AddGameStat(int gameId, TeamStat stat, int teamId)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format(
+                "INSERT INTO game_stat " +
+                "(game_id, team_id, shots, shots_in,faceoff, hits, block_shots, penalty) " +
+                "VALUES({0},{1}, {2}, {3}, {4},{5}, {6},{7})",
+                gameId, teamId, stat.Shots, stat.ShotsIn, stat.Faceoff, stat.Hits, stat.BlockShots, stat.Penalty);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        private static void AddGame(Game game, int opteam_id)
+        {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = string.Format(
                 "INSERT INTO game " +
@@ -560,25 +711,11 @@ namespace Aviators
                 cmd.ExecuteNonQuery();
 
                 cmd.CommandText = @"select last_insert_rowid()";
-                game.Id = Convert.ToInt32((long) cmd.ExecuteScalar());
+                game.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
             }
             catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
-            }
-
-            #endregion
-
-            //Добавляем игроков в игру(пока сделаем через Action)
-            foreach (var player in roster)
-            {
-                //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
-                AddAction(game.Id, player.Id, Action.Игра);
-;           }
-
-            foreach (var goal in game.Goal)
-            {
-                AddGoal(goal, game.Id);
             }
         }
 
