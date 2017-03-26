@@ -116,25 +116,26 @@ create table team (
    town                 TEXT                 null
 );
 
+INSERT INTO team(name, name_lower) VALUES ('Авиаторы', 'авиаторы');
+
 /*==============================================================*/
 /* Table: game_stat                                             */
 /*==============================================================*/
 create table game_stat (
-   id                   INT4                 not null,
+   id                  INTEGER PRIMARY KEY,
    game_id              INT4                 null,
    team_id              INT4                 null,
    shots                INT4                 null,
    shots_in             INT4                 null,
    faceoff              INT4                 null,
    hits                 INT4                 null,
-   block_shoots         INT4                 null,
+   block_shots         INT4                 null,
    penalty              INT4                 null,
-   constraint PK_GAME_STAT primary key (id),
    constraint FK_GAME_STA_REFERENCE_GAME foreign key (game_id)
       references game (id)
       on delete cascade on update cascade,
    constraint FK_GAME_STA_REFERENCE_TEAMS foreign key (team_id)
-      references teams (id)
+      references team (id)
       on delete restrict on update restrict
 );
 

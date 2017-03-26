@@ -44,6 +44,8 @@ namespace Aviators
             Game.Date = Convert.ToDateTime(lines[0]);
             Game.Tournament = new Tournament(lines[1]);
 
+
+            Game.Team1 = "Авиаторы";
             Game.Team2 = lines[2];
 
             int i = 5;
