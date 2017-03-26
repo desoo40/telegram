@@ -38,7 +38,7 @@ namespace Aviators
                 }
             }
 
-            if(LoadIncome) Parse.ProcessFiles();
+            if(LoadIncome || args.Length > 0 && args[0] == "load") Parse.ProcessFiles();
 
             Console.WriteLine("Starting Bot...");
             try
