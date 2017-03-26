@@ -12,6 +12,11 @@ namespace Aviators
 {
     public class ImageGenerator
     {
+        struct PairOfRectangle
+        {
+            public Rectangle Left;
+            public Rectangle Right;
+        }
 
         public string GenOxy(string pathToPhoto)
         {
@@ -44,25 +49,63 @@ namespace Aviators
         {
             Image bitmap = Image.FromFile("Images\\stata_blank.jpg");
 
-            var fontScore = new Font("Segoe UI Ligth", 56);
+            var Segoe = new Font("Segoe UI Semibold", 42);
+            var Myraid = new Font("Myriad Pro", 42);
 
             using (Graphics g = Graphics.FromImage(bitmap))
             {
-                //g.DrawString("1", font, Brushes.White, 200, 105);
+                StringFormat centerFormat = new StringFormat();
+                centerFormat.Alignment = StringAlignment.Center;
+                centerFormat.LineAlignment = StringAlignment.Center;
 
-                var r = new Rectangle(180, 90, 65, 65);
+                StringFormat leftFormat = new StringFormat();
+                leftFormat.Alignment = StringAlignment.Near;
+                leftFormat.LineAlignment = StringAlignment.Near;
 
-                StringFormat stringFormat = new StringFormat();
-                stringFormat.Alignment = StringAlignment.Center;
-                stringFormat.LineAlignment = StringAlignment.Center;
+                StringFormat rightFormat = new StringFormat();
+                rightFormat.Alignment = StringAlignment.Far;
+                rightFormat.LineAlignment = StringAlignment.Far;
+
+                var score = new PairOfRectangle();
+
+                score.Left = new Rectangle(167, 75, 90, 90); // Х У вернего левого, ширина высота
+                score.Right = new Rectangle(300, 75, 90, 90);
+
+                g.DrawString("1", Segoe, Brushes.White, score.Left, centerFormat);
+                g.DrawString("2", Segoe, Brushes.White, score.Right, centerFormat);
+
+                var statY = 240;
+                var statX = 14;
+
+                var arrOfStat = new int[6, 2]
+                {
+                    {game.Stat1.Shots, game.Stat2.Shots},
+                    {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
+                    {game.Stat1.Faceoff, game.Stat2.Faceoff},
+                    {game.Stat1.Hits, game.Stat2.Shots},
+                    {game.Stat1.Penalty, game.Stat2.Penalty},
+                    {game.Stat1.BlockShots, game.Stat2.BlockShots},
+                };
 
 
-                //g.DrawRectangle(Pens.Red,r);
-                g.DrawString("1", fontScore, Brushes.White, r, stringFormat);
-                g.DrawString("2", fontScore, Brushes.White, 330, 105);
+                for (int i = 0; i < 6; i++)
+                {
+                    for (int j = 0; j < 2; j++)
+                    {
+                        var tmp = new Rectangle(statX + j * 399, statY + i * 96, 80, 80);
+                        g.DrawString(Convert.ToString(arrOfStat[i, j]), Segoe, Brushes.Black, tmp, centerFormat);
+
+                    }
+                }
+
+
+                //g.DrawRectangle(Pens.Red, aviGoals);
+                //g.DrawRectangle(Pens.Red, enemyGoals);
+
+
             }
 
-            var file = $"Images\\game_{game.Id}.jpg";
+            var file = $"Images\\game_as.jpg";
             bitmap.Save(file, ImageFormat.Jpeg);
             return file;
         }
