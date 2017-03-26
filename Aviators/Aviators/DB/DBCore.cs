@@ -247,7 +247,7 @@ namespace Aviators
         public Player GetPlayerByNumber(int number)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT player.*,position_dic.name AS pos  FROM player LEFT JOIN position_dic ON position_dic.id = position_id WHERE number = " + number;
+            cmd.CommandText = "SELECT * FROM player WHERE number = " + number;
 
             SqliteDataReader reader = null;
             try
@@ -264,9 +264,9 @@ namespace Aviators
                     reader["name"].ToString(),
                     reader["lastname"].ToString());
                 player.Id = Convert.ToInt32(reader["id"].ToString());
-                player.Position = reader["pos"].ToString();
-                player.VK = reader["vk_href"].ToString();
-                player.INSTA = reader["insta_href"].ToString();
+                //player.Position = reader["pos"].ToString();
+                //player.VK = reader["vk_href"].ToString();
+                //player.INSTA = reader["insta_href"].ToString();
 
                 return player;
             }
@@ -675,7 +675,7 @@ namespace Aviators
         {
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = $"select ID from team where name_lower = '{teamname}' ";
+            cmd.CommandText = $"select ID from team where name_lower = '{teamname.ToLower()}' ";
 
             try
             {

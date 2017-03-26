@@ -77,6 +77,7 @@
     <Compile Include="Bot\AviaBot.cs" />
     <Compile Include="Bot\Chat.cs" />
     <Compile Include="Bot\CommandProcessor.cs" />
+    <Compile Include="Bot\ImageGenerator.cs" />
     <Compile Include="Configs\Config.cs" />
     <Compile Include="Data\ParseFiles.cs" />
     <Compile Include="DB\DBCore.cs" />

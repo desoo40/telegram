@@ -21,6 +21,7 @@ namespace Aviators
     {
         private TelegramBotClient Bot;
         private readonly Randomiser Gen;
+        private ImageGenerator ImageGen;
         //private DBCore DB;
         Regex rxNums = new Regex(@"^\d+$"); // проверка на число
 
@@ -29,6 +30,7 @@ namespace Aviators
         {
             Bot = bot;
             Gen = new Randomiser();
+            ImageGen = new ImageGenerator();
             //DB = new DBCore();
         }
 
@@ -74,6 +76,10 @@ namespace Aviators
 
                 case "следующая":
                     NextGame(chatFinded);
+                    return;
+
+                case "последняя":
+                    LastGame(chatFinded);
                     return;
 
                 case "соперник":
@@ -332,30 +338,10 @@ namespace Aviators
                     Console.WriteLine($"Send player:{player.Surname}");
                     if (File.Exists(photopath))
                     {
-
-                        var str = (new StreamReader(photopath)).BaseStream;
-                        Bitmap bitmap = new Bitmap(str);
-
-                        var ssss = @"Говно, залупа, пенис, хер, давалка, хуй, блядина,
-Головка, шлюха, жопа, член, еблан, петух, мудила,
-Рукоблуд, ссанина, очко, блядун, вагина,
-Сука, ебланище, влагалище, пердун, дрочила,
-Пидор, пизда, туз, малафья, гомик, мудила, пилотка, манда,
-Анус, вагина, путана, педрила, шалава, хуила, мошонка, елда";
-
-                        var spl = ssss.Split(',');
-
-                        Random r = new Random();
-                        int i = r.Next(spl.Length);
-
-                        using (Graphics g = Graphics.FromImage(bitmap))
-                        {
-                            g.DrawString(spl[i].Trim().ToUpper(), new Font(FontFamily.GenericSansSerif, 30), Brushes.Chartreuse, 50, 600);
-                        }
-
-                        bitmap.Save("temp.jpg", ImageFormat.Jpeg);
+                        var file = ImageGen.GenOxy(photopath);
+                        
                         var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                            (new StreamReader("temp.jpg")).BaseStream);
+                            (new StreamReader(file)).BaseStream);
 
                         var button  = new InlineKeyboardButton("Статистика");
                         var keyboard = new InlineKeyboardMarkup(new[]{new[] { button }});
@@ -557,6 +543,16 @@ namespace Aviators
             await Bot.SendTextMessageAsync(chatFinded.Id, "*Привет, я соперник*", parseMode: ParseMode.Markdown);
         }
 
+
+        private async void LastGame(Chat chatFinded)
+        {
+            var file = ImageGen.GameStat(new Game {Id = 99});
+
+            //var photo = new Telegram.Bot.Types.FileToSend("gamestat",
+            //    (new StreamReader(file)).BaseStream);
+
+            //Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
+        }
         private async void NextGame(Chat chatFinded)
         {
             await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я следующая игра");
