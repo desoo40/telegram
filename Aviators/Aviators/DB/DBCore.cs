@@ -76,10 +76,6 @@ namespace Aviators
             }
         }
 
-       
-
-
-
         #region Import
 
         //public void LoadPlayersFromFile()
@@ -216,9 +212,6 @@ namespace Aviators
         
 
         #endregion
-
-
-
 
         public static void Initialization()
         {
@@ -768,6 +761,7 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
         }
+
 
         #region SelectOrInsert
 
