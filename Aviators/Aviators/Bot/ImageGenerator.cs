@@ -3,10 +3,12 @@ using System.Collections.Generic;
 using System.Drawing;
 using System.Drawing.Drawing2D;
 using System.Drawing.Imaging;
+using System.Drawing.Text;
 using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Windows.Forms;
 
 namespace Aviators
 {
@@ -41,7 +43,7 @@ namespace Aviators
 
         public string GameStat(Game game)
         {
-            Image bitmap = Image.FromFile("Images\\stata_shl.jpg");
+            Image bitmap = Image.FromFile("Images\\stata_blank.jpg");
 
             var Segoe56 = new Font("Segoe UI", 56);
             var Segoe = new Font("Segoe UI Semibold", 42);
@@ -71,6 +73,7 @@ namespace Aviators
                 var aviPucks = new Rectangle(167, 75, 90, 90); // Х У вернего левого, ширина высота
                 var enemyPucks= new Rectangle(300, 75, 90, 90);
 
+                TextRenderer.DrawText(g, "dfgdf", Myraid, aviPucks,Color.Red);
 
                 if (game.Score != null)
                 {
