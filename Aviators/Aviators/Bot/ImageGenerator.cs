@@ -32,7 +32,7 @@ namespace Aviators
             var str = (new StreamReader(pathToPhoto)).BaseStream;
             Bitmap bitmap = new Bitmap(str);
 
-            var ssss = @"Красавчик";
+            var ssss = @"";
 
             var spl = ssss.Split(',');
 
