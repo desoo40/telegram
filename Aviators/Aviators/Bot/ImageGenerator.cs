@@ -56,7 +56,7 @@ namespace Aviators
 
         public string GameStat(Game game)
         {
-            Image bitmap = Image.FromFile("Images\\stata_blank.jpg");
+            Image bitmap = Image.FromFile("Images\\stata_shl2.jpg");
 
             var enemyFont = new Font(statFonts.Families[2], 24);
             var viewersFont = new Font(statFonts.Families[2], 38);
@@ -117,7 +117,7 @@ namespace Aviators
                 var aviPucks = new Rectangle(167, 75, 90, 90); // Х У вернего левого, ширина высота
                 var enemyPucks= new Rectangle(300, 75, 90, 90);
 
-                TextRenderer.DrawText(g, "dfgdf", Myraid, aviPucks,Color.Red);
+                //TextRenderer.DrawText(g, "dfgdf", Myraid, aviPucks,Color.Red);
 
                 if (game.Score != null)
                 {
@@ -125,8 +125,8 @@ namespace Aviators
                     g.DrawString(game.Score.Item2.ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
                 }
 
-                g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, aviPucks, centerFormat);
-                g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
+                //g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, aviPucks, centerFormat);
+                //g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
 #endregion
 
                 #region Статистика

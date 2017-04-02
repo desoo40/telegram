@@ -96,7 +96,7 @@ create table goal_player (
    id                    INTEGER PRIMARY KEY,
    goal_id              INT4                 null,
 	player_id            INT4                 null,
-	asist            bool                 null,	
+	asist            BOOLEAN                 null,	
 	constraint FK_GAME_ACT_REFERENCE_PLAYER foreign key (player_id)
       references player (id)
       on delete restrict on update restrict,	   

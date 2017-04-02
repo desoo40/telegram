@@ -240,7 +240,7 @@ namespace Aviators
         public Player GetPlayerByNumber(int number)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM player WHERE number = " + number;
+            cmd.CommandText = "SELECT * FROM player WHERE number = " + number + " ORDER BY id DESC";
 
             SqliteDataReader reader = null;
             try
@@ -381,7 +381,7 @@ namespace Aviators
             if (player == null) return null;
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM game_action WHERE player_id = " + player.Id;
+            cmd.CommandText = "SELECT * FROM game_action  WHERE player_id = " + player.Id;
 
             SqliteDataReader reader = null;
             try
@@ -397,6 +397,30 @@ namespace Aviators
             {
                 var game_id = reader["game_id"].ToString();
                 var action = (Action)Convert.ToInt32(reader["action"].ToString());
+                var gameaction = new GameAction(player, game_id, action);
+
+                player.Actions.Add(gameaction);
+            }
+            reader.Close();
+            cmd.CommandText = "SELECT * FROM goal_player  LEFT JOIN goal ON goal_player.goal_id = goal.id WHERE player_id = " + player.Id;
+
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            //var playeractions = new List<GameAction>();
+            while (reader.Read())
+            {
+                var game_id = reader["game_id"].ToString();
+                // bool ass = reader["asist"].ToString() == "True";
+
+                var kek = (bool)reader["asist"];
+                var action = Action.Гол;
+                //if (ass) action = Action.Пас;;
                 var gameaction = new GameAction(player, game_id, action);
 
                 player.Actions.Add(gameaction);
