@@ -5,12 +5,14 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Windows.Forms;
 using Telegram.Bot;
 using Aviators.Configs;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Telegram.Bot.Types.ReplyMarkups;
 using File = System.IO.File;
+using Message = Telegram.Bot.Types.Message;
 
 namespace Aviators
 {
@@ -104,6 +106,9 @@ namespace Aviators
                     return;
                 case "полезность":
                     Top(chatFinded, Aviators.Top.Usefull);
+                    return;
+                case "среднее":
+                    Top(chatFinded, Aviators.Top.APG);
                     return;
 
             }
@@ -430,8 +435,9 @@ namespace Aviators
                 result += String.Format("{0, 0} {1, 18}\n", "Голы:", player.Goals);
                 result += String.Format("{0, 0} {1, 18}\n", "Пасы:", player.Pas);
                 result += String.Format("{0, 0} {1, 12}\n", "Гол+Пас:", player.Goals + player.Pas);
-                result += String.Format("{0, 0} {1, 15}\n", "Штраф:", player.Shtraf);
-                result += String.Format("{0, 0} {1, 23}\n", "+/-:", player.PlusMinus);
+                //result += String.Format("{0, 0} {1, 15}\n", "Штраф:", player.Shtraf);
+                //result += String.Format("{0, 0} {1, 23}\n", "+/-:", player.PlusMinus);
+                result += String.Format("{0, 0} {1, 9:F}\n", "Ср. за игру:", player.StatAverragePerGame);
             }
             return result;
         }
@@ -444,10 +450,20 @@ namespace Aviators
         private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
             string result = "";
-            List<Player> topPlayers = new List<Player>();// = DB.DBCommands.GetTopPlayers(5);
+            List<Player> topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
+
+            result = "Топ 5 *" +GetTypeDescription(type) + "* ХК \"Авиаторы\":\n";
+
+            foreach (var topPlayer in topPlayers)
+            {
+                result += "\n";
+                result += string.Format("`#{0,-3}{1,-20}`*{2}*", topPlayer.Number, topPlayer.Name + " " + topPlayer.Surname,
+                    GetTypeParametr(type, topPlayer));
+
+            }
             //TODO сделать Денису тут все
 
-            
+
             if (type == Aviators.Top.Bomb)
             {
                 topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
@@ -457,11 +473,14 @@ namespace Aviators
 
                 foreach (var topPlayer in topPlayers)
                 {
-                    result += $"\n`#{topPlayer.Number}` ";
-                    if (topPlayer.Number < 10)
-                        result += "  ";
-                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas + topPlayer.Goals}*";
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatBomb}*";
+                    //result += $"\n`#{topPlayer.Number}` ";
+                    //if (topPlayer.Number < 10)
+                    //    result += "  ";
+                    ////result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas + topPlayer.Goals}*";
+                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatBomb}*";
+                    result += "\n";
+                    result += string.Format("`#{0,-3}{1,-20}`*{2}*", topPlayer.Number, topPlayer.Name + " " + topPlayer.Surname,
+                        topPlayer.StatBomb);
 
                 }
             }
@@ -564,7 +583,26 @@ namespace Aviators
         }
         #endregion
 
-       
+
+        private string GetTypeDescription(Top type)
+        {
+            switch (type)
+            {
+                    case Aviators.Top.APG:
+                    return "среднее очков за игру";
+            }
+            return "";
+        }
+
+        private string GetTypeParametr(Top type, Player topPlayer)
+        {
+            switch (type)
+            {
+                case Aviators.Top.APG:
+                    return topPlayer.StatAverragePerGame.ToString("F");
+            }
+            return "";
+        }
     }
 
     public class Command
@@ -598,6 +636,7 @@ namespace Aviators
         BadBoy,
         Bomb,
         Snip,
-        Usefull
+        Usefull,
+        APG
     }
 }

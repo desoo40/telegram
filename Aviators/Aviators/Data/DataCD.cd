@@ -4,8 +4,8 @@
     <Position X="0.5" Y="2.25" Width="1.5" />
     <AssociationLine Name="Actions" Type="Aviators.GameAction" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="2" Y="4.813" />
-        <Point X="4.76" Y="4.813" />
+        <Point X="2" Y="4.915" />
+        <Point X="4.76" Y="4.915" />
         <Point X="4.76" Y="1.559" />
         <Point X="5.75" Y="1.559" />
         <Point X="5.75" Y="1.688" />
@@ -15,7 +15,7 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>QAACAAAAIAAIAgAsAEAEAAUABAAAAAAAAABAAgAAIAA=</HashCode>
+      <HashCode>UAACAAAAIAAIAgAsgEAEAAUABAAAAAAAAABAAgAAIAA=</HashCode>
       <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>
@@ -30,7 +30,7 @@
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
-      <HashCode>AgACAAAAIQAAAAgAAAAAAAAAAgAAAAABAEAAAAAAQAA=</HashCode>
+      <HashCode>AwACAAAAIQAAgAgAAAAAQAAAAgAAAAABAEAAAAAAQBA=</HashCode>
       <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
     <ShowAsCollectionAssociation>

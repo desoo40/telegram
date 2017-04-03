@@ -19,6 +19,8 @@ namespace Aviators
         public int StatAssist { get; set; }
         public int StatBomb { get; set; }
 
+        public float StatAverragePerGame => (float) ((Goals + Pas) / (float) Games);
+
 
         public string PhotoFile { get; set; }
         public string Position { get; set; }

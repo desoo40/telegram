@@ -5,6 +5,7 @@ using System.Text.RegularExpressions;
 using Mono.Data.Sqlite;
 using Aviators.Configs;
 using System.Globalization;
+using System.Linq;
 
 namespace Aviators
 {
@@ -331,7 +332,7 @@ namespace Aviators
 
                 var player = new Player(number, name, lastname);
                 player.Id = Convert.ToInt32(reader["id"].ToString());
-                player.Position = reader["position_id"].ToString();
+                player.Position = reader["positionid"].ToString();
                 players.Add(player);
             }
             return players;
@@ -402,7 +403,7 @@ namespace Aviators
                 player.Actions.Add(gameaction);
             }
             reader.Close();
-            cmd.CommandText = "SELECT * FROM goal_player  LEFT JOIN goal ON goal_player.goal_id = goal.id WHERE player_id = " + player.Id;
+            cmd.CommandText = "SELECT goal_player.asist, goal.game_id  FROM goal_player  LEFT JOIN goal ON goal_player.goal_id = goal.id WHERE player_id = " + player.Id;
 
             try
             {
@@ -415,12 +416,15 @@ namespace Aviators
             //var playeractions = new List<GameAction>();
             while (reader.Read())
             {
+                //var id  = reader["id"].ToString();
                 var game_id = reader["game_id"].ToString();
-                // bool ass = reader["asist"].ToString() == "True";
+                 bool ass = reader["asist"].ToString() == "True";
 
-                var kek = (bool)reader["asist"];
+                //var s = reader["asist"].ToString();
+
+                //var kek = reader.GetBoolean(1);
                 var action = Action.Гол;
-                //if (ass) action = Action.Пас;;
+               if (ass) action = Action.Пас;;
                 var gameaction = new GameAction(player, game_id, action);
 
                 player.Actions.Add(gameaction);
@@ -429,36 +433,21 @@ namespace Aviators
         }
 
 
-        public List<Player> GetTopPlayers(int input)
+        private List<Player> GetTopPlayersAPG(int input)
         {
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText =
-                "SELECT  player_id , count(*) AS num FROM game_action GROUP BY player_id ORDER BY num DESC LIMIT " +
-                input;
-
-            SqliteDataReader reader = null;
-            try
+            List<Player> players = GetAllPlayerWitoutStatistic();
+            foreach (var player in players)
             {
-                reader = cmd.ExecuteReader();
+                GetPlayerStatistic(player);
             }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            List<Player> players = new List<Player>();
-            while (reader.Read())
-            {
-                var player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
-
-                player = GetPlayerStatistic(player);
-                players.Add(player);
-            }
-            return players;
+           
+            return players.OrderByDescending(p=>p.StatAverragePerGame).ToList().GetRange(0,input);
         }
 
         internal List<Player> GetTopPlayers(Top type, int count)
         {
+            if (type == Top.APG) return GetTopPlayersAPG(count);
+
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
 
             var typestring = "";
