@@ -451,8 +451,8 @@ namespace Aviators
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
 
             var typestring = "";
-            if (type == Top.Asist) typestring += " WHERE asist = 'True'";
-            if (type == Top.Snip) typestring += " WHERE asist = 'False'";
+            if (type == Top.Assist) typestring += " WHERE asist = 'True'";
+            if (type == Top.Goals) typestring += " WHERE asist = 'False'";
 
             cmd.CommandText =
                 "SELECT  player_id , count(*) AS num FROM goal_player "+ typestring + " GROUP BY player_id ORDER BY num DESC LIMIT " +
@@ -473,9 +473,9 @@ namespace Aviators
             {
                 var player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
 
-                if (type == Top.Asist) player.StatAssist = Convert.ToInt32(reader["num"].ToString());
-                if (type == Top.Snip) player.StatGoal = Convert.ToInt32(reader["num"].ToString());
-                if (type == Top.Bomb) player.StatBomb = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Assist) player.StatAssist = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Goals) player.StatGoal = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Points) player.StatBomb = Convert.ToInt32(reader["num"].ToString());
 
                 players.Add(player);
             }

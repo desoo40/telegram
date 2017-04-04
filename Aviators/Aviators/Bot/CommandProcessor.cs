@@ -6,6 +6,7 @@ using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
 using System.Windows.Forms;
+using Aviators.Bot;
 using Telegram.Bot;
 using Aviators.Configs;
 using Telegram.Bot.Types;
@@ -45,7 +46,7 @@ namespace Aviators
             if (rxNums.IsMatch(command.Name))
             {
                 //в случае числа показываем игрока
-                var number = int.Parse(command.Name);
+                //var number = int.Parse(command.Name);
                 ShowPlayerByNubmer(chatFinded, command);
                 return;
             }
@@ -57,21 +58,9 @@ namespace Aviators
                     return;
 
                 case "статистика":
-                    if (command.Argument != null)
-                    {
-                        PlayerStatistic(chatFinded, command.Argument);
-                        return;
-                    }
-                    else
-                    {
-                        TourAnswer(chatFinded);
-                        //chatFinded.PersonalStatMode = true;
-                        //if (isLastCommand)
-                        // {
-                        // await Bot.SendTextMessageAsync(chatFinded.Id, "Введите номер или фамилию игрока"); // рассмотреть возможность однофамильцев
-                        //}
-                        return;
-                    }
+                    PlayerStatistic(chatFinded, command.Argument);
+                    return;
+                    
                 case "расписание":
                     TimeTable(chatFinded, 0);
                     return;
@@ -93,19 +82,19 @@ namespace Aviators
                     return;
 
                 case "бомбардиры":
-                    Top(chatFinded, Aviators.Top.Bomb);
+                    Top(chatFinded, Aviators.Top.Points);
                     return;
                 case "снайперы":
-                    Top(chatFinded, Aviators.Top.Snip);
+                    Top(chatFinded, Aviators.Top.Goals);
                     return;
-                case "асистенты":
-                    Top(chatFinded, Aviators.Top.Asist);
+                case "ассистенты":
+                    Top(chatFinded, Aviators.Top.Assist);
                     return;
                 case "штрафники":
-                    Top(chatFinded, Aviators.Top.BadBoy);
+                    Top(chatFinded, Aviators.Top.Penalty);
                     return;
                 case "полезность":
-                    Top(chatFinded, Aviators.Top.Usefull);
+                    Top(chatFinded, Aviators.Top.PlusMinus);
                     return;
                 case "среднее":
                     Top(chatFinded, Aviators.Top.APG);
@@ -125,6 +114,8 @@ namespace Aviators
 
             await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
         }
+
+        #region неиспользумое
 
         private async void ProcessCommands(Chat chatFinded, int fromId)
         {
@@ -203,8 +194,8 @@ namespace Aviators
             //    }
 
             //    //do command
-                
-                
+
+
 
             //    //если не в режиме, не установили режим, не выполнили команду сразу, может пользователь ввёл число для поиска игрока
             //    if (rxNums.IsMatch(command))
@@ -235,7 +226,7 @@ namespace Aviators
             var rowCount = tours.Count%2 == 0 ? tours.Count/2 : tours.Count/2 + 1;
             ++rowCount; // ибо "официальные" и "все"
 
-            var keys2 = new Telegram.Bot.Types.ReplyMarkups.InlineKeyboardMarkup();
+            var keys2 = new InlineKeyboardMarkup();
             keys2.InlineKeyboard = new InlineKeyboardButton[1][];
             keys2.InlineKeyboard[0] = new InlineKeyboardButton[1];
             keys2.InlineKeyboard[0][0] = new InlineKeyboardButton("ГОГОУ!");
@@ -271,12 +262,14 @@ namespace Aviators
         private async void WrongCmd(Chat chatFinded)
         {
             chatFinded.ResetMode();
-            var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup();
-            keys.Keyboard = new Telegram.Bot.Types.KeyboardButton[1][];
-            keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
+            var keys = new ReplyKeyboardMarkup();
+            keys.Keyboard = new KeyboardButton[1][];
+            keys.Keyboard[0] = new KeyboardButton[1]
+            {new KeyboardButton("/помощь")};
             keys.ResizeKeyboard = true;
             keys.OneTimeKeyboard = true;
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный запрос, воспользуйтесь /помощь", false, false, 0, keys);
+            await
+                Bot.SendTextMessageAsync(chatFinded.Id, "Неверный запрос, воспользуйтесь /помощь", false, false, 0, keys);
         }
 
         private async void ExceptionOnCmd(Chat chatFinded, Exception ex)
@@ -309,6 +302,43 @@ namespace Aviators
             DB.DBCommands.RemovePlayerByNumber(number);
             await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
             //ShowPlayerByNubmer(chatFinded, number);
+        }
+
+        #endregion
+
+        #region Исполнение команд
+
+        /// <summary>
+        /// Выводит помощь по командам
+        /// </summary>
+        private async void Help(Chat chatFinded)
+        {
+            var p = DB.DBCommands.GetAllPlayerWitoutStatistic();
+            var n = p[(new Random()).Next(p.Count - 1)].Number;
+
+            var help =
+@"Управление:
+
+Топ игроков команды:
+--------------------
+/бомбардиры
+/снайперы
+/асистенты
+/штрафники
+/полезность (+/-)
+--------------------
+
+/статистика игрока
+/расписание - ближайшие 3 игры
+/следующая игра: дата, время, соперник и место
+/соперник - история встреч
+/кричалки - выводит одну из кричалок команды
+
+💥Также попробуйте ввести номер любимого игрока💥";
+
+            help = help.Replace("'%номер%'", $"{n}");
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, help);
         }
 
         private async void ShowPlayerByNubmer(Chat chatFinded, Command command)
@@ -344,14 +374,14 @@ namespace Aviators
                     if (File.Exists(photopath))
                     {
                         var file = ImageGen.GenOxy(photopath);
-                        
+
                         var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
                             (new StreamReader(file)).BaseStream);
 
-                        var button  = new InlineKeyboardButton("Статистика");
-                        var keyboard = new InlineKeyboardMarkup(new[]{new[] { button }});
+                        var button = new InlineKeyboardButton("Статистика");
+                        var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
-                        Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup:keyboard);
+                        Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup: keyboard);
                         command.Message = mes;
                         chatFinded.WaitingCommands.Add(command);
                     }
@@ -367,46 +397,6 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
                 await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать.");
             }
-        }
-
-
-
-      
-
-
-        #region Исполнение команд
-
-        /// <summary>
-        /// Выводит помощь по командам
-        /// </summary>
-        private async void Help(Chat chatFinded)
-        {
-            var p = DB.DBCommands.GetAllPlayerWitoutStatistic();
-            var n = p[(new Random()).Next(p.Count - 1)].Number;
-
-            var help =
-@"Управление:
-
-Топ игроков команды:
---------------------
-/бомбардиры
-/снайперы
-/асистенты
-/штрафники
-/полезность (+/-)
---------------------
-
-/статистика игрока
-/расписание - ближайшие 3 игры
-/следующая игра: дата, время, соперник и место
-/соперник - история встреч
-/кричалки - выводит одну из кричалок команды
-
-💥Также попробуйте ввести номер любимого игрока💥";
-
-            help = help.Replace("'%номер%'", $"{n}");
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, help);
         }
 
         private string GetPlayerStatistic(string arg)
@@ -457,96 +447,10 @@ namespace Aviators
             foreach (var topPlayer in topPlayers)
             {
                 result += "\n";
-                result += string.Format("`#{0,-3}{1,-20}`*{2}*", topPlayer.Number, topPlayer.Name + " " + topPlayer.Surname,
+                result += string.Format("`#{0,-3}{1,-20}`*{2}*", topPlayer.Number,
+                    topPlayer.Name + " " + topPlayer.Surname,
                     GetTypeParametr(type, topPlayer));
 
-            }
-            //TODO сделать Денису тут все
-
-
-            if (type == Aviators.Top.Bomb)
-            {
-                topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
-
-                result = "Топ 5 *бомбардиров* ХК \"Авиаторы\":\n";
-
-
-                foreach (var topPlayer in topPlayers)
-                {
-                    //result += $"\n`#{topPlayer.Number}` ";
-                    //if (topPlayer.Number < 10)
-                    //    result += "  ";
-                    ////result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas + topPlayer.Goals}*";
-                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatBomb}*";
-                    result += "\n";
-                    result += string.Format("`#{0,-3}{1,-20}`*{2}*", topPlayer.Number, topPlayer.Name + " " + topPlayer.Surname,
-                        topPlayer.StatBomb);
-
-                }
-            }
-
-            if (type == Aviators.Top.Asist)
-            {
-                topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
-
-                result = "Топ 5 *асистентов* ХК \"Авиаторы\":\n";
-
-
-                foreach (var topPlayer in topPlayers)
-                {
-                    result += $"\n`#{topPlayer.Number}` ";
-                    if (topPlayer.Number < 10)
-                        result += "  "; 
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatAssist}*";
-                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Pas}*";
-
-                }
-            }
-
-            if (type == Aviators.Top.Snip)
-            {
-                topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
-
-                result = "Топ 5 *снайперов* ХК \"Авиаторы\":\n";
-
-
-                foreach (var topPlayer in topPlayers)
-                {
-                    result += $"\n`#{topPlayer.Number}` ";
-                    if (topPlayer.Number < 10)
-                        result += "  ";
-                    //result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Goals}*";
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.StatGoal}*";
-
-                }
-            }
-
-            if (type == Aviators.Top.BadBoy)
-            {
-                result = "Топ 5 *штрафников* ХК \"Авиаторы\":\n";
-
-
-                foreach (var topPlayer in topPlayers)
-                {
-                    result += $"\n`#{topPlayer.Number}` ";
-                    if (topPlayer.Number < 10)
-                        result += "  ";  
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.Shtraf}*";
-                }
-            }
-
-            if (type == Aviators.Top.Usefull)
-            {
-                result = "Топ 5 *полезных игроков* ХК \"Авиаторы\":\n";
-
-
-                foreach (var topPlayer in topPlayers)
-                {
-                    result += $"\n`#{topPlayer.Number}` ";
-                    if (topPlayer.Number < 10)
-                        result += "  ";  
-                    result += $"{topPlayer.Name} {topPlayer.Surname}     *{topPlayer.PlusMinus}*";
-                }
             }
 
             await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
@@ -588,8 +492,23 @@ namespace Aviators
         {
             switch (type)
             {
-                    case Aviators.Top.APG:
+                case Aviators.Top.APG:
                     return "среднее очков за игру";
+
+                case Aviators.Top.Goals:
+                    return "снайперов";
+
+                case Aviators.Top.Assist:
+                    return "ассистентов";
+
+                case Aviators.Top.Points:
+                    return "бомбардиров";
+
+                case Aviators.Top.Penalty:
+                    return "штрафников";
+
+                case Aviators.Top.PlusMinus:
+                    return "полезных игроков";
             }
             return "";
         }
@@ -600,6 +519,22 @@ namespace Aviators
             {
                 case Aviators.Top.APG:
                     return topPlayer.StatAverragePerGame.ToString("F");
+
+                case Aviators.Top.Goals:
+                    return topPlayer.StatGoal.ToString();
+
+                case Aviators.Top.Assist:
+                    return topPlayer.StatAssist.ToString();
+
+                case Aviators.Top.Points:
+                    return (topPlayer.StatAssist + topPlayer.StatGoal).ToString();
+
+                case Aviators.Top.Penalty:
+                    return topPlayer.Shtraf.ToString();
+
+                case Aviators.Top.PlusMinus:
+                    return topPlayer.PlusMinus.ToString();
+
             }
             return "";
         }
@@ -631,12 +566,14 @@ namespace Aviators
 
     public enum Top
     {
-        All,
-        Asist,
-        BadBoy,
-        Bomb,
-        Snip,
-        Usefull,
+        Assist,
+        Penalty,
+        Points,
+        Goals,
+        PlusMinus,
         APG
     }
+
+
+
 }

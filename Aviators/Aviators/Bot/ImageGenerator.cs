@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Aviators.Properties;
 
 namespace Aviators
 {
@@ -20,6 +21,7 @@ namespace Aviators
         {
             //Добавляем шрифт из указанного файла в em.Drawing.Text.PrivateFontCollection
             statFonts = new PrivateFontCollection();
+
             statFonts.AddFontFile("Fonts/MyriadPro-Cond.otf");
             statFonts.AddFontFile("Fonts/MyriadPro-Regular.otf");
             statFonts.AddFontFile("Fonts/MyriadPro-Semibold.otf");
