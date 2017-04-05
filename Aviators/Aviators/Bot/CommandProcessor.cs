@@ -527,7 +527,7 @@ namespace Aviators
                     return topPlayer.StatAssist.ToString();
 
                 case Aviators.Top.Points:
-                    return (topPlayer.StatAssist + topPlayer.StatGoal).ToString();
+                    return topPlayer.StatBomb.ToString();
 
                 case Aviators.Top.Penalty:
                     return topPlayer.Shtraf.ToString();
