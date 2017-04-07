@@ -506,7 +506,7 @@ namespace Aviators
             return null;
         }
 
-        public Game GetGame(int backId = 0)
+        public Game GetLastGame(int backId = 0)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = "SELECT * FROM game WHERE id =(SELECT MAX(id) FROM game) -"+ backId;
@@ -595,6 +595,52 @@ namespace Aviators
 
             }
             return null;
+        }
+
+        public List<Game> GetAllGames()
+        {
+            List<Game> games = new List<Game>();
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM game";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
+
+            while (reader.Read())
+            {
+                Game game = new Game();
+                game.Id = Convert.ToInt32(reader["id"].ToString());
+                game.Date = Convert.ToDateTime(reader["date"].ToString());
+
+                game.Team1 = "Авиаторы";
+                var opteam_id = Convert.ToInt32(reader["op_team_id"].ToString());
+                game.Team2 = GetTeam(opteam_id);
+
+                game.Score = new Tuple<int, int>(
+                    Convert.ToInt32(reader["score"].ToString()),
+                    Convert.ToInt32(reader["op_score"].ToString()));
+
+                var tournamentId = Convert.ToInt32(reader["tournament_id"].ToString());
+                game.Tournament = GetTournament(tournamentId);
+
+                game.Stat1 = GetGameStat(game.Id, 1);
+                game.Stat2 = GetGameStat(game.Id, opteam_id);
+
+                games.Add(game);
+            }
+
+            return games;
+
         }
 
         private string GetTeam(int opteam_id)
@@ -913,6 +959,5 @@ namespace Aviators
             return season;
         }
         #endregion
-
     }
 }

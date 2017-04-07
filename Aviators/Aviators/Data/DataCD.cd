@@ -1,17 +1,16 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <ClassDiagram MajorVersion="1" MinorVersion="1" MembersFormat="NameAndType">
   <Class Name="Aviators.Player">
-    <Position X="0.5" Y="2.25" Width="1.5" />
+    <Position X="0.5" Y="2.25" Width="2.25" />
     <AssociationLine Name="Actions" Type="Aviators.GameAction" ManuallyRouted="true" FixedFromPoint="true" FixedToPoint="true">
       <Path>
-        <Point X="2" Y="4.915" />
-        <Point X="4.76" Y="4.915" />
-        <Point X="4.76" Y="1.559" />
-        <Point X="5.75" Y="1.559" />
-        <Point X="5.75" Y="1.688" />
+        <Point X="2.75" Y="4.915" />
+        <Point X="5.25" Y="4.915" />
+        <Point X="5.25" Y="2.938" />
+        <Point X="6.25" Y="2.938" />
       </Path>
       <MemberNameLabel ManuallyPlaced="true">
-        <Position X="1.225" Y="-2.846" />
+        <Position X="-2.586" Y="1.173" />
       </MemberNameLabel>
     </AssociationLine>
     <TypeIdentifier>
@@ -23,7 +22,7 @@
     </ShowAsCollectionAssociation>
   </Class>
   <Class Name="Aviators.Game">
-    <Position X="2.25" Y="0.5" Width="1.75" />
+    <Position X="3" Y="0.5" Width="2" />
     <AssociationLine Name="Actions" Type="Aviators.GameAction">
       <MemberNameLabel ManuallyPlaced="true">
         <Position X="0.047" Y="0.102" />
@@ -33,6 +32,10 @@
       <HashCode>AwACAAAAIQAAgAgAAAAAQAAAAgAAAAABAEAAAAAAQBA=</HashCode>
       <FileName>Data\Data.cs</FileName>
     </TypeIdentifier>
+    <ShowAsAssociation>
+      <Property Name="Stat1" />
+      <Property Name="Stat2" />
+    </ShowAsAssociation>
     <ShowAsCollectionAssociation>
       <Property Name="Actions" />
     </ShowAsCollectionAssociation>
@@ -45,7 +48,7 @@
     </TypeIdentifier>
   </Class>
   <Class Name="Aviators.GameAction">
-    <Position X="5.75" Y="0.5" Width="1.5" />
+    <Position X="6.25" Y="1.75" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAACAAAAAAAAAAAAAAAAAAAAAAgAAAAAAAAAAQAAAAQ=</HashCode>
       <FileName>Data\Data.cs</FileName>
@@ -54,8 +57,15 @@
       <Property Name="Action" />
     </ShowAsAssociation>
   </Class>
+  <Class Name="Aviators.TeamStat">
+    <Position X="8.75" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>AQCAAAAAAAAAAAAAAAGABAAAAAAAAABAAAAAAAAAAAA=</HashCode>
+      <FileName>Data\Data.cs</FileName>
+    </TypeIdentifier>
+  </Class>
   <Enum Name="Aviators.Action">
-    <Position X="5.25" Y="2.75" Width="1.5" />
+    <Position X="6.25" Y="4.5" Width="1.5" />
     <TypeIdentifier>
       <HashCode>AAAAAAgAEAAAAAAAAAAAJAAAAAgAAAAAAAAAAACAAAA=</HashCode>
       <FileName>Data\Data.cs</FileName>

@@ -58,7 +58,10 @@ namespace Aviators
                     return;
 
                 case "статистика":
-                    PlayerStatistic(chatFinded, command.Argument);
+                    if (command.Argument == "команда")
+                        GamesStatistic(chatFinded);
+                    else
+                        PlayerStatistic(chatFinded, command.Argument);
                     return;
                     
                 case "расписание":
@@ -103,6 +106,41 @@ namespace Aviators
             }
 
             //ProcessCommands(chatFinded, fromId);            
+        }
+
+        private async void GamesStatistic(Chat chatFinded)
+        {
+            var result = new List<string>();
+
+            List<Game> allGames = DB.DBCommands.GetAllGames();
+
+            const int otstup = -20;
+
+            var goals = allGames.Sum(g => g.Score.Item1);
+            var shotsIn = allGames.Sum(g => g.Stat1.ShotsIn);
+            var shots = allGames.Sum(g => g.Stat1.Shots);
+            var opGoals = allGames.Sum(g => g.Score.Item2);
+            var allGamesCount = allGames.Count;
+
+            result.Add($"`{"Всего игр",otstup}` {allGamesCount}");
+            result.Add($"`{"Победы",otstup}` {allGames.Count(g => g.Score.Item1 > g.Score.Item2)}");
+            result.Add($"`{"Поражения",otstup}` {allGames.Count(g => g.Score.Item1 < g.Score.Item2)}");
+            result.Add($"`{"Ничьи",otstup}` {allGames.Count(g => g.Score.Item1 == g.Score.Item2)}");
+            result.Add($"`{"Сухие победы",otstup}` {allGames.Count(g => g.Score.Item2 == 0 && g.Score.Item1 != g.Score.Item2)}");
+            result.Add($"`{"Забитые",otstup}` {goals + " (" + (goals / (float)shotsIn * 100).ToString("F") + "%)"}");
+            result.Add($"`{"Пропущеные",otstup}` {opGoals}");
+            result.Add($"`{"КДРАТИО",otstup}` {goals / (float)opGoals:F}");
+            result.Add($"`{"Броски",otstup}` {shots}");
+            result.Add($"`{"Броски в створ",otstup}` {shotsIn + " (" + (shotsIn / (float)shots * 100).ToString("F") +"%)"}");
+            result.Add($"`{"ср.голов за игру",otstup}` {goals / (float)allGamesCount:F}");
+            result.Add($"`{"ср.бросокв за игру",otstup}` {shots / (float)allGamesCount:F}");
+            result.Add($"`{"ср.бросков в створ за игру",otstup}` {shotsIn / (float)allGamesCount:F}");
+            result.Add($"`{"ср.пропущенных за игру",otstup}` {opGoals / (float)allGamesCount:F}");
+            result.Add($"`{"Силовые",otstup}` {allGames.Sum(g => g.Stat1.Hits)}");
+            result.Add($"`{"Заблокированные",otstup}` {allGames.Sum(g => g.Stat1.BlockShots)}");
+            result.Add($"`{"% выигр.вбрасываний",otstup}` {(allGames.Sum(g => g.Stat1.Faceoff) /(float) (allGames.Sum(g => g.Stat1.Faceoff)+ allGames.Sum(g => g.Stat2.Faceoff))*100).ToString("F") + "%"}");
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, string.Join("\n", result), parseMode: ParseMode.Markdown);
         }
 
         public async void ContinueCommand(Chat chatFinded, int msgid)
@@ -460,21 +498,19 @@ namespace Aviators
         {
             await Bot.SendTextMessageAsync(chatFinded.Id, Gen.GetSlogan());
         }
-
-        private async void EnemyTeam(Chat chatFinded, string team)
-        {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "*Привет, я соперник*", parseMode: ParseMode.Markdown);
-        }
-
-
         private async void LastGame(Chat chatFinded)
         {
-            var file = ImageGen.GameStat(DB.DBCommands.GetGame());
+            var file = ImageGen.GameStat(DB.DBCommands.GetLastGame());
 
             var photo = new Telegram.Bot.Types.FileToSend("gamestat",
                 (new StreamReader(file)).BaseStream);
 
             Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
+        }
+
+        private async void EnemyTeam(Chat chatFinded, string team)
+        {
+            await Bot.SendTextMessageAsync(chatFinded.Id, "*Привет, я соперник*", parseMode: ParseMode.Markdown);
         }
         private async void NextGame(Chat chatFinded)
         {
