@@ -5,6 +5,7 @@ using System.Drawing.Imaging;
 using System.IO;
 using System.Linq;
 using System.Text.RegularExpressions;
+using System.Threading.Tasks;
 using System.Windows.Forms;
 using Aviators.Bot;
 using Telegram.Bot;
@@ -77,7 +78,8 @@ namespace Aviators
                     return;
 
                 case "соперник":
-                    EnemyTeam(chatFinded, "соперник");
+                    if (string.IsNullOrEmpty(command.Argument)) TeamList(chatFinded, command);
+                    else EnemyTeam(chatFinded, command);
                     return;
 
                 case "кричалки":
@@ -108,49 +110,41 @@ namespace Aviators
             //ProcessCommands(chatFinded, fromId);            
         }
 
-        private async void GamesStatistic(Chat chatFinded)
+
+
+        public async void ContinueCommand(Chat chatFinded, CallbackQuery cQuery)
         {
-            var result = new List<string>();
+            var msgid = cQuery.Message.MessageId;
 
-            List<Game> allGames = DB.DBCommands.GetAllGames();
-
-            const int otstup = -20;
-
-            var goals = allGames.Sum(g => g.Score.Item1);
-            var shotsIn = allGames.Sum(g => g.Stat1.ShotsIn);
-            var shots = allGames.Sum(g => g.Stat1.Shots);
-            var opGoals = allGames.Sum(g => g.Score.Item2);
-            var allGamesCount = allGames.Count;
-
-            result.Add($"`{"Всего игр",otstup}` {allGamesCount}");
-            result.Add($"`{"Победы",otstup}` {allGames.Count(g => g.Score.Item1 > g.Score.Item2)}");
-            result.Add($"`{"Поражения",otstup}` {allGames.Count(g => g.Score.Item1 < g.Score.Item2)}");
-            result.Add($"`{"Ничьи",otstup}` {allGames.Count(g => g.Score.Item1 == g.Score.Item2)}");
-            result.Add($"`{"Сухие победы",otstup}` {allGames.Count(g => g.Score.Item2 == 0 && g.Score.Item1 != g.Score.Item2)}");
-            result.Add($"`{"Забитые",otstup}` {goals + " (" + (goals / (float)shotsIn * 100).ToString("F") + "%)"}");
-            result.Add($"`{"Пропущеные",otstup}` {opGoals}");
-            result.Add($"`{"КДРАТИО",otstup}` {goals / (float)opGoals:F}");
-            result.Add($"`{"Броски",otstup}` {shots}");
-            result.Add($"`{"Броски в створ",otstup}` {shotsIn + " (" + (shotsIn / (float)shots * 100).ToString("F") +"%)"}");
-            result.Add($"`{"ср.голов за игру",otstup}` {goals / (float)allGamesCount:F}");
-            result.Add($"`{"ср.бросокв за игру",otstup}` {shots / (float)allGamesCount:F}");
-            result.Add($"`{"ср.бросков в створ за игру",otstup}` {shotsIn / (float)allGamesCount:F}");
-            result.Add($"`{"ср.пропущенных за игру",otstup}` {opGoals / (float)allGamesCount:F}");
-            result.Add($"`{"Силовые",otstup}` {allGames.Sum(g => g.Stat1.Hits)}");
-            result.Add($"`{"Заблокированные",otstup}` {allGames.Sum(g => g.Stat1.BlockShots)}");
-            result.Add($"`{"% выигр.вбрасываний",otstup}` {(allGames.Sum(g => g.Stat1.Faceoff) /(float) (allGames.Sum(g => g.Stat1.Faceoff)+ allGames.Sum(g => g.Stat2.Faceoff))*100).ToString("F") + "%"}");
-
-            await Bot.SendTextMessageAsync(chatFinded.Id, string.Join("\n", result), parseMode: ParseMode.Markdown);
-        }
-
-        public async void ContinueCommand(Chat chatFinded, int msgid)
-        {
             var command = chatFinded.WaitingCommands.FirstOrDefault(m => m.Message.MessageId == msgid);
             if(command == null) return;
 
-            var statistic = GetPlayerStatistic(command.Name).Replace("*","");
+            if (command.Name == "соперник")
+            {
+                if (string.IsNullOrEmpty(command.Argument))
+                {
+                    command.ListArguments.Add(cQuery.Data);
+                    EnemyTeam(chatFinded, command);
+                }
+                else
+                {
+                    var file = ImageGen.GameStat(DB.DBCommands.GetGame(Convert.ToInt32(cQuery.Data)));
 
-            await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
+                    var photo = new Telegram.Bot.Types.FileToSend("gamestat",
+                        (new StreamReader(file)).BaseStream);
+
+                    Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
+                }
+
+
+            }
+
+            else
+            {
+                var statistic = GetPlayerStatistic(command.Name).Replace("*", "");
+
+                await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
+            }
         }
 
         #region неиспользумое
@@ -508,9 +502,93 @@ namespace Aviators
             Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
         }
 
-        private async void EnemyTeam(Chat chatFinded, string team)
+        private async void TeamList(Chat chatFinded, Command command)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "*Привет, я соперник*", parseMode: ParseMode.Markdown);
+            List<Team> teams = DB.DBCommands.GetAllTeams();
+
+            teams.RemoveAt(0);
+
+            var keyboard = MakeKeyboardTeams(teams);
+            Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите соперника", replyMarkup: keyboard);
+            command.Message = mes;
+            chatFinded.WaitingCommands.Add(command);
+
+        }
+
+       
+
+        private async void GamesStatistic(Chat chatFinded)
+        {
+            var result = new List<string>();
+
+            List<Game> allGames = DB.DBCommands.GetAllGames();
+
+            const int otstup = -20;
+
+            var goals = allGames.Sum(g => g.Score.Item1);
+            var shotsIn = allGames.Sum(g => g.Stat1.ShotsIn);
+            var shots = allGames.Sum(g => g.Stat1.Shots);
+            var opGoals = allGames.Sum(g => g.Score.Item2);
+            var allGamesCount = allGames.Count;
+
+            result.Add($"`{"Всего игр",otstup}` {allGamesCount}");
+            result.Add($"`{"Победы",otstup}` {allGames.Count(g => g.Score.Item1 > g.Score.Item2)}");
+            result.Add($"`{"Поражения",otstup}` {allGames.Count(g => g.Score.Item1 < g.Score.Item2)}");
+            result.Add($"`{"Ничьи",otstup}` {allGames.Count(g => g.Score.Item1 == g.Score.Item2)}");
+            result.Add($"`{"Сухие победы",otstup}` {allGames.Count(g => g.Score.Item2 == 0 && g.Score.Item1 != g.Score.Item2)}");
+            result.Add($"`{"Забитые",otstup}` {goals + " (" + (goals / (float)shotsIn * 100).ToString("F") + "%)"}");
+            result.Add($"`{"Пропущеные",otstup}` {opGoals}");
+            result.Add($"`{"КДРАТИО",otstup}` {goals / (float)opGoals:F}");
+            result.Add($"`{"Броски",otstup}` {shots}");
+            result.Add($"`{"Броски в створ",otstup}` {shotsIn + " (" + (shotsIn / (float)shots * 100).ToString("F") + "%)"}");
+            result.Add($"`{"ср.голов",otstup}` {goals / (float)allGamesCount:F}");
+            result.Add($"`{"ср.бросоков",otstup}` {shots / (float)allGamesCount:F}");
+            result.Add($"`{"ср.бросков в створ",otstup}` {shotsIn / (float)allGamesCount:F}");
+            result.Add($"`{"ср.пропущенных",otstup}` {opGoals / (float)allGamesCount:F}");
+            result.Add($"`{"Силовые",otstup}` {allGames.Sum(g => g.Stat1.Hits)}");
+            result.Add($"`{"Заблокированные",otstup}` {allGames.Sum(g => g.Stat1.BlockShots)}");
+            result.Add($"`{"% выигр.вбрасываний",otstup}` {(allGames.Sum(g => g.Stat1.Faceoff) / (float)(allGames.Sum(g => g.Stat1.Faceoff) + allGames.Sum(g => g.Stat2.Faceoff)) * 100).ToString("F") + "%"}");
+
+            await Bot.SendTextMessageAsync(chatFinded.Id, string.Join("\n", result), parseMode: ParseMode.Markdown);
+        }
+
+        private async void EnemyTeam(Chat chatFinded, Command command)
+        {
+            var result = new List<string>();
+            var team = DB.DBCommands.GetTeam(command.Argument);
+            if (team.Id < 1) result.Add("Соперник не найден");
+
+            var games = DB.DBCommands.GetGamesTeam(team);
+            if (games.Count < 1) result.Add("Игр не найдено");
+
+            const int otstup = -15;
+
+            var goals = games.Sum(g => g.Score.Item1);
+            var shotsIn = games.Sum(g => g.Stat1.ShotsIn);
+            var opGoals = games.Sum(g => g.Score.Item2);
+
+            result.Add("Статистика встреч с соперником *" + team.Name +"*");
+
+            result.Add($"`{"Всего игр",otstup}` {games.Count}");
+            result.Add($"`{"Победы",otstup}` {games.Count(g => g.Score.Item1 > g.Score.Item2)}");
+            result.Add($"`{"Поражения",otstup}` {games.Count(g => g.Score.Item1 < g.Score.Item2)}");
+            result.Add($"`{"Ничьи",otstup}` {games.Count(g => g.Score.Item1 == g.Score.Item2)}");
+            result.Add($"`{"Забитые",otstup}` {goals + " (" + (goals / (float)shotsIn * 100).ToString("F") + "%)"}");
+            result.Add($"`{"Пропущеные",otstup}` {opGoals}");
+
+            Player player = DB.DBCommands.GetPlayerTopForTeam(team);
+            if (player != null)
+                result.Add($"`{"Любимчик",otstup}` {player.Surname +" (" + player.StatGoal+"+" + player.StatAssist + ")"}");
+
+            var keyboard = MakeKeyboardGames(games);
+
+            Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, string.Join("\n", result),
+                parseMode: ParseMode.Markdown, replyMarkup: keyboard);
+            command.Message = mes;
+            chatFinded.WaitingCommands.Add(command);
+
+
+           
         }
         private async void NextGame(Chat chatFinded)
         {
@@ -574,7 +652,44 @@ namespace Aviators
             }
             return "";
         }
+
+        #region Создание кнопок
+
+        private InlineKeyboardMarkup MakeKeyboardTeams(List<Team> teams)
+        {
+            var massiv = new List<InlineKeyboardButton[]>();
+            for (int i = 0; i < teams.Count; i++)
+            {
+                if (i == teams.Count - 1) massiv.Add(new[] { new InlineKeyboardButton(teams[i].Name) });
+                else if (teams[i].Name.Length > 20) massiv.Add(new[] { new InlineKeyboardButton(teams[i].Name) });
+                else
+                {
+                    massiv.Add(new[] { new InlineKeyboardButton(teams[i].Name), new InlineKeyboardButton(teams[i + 1].Name) });
+                    i++;
+                }
+            }
+
+
+            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
+            return keyboard;
+        }
+
+        private InlineKeyboardMarkup MakeKeyboardGames(List<Game> games)
+        {
+            var massiv = new List<InlineKeyboardButton[]>();
+            foreach (Game g in games)
+            {
+                var str = $"{g.Date.ToShortDateString()} {g.Tournament.Name} {g.Team1} {g.Score.Item1}:{g.Score.Item2} {g.Team2}";
+                massiv.Add(new[] { new InlineKeyboardButton(str, g.Id.ToString())});
+            }
+
+            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
+            return keyboard;
+        }
+
+        #endregion
     }
+
 
     public class Command
     {

@@ -485,6 +485,7 @@ namespace Aviators
         private Player GetPlayerByNameOrSurname(string nameOrSurname)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            //TODO тут надо переделать, что бы у нас все что касается имен делалось с большой буквы, потом маленькими
             cmd.CommandText = $"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'";
 
             SqliteDataReader reader = null;
@@ -496,7 +497,7 @@ namespace Aviators
             {
                 Console.WriteLine(ex.Message);
             }
-            while (reader.Read())
+            while (reader != null && reader.Read())
             {
                 var player = new Player(Convert.ToInt32(reader["number"].ToString()), reader["name"].ToString(),
                     reader["lastname"].ToString());
@@ -510,6 +511,46 @@ namespace Aviators
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = "SELECT * FROM game WHERE id =(SELECT MAX(id) FROM game) -"+ backId;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Game game = new Game();
+
+            while (reader.Read())
+            {
+
+                game.Id = Convert.ToInt32(reader["id"].ToString());
+                game.Date = Convert.ToDateTime(reader["date"].ToString());
+
+                game.Team1 = "Авиаторы";
+                var opteam_id = Convert.ToInt32(reader["op_team_id"].ToString());
+                game.Team2 = GetTeam(opteam_id);
+
+                game.Score = new Tuple<int, int>(
+                    Convert.ToInt32(reader["score"].ToString()),
+                    Convert.ToInt32(reader["op_score"].ToString()));
+
+                var tournamentId = Convert.ToInt32(reader["tournament_id"].ToString());
+                game.Tournament = GetTournament(tournamentId);
+
+                game.Stat1 = GetGameStat(game.Id, 1);
+                game.Stat2 = GetGameStat(game.Id, opteam_id);
+            }
+
+            return game;
+        }
+        public Game GetGame(int Id)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM game WHERE id =" + Id;
 
             SqliteDataReader reader = null;
             try
@@ -821,6 +862,32 @@ namespace Aviators
             }
         }
 
+        public Team GetTeam(string teamname)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"select * from team where name_lower = '{teamname.ToLower()}' ";
+            SqliteDataReader reader = null;
+
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
+            Team team  = new Team();
+            while (reader != null && reader.Read())
+            {
+                team.Id = Convert.ToInt32(reader["id"].ToString());
+                team.Name = reader["name"].ToString();
+            }
+
+            return team;
+        }
+
 
         #region SelectOrInsert
 
@@ -959,5 +1026,147 @@ namespace Aviators
             return season;
         }
         #endregion
+
+        public List<Game> GetGamesTeam(Team team)
+        {
+            List<Game> games = new List<Game>();
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM game WHERE op_team_id = " + team.Id;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+
+
+            while (reader.Read())
+            {
+                Game game = new Game();
+                game.Id = Convert.ToInt32(reader["id"].ToString());
+                game.Date = Convert.ToDateTime(reader["date"].ToString());
+
+                game.Team1 = "Авиаторы";
+                var opteam_id = Convert.ToInt32(reader["op_team_id"].ToString());
+                game.Team2 = GetTeam(opteam_id);
+
+                game.Score = new Tuple<int, int>(
+                    Convert.ToInt32(reader["score"].ToString()),
+                    Convert.ToInt32(reader["op_score"].ToString()));
+
+                var tournamentId = Convert.ToInt32(reader["tournament_id"].ToString());
+                game.Tournament = GetTournament(tournamentId);
+
+                game.Stat1 = GetGameStat(game.Id, 1);
+                game.Stat2 = GetGameStat(game.Id, opteam_id);
+
+                games.Add(game);
+            }
+
+            return games;
+        }
+
+        public Player GetPlayerTopForTeam(Team team)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+
+            //cmd.CommandText =
+            //    "SELECT  player_id , count(*) AS num FROM goal_player " +
+            //    "LEFT JOIN goal ON goal_player.goal_id = goal.id " +
+            //    "LEFT JOIN game ON goal.game_id = game.id " +
+            //    "WHERE game.op_team_id = " + team.Id + " " +
+            //    "GROUP BY player_id ORDER BY num DESC LIMIT 1";
+
+            cmd.CommandText =
+                @"SELECT player_id, count(*) AS num FROM goal_player
+LEFT JOIN goal ON goal_player.goal_id = goal.id
+LEFT JOIN game ON goal.game_id = game.id
+WHERE game.op_team_id = "+ team.Id + @" AND goal_player.asist = 'True' AND player_id = (SELECT  player_id FROM goal_player
+LEFT JOIN goal ON goal_player.goal_id = goal.id
+LEFT JOIN game ON goal.game_id = game.id
+WHERE game.op_team_id = " + team.Id + @"
+GROUP BY player_id ORDER BY count(*) DESC LIMIT 1)
+GROUP BY player_id ORDER BY num DESC LIMIT 1";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Player player = null;
+            while (reader != null && reader.Read())
+            {
+                player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
+                player.StatAssist = Convert.ToInt32(reader["num"].ToString());
+
+            }
+            reader.Close();
+
+            cmd.CommandText =
+                @"SELECT player_id, count(*) AS num FROM goal_player
+LEFT JOIN goal ON goal_player.goal_id = goal.id
+LEFT JOIN game ON goal.game_id = game.id
+WHERE game.op_team_id = " + team.Id + @" AND goal_player.asist = 'False' AND player_id = (SELECT  player_id FROM goal_player
+LEFT JOIN goal ON goal_player.goal_id = goal.id
+LEFT JOIN game ON goal.game_id = game.id
+WHERE game.op_team_id = " + team.Id + @"
+GROUP BY player_id ORDER BY count(*) DESC LIMIT 1)
+GROUP BY player_id ORDER BY num DESC LIMIT 1";
+
+            reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            while (reader != null && reader.Read())
+            {
+                player.StatGoal= Convert.ToInt32(reader["num"].ToString());
+
+            }
+            return player;
+        }
+
+        public List<Team> GetAllTeams()
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"select * from team";
+            SqliteDataReader reader = null;
+
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            List<Team> teams = new List<Team>();
+            
+            while (reader != null && reader.Read())
+            {
+                Team team = new Team();
+                team.Id = Convert.ToInt32(reader["id"].ToString());
+                team.Name = reader["name"].ToString();
+                teams.Add(team);
+            }
+            return teams;
+        }
     }
 }

@@ -90,7 +90,7 @@ namespace Aviators.Bot
             }
             else
             {
-                Commands.ContinueCommand(chatFinded, e.CallbackQuery.Message.MessageId);
+                Commands.ContinueCommand(chatFinded, e.CallbackQuery);
             }
         }
 
