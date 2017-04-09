@@ -319,7 +319,7 @@ namespace Aviators
             if (playerinfo.Length == 3)
             {
                 var player = new Player(int.Parse(playerinfo[0]), playerinfo[1].Trim(), playerinfo[2].Trim());
-                DB.DBCommands.AddPlayer(player);
+                DB.DBCommands.Player.AddPlayer(player);
                 await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали добавить {player.Number}.");
             }
             else
@@ -331,7 +331,7 @@ namespace Aviators
         private async void RemovePlayer(Chat chatFinded, int number)
         {
             chatFinded.RemoveMode = false;
-            DB.DBCommands.RemovePlayerByNumber(number);
+            DB.DBCommands.Player.RemovePlayerByNumber(number);
             await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
             //ShowPlayerByNubmer(chatFinded, number);
         }
@@ -345,7 +345,7 @@ namespace Aviators
         /// </summary>
         private async void Help(Chat chatFinded)
         {
-            var p = DB.DBCommands.GetAllPlayerWitoutStatistic();
+            var p = DB.DBCommands.Player.GetAllPlayerWitoutStatistic();
             var n = p[(new Random()).Next(p.Count - 1)].Number;
 
             var help =
@@ -386,7 +386,7 @@ namespace Aviators
 
             try
             {
-                var player = DB.DBCommands.GetPlayerByNumber(playerNumber);
+                var player = DB.DBCommands.Player.GetPlayerByNumber(playerNumber);
                 if (player == null)
                 {
                     await Bot.SendTextMessageAsync(chatFinded.Id, $"Игрок под номером {playerNumber} не найден.");
@@ -440,12 +440,12 @@ namespace Aviators
             {
                 //в случае числа показываем стату
                 var number = int.Parse(arg);
-                player = DB.DBCommands.GetPlayerStatisticByNumber(number);
+                player = DB.DBCommands.Player.GetPlayerStatisticByNumber(number);
             }
             else
             {
                 //в случае букв ищем по имени или фамилии
-                player = DB.DBCommands.GetPlayerStatisticByNameOrSurname(arg);
+                player = DB.DBCommands.Player.GetPlayerStatisticByNameOrSurname(arg);
             }
 
             if (player != null)
@@ -472,7 +472,7 @@ namespace Aviators
         private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
             string result = "";
-            List<Player> topPlayers = DB.DBCommands.GetTopPlayers(type, 5);
+            List<Player> topPlayers = DB.DBCommands.Player.GetTopPlayers(type, 5);
 
             result = "Топ 5 *" +GetTypeDescription(type) + "* ХК \"Авиаторы\":\n";
 
@@ -576,7 +576,7 @@ namespace Aviators
             result.Add($"`{"Забитые",otstup}` {goals + " (" + (goals / (float)shotsIn * 100).ToString("F") + "%)"}");
             result.Add($"`{"Пропущеные",otstup}` {opGoals}");
 
-            Player player = DB.DBCommands.GetPlayerTopForTeam(team);
+            Player player = DB.DBCommands.Player.GetPlayerTopForTeam(team);
             if (player != null)
                 result.Add($"`{"Любимчик",otstup}` {player.Surname +" (" + player.StatGoal+"+" + player.StatAssist + ")"}");
 

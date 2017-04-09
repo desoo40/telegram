@@ -82,6 +82,7 @@
     <Compile Include="Configs\Config.cs" />
     <Compile Include="Data\ParseFiles.cs" />
     <Compile Include="DB\DBCore.cs" />
+    <Compile Include="DB\DBPlayerCommand.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DesignTime>True</DesignTime>
@@ -122,19 +123,19 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DB\GamesInfo.txt">
+    <Content Include="DB\TextFiles\GamesInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="DB\logo.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\Descr.txt">
+    <Content Include="DB\TextFiles\Descr.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\Slogans.txt">
+    <Content Include="DB\TextFiles\Slogans.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\PlayersInfo.txt">
+    <Content Include="DB\TextFiles\PlayersInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="DB\PlayersPhoto\100_данилин.jpg">
@@ -233,17 +234,17 @@
     <Content Include="DB\SQLDBCreate.sql">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\ToursInfo.txt">
+    <Content Include="DB\TextFiles\ToursInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\stata_shl2.jpg" />
     <None Include="sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
-    <Content Include="DB\TeamsInfo.txt">
+    <Content Include="DB\TextFiles\TeamsInfo.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\TimeTable.txt" />
+    <Content Include="DB\TextFiles\TimeTable.txt" />
   </ItemGroup>
   <ItemGroup>
     <EmbeddedResource Include="Properties\Resources.resx">
