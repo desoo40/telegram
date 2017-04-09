@@ -78,6 +78,8 @@ namespace Aviators
         public int BlockShots { get; set; }
         public int Hits { get; set; }
         public int Penalty { get; set; }
+        public int MVP { get; set; }
+
     }
     public class Game
     {
@@ -98,6 +100,8 @@ namespace Aviators
 
         public List<GameAction> Actions { get; set; }
         public List<Goal> Goal { get; set; }
+        public int MVP { get; set; }
+
 
         public Game()
         {

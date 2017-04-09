@@ -405,10 +405,9 @@ namespace Aviators
                     Console.WriteLine($"Send player:{player.Surname}");
                     if (File.Exists(photopath))
                     {
-                        var file = ImageGen.GenOxy(photopath);
 
                         var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                            (new StreamReader(file)).BaseStream);
+                            (new StreamReader(photopath)).BaseStream);
 
                         var button = new InlineKeyboardButton("Статистика");
                         var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });

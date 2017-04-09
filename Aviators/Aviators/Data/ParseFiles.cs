@@ -181,14 +181,19 @@ namespace Aviators
 
                 }
 
-                if (lines[i] == "Лучший" && lines[i + 1].Contains("-")) // MVP ++
+                if (lines[i] == "Лучший" && !lines[i + 1].Equals("Зрители")) // MVP ++
                 {
-
+                    
                 }
 
-                if (lines[i] == "Зрители" && lines[i + 1].Contains("-"))
+                if (lines[i] == "Зрители" && lines[i + 1] != "Место")
                 {
                     Game.Viewers = Convert.ToInt32(lines[++i]);
+                }
+
+                if (lines[i] == "Место" && !lines[i + 1].Equals(null))
+                {
+                    Game.Place = lines[++i];
                 }
 
                 i++;

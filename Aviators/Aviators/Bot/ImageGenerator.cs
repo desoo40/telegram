@@ -29,28 +29,6 @@ namespace Aviators
             statFonts.AddFontFile("Fonts/seguisb.ttf");
         }
 
-        public string GenOxy(string pathToPhoto)
-        {
-            var str = (new StreamReader(pathToPhoto)).BaseStream;
-            Bitmap bitmap = new Bitmap(str);
-
-            var ssss = @"";
-
-            var spl = ssss.Split(',');
-
-            Random r = new Random();
-            int i = r.Next(spl.Length);
-
-            using (Graphics g = Graphics.FromImage(bitmap))
-            {
-                g.DrawString(spl[i].Trim().ToUpper(), new Font(FontFamily.GenericSansSerif, 30), Brushes.Chartreuse, 50, 600);
-            }
-
-            var file = "temp.jpg";
-            bitmap.Save(file, ImageFormat.Jpeg);
-            return file;
-        }
-
         public string GameStat(Game game)
         {
             Image bitmap = Image.FromFile("Images\\stata_shl2.jpg");
@@ -102,8 +80,8 @@ namespace Aviators
 
 
                 //g.DrawString("г. Зеленоград, ФОК \"Ледовый\"", placeFont, Brushes.White, place, rightFormat);
-                g.DrawString("г. Москва, ЛД \"Медведково\"", placeFont, Brushes.White, place, rightFormat);
-                g.DrawString("21.12.17", dateFont, Brushes.White, date, rightFormat);
+                g.DrawString(game.Date.ToString("dd.MM.yyyy"), dateFont, Brushes.White, date, rightFormat);
+                g.DrawString(game.Place, placeFont, Brushes.White, place, rightFormat);
 
                 //g.DrawRectangle(Pens.Red, place);
                 //g.DrawRectangle(Pens.Red, date);
@@ -130,25 +108,25 @@ namespace Aviators
                 var statY = 240;
                 var statX = 15;
 
-                //var arrOfStat = new int[6, 2]
-                //{
-                //    {game.Stat1.Shots, game.Stat2.Shots},
-                //    {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
-                //    {game.Stat1.Faceoff, game.Stat2.Faceoff},
-                //    {game.Stat1.Hits, game.Stat2.Shots},
-                //    {game.Stat1.Penalty, game.Stat2.Penalty},
-                //    {game.Stat1.BlockShots, game.Stat2.BlockShots},
-                //};
-
                 var arrOfStat = new int[6, 2]
                 {
-                    {kek.Next(1, 50), kek.Next(1, 50)},
-                     {kek.Next(1, 50), kek.Next(1, 50)},
-                      {kek.Next(1, 50), kek.Next(1, 50)},
-                       {kek.Next(1, 50), kek.Next(1, 50)},
-                        {kek.Next(1, 50), kek.Next(1, 50)},
-                         {kek.Next(1, 50), kek.Next(1, 50)}
+                    {game.Stat1.Shots, game.Stat2.Shots},
+                    {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
+                    {game.Stat1.Faceoff, game.Stat2.Faceoff},
+                    {game.Stat1.Hits, game.Stat2.Shots},
+                    {game.Stat1.Penalty, game.Stat2.Penalty},
+                    {game.Stat1.BlockShots, game.Stat2.BlockShots},
                 };
+
+                //var arrOfStat = new int[6, 2]
+                //{
+                //    {kek.Next(1, 50), kek.Next(1, 50)},
+                //     {kek.Next(1, 50), kek.Next(1, 50)},
+                //      {kek.Next(1, 50), kek.Next(1, 50)},
+                //       {kek.Next(1, 50), kek.Next(1, 50)},
+                //        {kek.Next(1, 50), kek.Next(1, 50)},
+                //         {kek.Next(1, 50), kek.Next(1, 50)}
+                //};
 
 
                 for (int i = 0; i < 6; i++)
@@ -163,7 +141,8 @@ namespace Aviators
 
                 #endregion
 
-                #region Зрители
+                #region Следующий матч
+
                 var nextGame = new Rectangle(47, 865, 404, 115);
 
                 g.DrawString("ХК АВИАТОРЫ МАИ - ХК РЭУ\n" +
