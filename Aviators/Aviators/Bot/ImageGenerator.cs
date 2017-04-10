@@ -175,6 +175,7 @@ namespace Aviators
 
                     if (game.Tournament != null)
                     {
+                     
                         logo = getLogo(game.Tournament.Name);
 
                         if (logo != null)
@@ -213,32 +214,23 @@ namespace Aviators
         {
             Rectangle resRect = baseRect;
 
-            if (inputsize.Width > baseRect.Width || (inputsize.Height > baseRect.Height))
+            //соотнашение сторон
+            float ratio = inputsize.Width / (float) inputsize.Height;
+
+            int height = baseRect.Height;
+            int width = (int) (height * ratio);
+
+            if (width > baseRect.Width)
             {
-                var scaleX = baseRect.Width / (float)inputsize.Width;
-                var scaleY = baseRect.Height / (float)inputsize.Height;
-                var ratio = inputsize.Width / (float)inputsize.Height;
-
-                int width = 0;
-                int height = 0;
-                if (scaleX > scaleY)
-                {
-                    width = (int)(baseRect.Width * scaleY);
-                    height = (int)(width / ratio);
-                }
-                else
-                {
-                    height = (int)(baseRect.Width * scaleX);
-                    width = (int)(height * ratio);
-
-                }
-
-                var x = baseRect.X + baseRect.Width / 2 - width / 2;
-                var y = baseRect.Y + baseRect.Height / 2 - height / 2;
-
-                resRect = new Rectangle(x, y, width, height);
-               
+                width = baseRect.Width;
+                height = (int) (width / ratio);
             }
+
+            var x = baseRect.X + baseRect.Width / 2 - width / 2;
+            var y = baseRect.Y + baseRect.Height / 2 - height / 2;
+
+            resRect = new Rectangle(x, y, width, height);
+            
             return resRect;
         }
     }
