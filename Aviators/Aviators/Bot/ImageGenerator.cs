@@ -171,23 +171,21 @@ namespace Aviators
                 {
                     Image logo;
 
-                    
-                    game.Tournament = new Tournament("МСХЛ");
-
+                    game.Tournament = new Tournament("MoscowGames2016");
 
                     if (game.Tournament != null)
                     {
+                     
                         logo = getLogo(game.Tournament.Name);
 
                         if (logo != null)
                         {
-                            //Rectangle needRect = new Rectangle(15, 800, 480, 190);
                             Rectangle needRect = new Rectangle(50, 810, 410, 180);
-
-                            //g.DrawRectangle(Pens.Red, needRect);
+                            g.DrawRectangle(Pens.Red, needRect);
 
                             var resRect = GetInscribed(needRect, logo.Size);
-                            //g.DrawRectangle(Pens.Red, resRect);
+
+                            g.DrawRectangle(Pens.Red, resRect);
 
                             g.DrawImage(logo, resRect);
                         }
@@ -214,34 +212,25 @@ namespace Aviators
 
         private Rectangle GetInscribed(Rectangle baseRect, Size inputsize)
         {
-            var scaleX = baseRect.Width / (float)inputsize.Width;
-            var scaleY = baseRect.Height / (float)inputsize.Height;
-            var ratio = inputsize.Width / (float)inputsize.Height;
+            Rectangle resRect = baseRect;
 
-            int width = 0;
-            int height = 0;
-            var x = 0;
-            var y = 0;
+            //соотнашение сторон
+            float ratio = inputsize.Width / (float) inputsize.Height;
 
-            if (scaleX >= scaleY)
-            {
-                height = baseRect.Height;
-                width = (int) (ratio*height);
-                x = baseRect.X + baseRect.Width / 2 - width / 2;
-                y = baseRect.Y;
-            }
-            else
+            int height = baseRect.Height;
+            int width = (int) (height * ratio);
+
+            if (width > baseRect.Width)
             {
                 width = baseRect.Width;
-                height = (int) (width/ratio);
-                x = baseRect.X;
-                y = baseRect.Y + baseRect.Height / 2 - height / 2;
+                height = (int) (width / ratio);
             }
 
-                
+            var x = baseRect.X + baseRect.Width / 2 - width / 2;
+            var y = baseRect.Y + baseRect.Height / 2 - height / 2;
 
-            Rectangle resRect = new Rectangle(x, y, width, height);
-               
+            resRect = new Rectangle(x, y, width, height);
+            
             return resRect;
         }
     }
