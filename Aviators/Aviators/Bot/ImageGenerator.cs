@@ -83,8 +83,8 @@ namespace Aviators
                 #endregion
 
                 #region Место + дата
-                var place = new Rectangle(543, 73, 458, 40);
-                var date = new Rectangle(600, 20, 400, 60);
+                var place = new Rectangle(543, 23, 458, 43);
+                var date = new Rectangle(600, 55, 400, 60);
 
 
                 g.DrawString("г. Зеленоград, ФОК \"Ледовый\"", placeFont, Brushes.White, place, rightFormat);
@@ -171,7 +171,7 @@ namespace Aviators
                 {
                     Image logo;
 
-                    game.Tournament = new Tournament("СХЛ");
+                    game.Tournament = new Tournament("MoscowGames2016");
 
                     if (game.Tournament != null)
                     {
@@ -179,7 +179,39 @@ namespace Aviators
 
                         if (logo != null)
                         {
-                            g.DrawImage(logo, );
+                            Rectangle needRect = new Rectangle(50, 810, 410, 180);
+                            g.DrawRectangle(Pens.Red, needRect);
+
+                            Rectangle resRect = needRect;
+
+                            if (logo.Width > needRect.Width || (logo.Height > needRect.Height))
+                            {
+                                var scaleX = needRect.Width / (float)logo.Width;
+                                var scaleY = needRect.Height / (float)logo.Height;
+                                var ratio = logo.Width / (float)logo.Height;
+
+                                int width = 0;
+                                int height = 0;
+                                if (scaleX > scaleY)
+                                {
+                                    width = (int) (needRect.Width * scaleY);
+                                    height = (int) (width/ratio);
+                                }
+                                else
+                                {
+                                    height = (int)(needRect.Width * scaleX);
+                                    width = (int) (height*ratio);
+
+                                }
+
+                                var x = needRect.X + needRect.Width / 2 - width / 2;
+                                var y = needRect.Y + needRect.Height / 2 - height / 2;
+
+                                resRect = new Rectangle(x,y, width, height);
+                            }
+                            g.DrawRectangle(Pens.Red, resRect);
+
+                            g.DrawImage(logo, resRect);
                         }
                     }
 
