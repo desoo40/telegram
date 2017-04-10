@@ -29,12 +29,12 @@ namespace Aviators
             statFonts.AddFontFile("Fonts/seguisb.ttf");
         }
 
-        public string GameStat(Game game)
+        public string GameStat(Game game, bool isLastGame = false)
         {
-            Image bitmap = Image.FromFile("Images\\stata_shl2.jpg");
+            Image bitmap = Image.FromFile("Images\\gameStat.jpg");
 
             var enemyFont = new Font(statFonts.Families[2], 24);
-            var viewersFont = new Font(statFonts.Families[2], 38);
+            var viewersFont = new Font(statFonts.Families[1], 45);
             var placeFont = new  Font(statFonts.Families[1], 38);
             var dateFont = new Font(statFonts.Families[1], 50);
             var scoreFont = new Font("Segoe UI", 56);
@@ -60,10 +60,18 @@ namespace Aviators
                 var kek = new Random();
 
                 #region Зрители
-                var viewers = new Rectangle(720, 155, 100, 45);
+                var onGame = new Rectangle(598, 115, 400, 50);
+                var sOnGame = "На матче присутствовало";
 
-                g.DrawString(kek.Next(1, 3000).ToString(), viewersFont, Brushes.White, viewers, rightFormat);
+                var viewers = new Rectangle(598, 160, 400, 50);
+                var sViewers = kek.Next(1, 3000).ToString();
+                sViewers += " зрителей";
+
+                g.DrawString(sOnGame, viewersFont, Brushes.White, onGame, rightFormat);
+                g.DrawString(sViewers, viewersFont, Brushes.White, viewers, rightFormat);
                 //g.DrawRectangle(Pens.Red, viewers);
+                //g.DrawRectangle(Pens.Red, onGame);
+
                 #endregion
 
                 #region Соперник
@@ -79,9 +87,9 @@ namespace Aviators
                 var date = new Rectangle(600, 20, 400, 60);
 
 
-                //g.DrawString("г. Зеленоград, ФОК \"Ледовый\"", placeFont, Brushes.White, place, rightFormat);
+                g.DrawString("г. Зеленоград, ФОК \"Ледовый\"", placeFont, Brushes.White, place, rightFormat);
                 g.DrawString(game.Date.ToString("dd.MM.yyyy"), dateFont, Brushes.White, date, rightFormat);
-                g.DrawString(game.Place, placeFont, Brushes.White, place, rightFormat);
+                //g.DrawString(game.Place, placeFont, Brushes.White, place, rightFormat);
 
                 //g.DrawRectangle(Pens.Red, place);
                 //g.DrawRectangle(Pens.Red, date);
@@ -100,33 +108,33 @@ namespace Aviators
                     g.DrawString(game.Score.Item2.ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
                 }
 
-                //g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, aviPucks, centerFormat);
-                //g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
-#endregion
+                g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, aviPucks, centerFormat);
+                g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
+                #endregion
 
                 #region Статистика
                 var statY = 240;
                 var statX = 15;
 
-                var arrOfStat = new int[6, 2]
-                {
-                    {game.Stat1.Shots, game.Stat2.Shots},
-                    {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
-                    {game.Stat1.Faceoff, game.Stat2.Faceoff},
-                    {game.Stat1.Hits, game.Stat2.Shots},
-                    {game.Stat1.Penalty, game.Stat2.Penalty},
-                    {game.Stat1.BlockShots, game.Stat2.BlockShots},
-                };
-
                 //var arrOfStat = new int[6, 2]
                 //{
-                //    {kek.Next(1, 50), kek.Next(1, 50)},
-                //     {kek.Next(1, 50), kek.Next(1, 50)},
-                //      {kek.Next(1, 50), kek.Next(1, 50)},
-                //       {kek.Next(1, 50), kek.Next(1, 50)},
-                //        {kek.Next(1, 50), kek.Next(1, 50)},
-                //         {kek.Next(1, 50), kek.Next(1, 50)}
+                //    {game.Stat1.Shots, game.Stat2.Shots},
+                //    {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
+                //    {game.Stat1.Faceoff, game.Stat2.Faceoff},
+                //    {game.Stat1.Hits, game.Stat2.Shots},
+                //    {game.Stat1.Penalty, game.Stat2.Penalty},
+                //    {game.Stat1.BlockShots, game.Stat2.BlockShots},
                 //};
+
+                var arrOfStat = new int[6, 2]
+                {
+                    {kek.Next(1, 50), kek.Next(1, 50)},
+                     {kek.Next(1, 50), kek.Next(1, 50)},
+                      {kek.Next(1, 50), kek.Next(1, 50)},
+                       {kek.Next(1, 50), kek.Next(1, 50)},
+                        {kek.Next(1, 50), kek.Next(1, 50)},
+                         {kek.Next(1, 50), kek.Next(1, 50)}
+                };
 
 
                 for (int i = 0; i < 6; i++)
@@ -141,20 +149,41 @@ namespace Aviators
 
                 #endregion
 
-                #region Следующий матч
+                #region Следующий матч или лого
 
-                var nextGame = new Rectangle(47, 865, 404, 115);
-
-                g.DrawString("ХК АВИАТОРЫ МАИ - ХК РЭУ\n" +
-                             "21,05,2015 | 20:30\n" +
-                             "ЛД МЕДВЕДКОВО", nextGameFont, Brushes.White, nextGame, centerFormat);
-                //g.DrawRectangle(Pens.Red, viewers);
-                #endregion
+                if (isLastGame)
+                {
 
 
-                //g.DrawRectangle(Pens.Red, aviGoals);
-                //g.DrawRectangle(Pens.Red, enemyGoals);
+                    var nextGame = new Rectangle(47, 865, 404, 115);
 
+                    g.DrawString("ХК АВИАТОРЫ МАИ - ХК РЭУ\n" +
+                                 "21,05,2015 | 20:30\n" +
+                                 "ЛД МЕДВЕДКОВО", nextGameFont, Brushes.White, nextGame, centerFormat);
+                    //g.DrawRectangle(Pens.Red, viewers);
+
+                    #endregion
+
+                    //g.DrawRectangle(Pens.Red, aviGoals);
+                    //g.DrawRectangle(Pens.Red, enemyGoals);
+                }
+                else
+                {
+                    Image logo;
+
+                    game.Tournament = new Tournament("СХЛ");
+
+                    if (game.Tournament != null)
+                    {
+                        logo = getLogo(game.Tournament.Name);
+
+                        if (logo != null)
+                        {
+                            g.DrawImage(logo, );
+                        }
+                    }
+
+                }
 
             }
 
@@ -163,5 +192,14 @@ namespace Aviators
             return file;
         }
 
+        private Image getLogo(string name)
+        {
+            var logoPath = $@"Images\Logo\{name}_logo.png";
+
+            if (File.Exists(logoPath))
+                return Image.FromFile(logoPath);
+           
+           return null;
+        }
     }
 }

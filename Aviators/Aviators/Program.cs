@@ -10,8 +10,8 @@ namespace Aviators
         /// Флаг для создания базы и табличек, что бы из кода.
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
-        private static bool InitFromCode = true;
-        private static bool LoadIncome = true;
+        private static bool InitFromCode = false;
+        private static bool LoadIncome = false;
 
         static void Main(string[] args)
         {
@@ -20,11 +20,11 @@ namespace Aviators
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-            //var ig = new ImageGenerator();
+            var ig = new ImageGenerator();
 
-            //ig.GameStat(new Game());
+            ig.GameStat(new Game());
 
-            //return;
+            return;
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")
             {
