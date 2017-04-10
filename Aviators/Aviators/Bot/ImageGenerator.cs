@@ -182,8 +182,35 @@ namespace Aviators
                             Rectangle needRect = new Rectangle(50, 810, 410, 180);
                             g.DrawRectangle(Pens.Red, needRect);
 
-                            var resRect = GetInscribed(needRect, logo.Size);
+                            Rectangle resRect = needRect;
 
+                            var xScale = needRect.Width / (float)logo.Width;
+
+                            if (logo.Width > needRect.Width || (logo.Height > needRect.Height))
+                            {
+                                var scaleX = needRect.Width / (float)logo.Width;
+                                var scaleY = needRect.Height / (float)logo.Height;
+                                var ratio = logo.Width / (float)logo.Height;
+
+                                int width = 0;
+                                int height = 0;
+                                if (scaleX > scaleY)
+                                {
+                                    width = (int) (needRect.Width * scaleY);
+                                    height = (int) (width/ratio);
+                                }
+                                else
+                                {
+                                    height = (int)(needRect.Width * scaleX);
+                                    width = (int) (height*ratio);
+
+                                }
+
+                                var x = needRect.X + needRect.Width / 2 - width / 2;
+                                var y = needRect.Y + needRect.Height / 2 - height / 2;
+
+                                resRect = new Rectangle(x,y, width, height);
+                            }
                             g.DrawRectangle(Pens.Red, resRect);
 
                             g.DrawImage(logo, resRect);
@@ -207,39 +234,6 @@ namespace Aviators
                 return Image.FromFile(logoPath);
            
            return null;
-        }
-
-        private Rectangle GetInscribed(Rectangle baseRect, Size inputsize)
-        {
-            Rectangle resRect = baseRect;
-
-            if (inputsize.Width > baseRect.Width || (inputsize.Height > baseRect.Height))
-            {
-                var scaleX = baseRect.Width / (float)inputsize.Width;
-                var scaleY = baseRect.Height / (float)inputsize.Height;
-                var ratio = inputsize.Width / (float)inputsize.Height;
-
-                int width = 0;
-                int height = 0;
-                if (scaleX > scaleY)
-                {
-                    width = (int)(baseRect.Width * scaleY);
-                    height = (int)(width / ratio);
-                }
-                else
-                {
-                    height = (int)(baseRect.Width * scaleX);
-                    width = (int)(height * ratio);
-
-                }
-
-                var x = baseRect.X + baseRect.Width / 2 - width / 2;
-                var y = baseRect.Y + baseRect.Height / 2 - height / 2;
-
-                resRect = new Rectangle(x, y, width, height);
-               
-            }
-            return resRect;
         }
     }
 }
