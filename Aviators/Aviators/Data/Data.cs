@@ -92,12 +92,14 @@ namespace Aviators
         public int Viewers { get; set; }
         public Tuple<int, int> Score { get; set; }
 
-        public string Place { get; set; }
+        public Place Place { get; set; }
         public Tournament Tournament { get; set; }
         public string Season { get; set; }
 
         public List<GameAction> Actions { get; set; }
         public List<Goal> Goal { get; set; }
+
+        public Player BestPlayer { get; set; }
 
         public Game()
         {
@@ -141,6 +143,19 @@ namespace Aviators
 
         public int Id { get; set; }
         public string Name { get; set; }
+    }
+    public class Place
+    {
+        public Place(string s)
+        {
+            Name = s;
+        }
+
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public string FullAdress { get; set; }
+        public string GeoPos { get; set; }
+
     }
 
     public class Team
