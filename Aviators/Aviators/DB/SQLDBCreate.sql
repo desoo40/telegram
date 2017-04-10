@@ -2,11 +2,11 @@
 /* Table: place                                                 */
 /*==============================================================*/
 create table place (
-   id                   SERIAL               not null,
+   id                   INTEGER PRIMARY KEY,
    name                 TEXT                 null,
+   name_lower           TEXT                 null,
    geoposition          TEXT                 null,
-   adress               TEXT                 null,
-   constraint PK_PLACE primary key (id)
+   adress               TEXT                 null   
 );
 
 /*==============================================================*/
@@ -22,9 +22,8 @@ create table tournament (
 /* Table: season                                                */
 /*==============================================================*/
 create table season (
-   id                   SERIAL               not null,
-   name                 TEXT                 null,
-   constraint PK_SEASON primary key (id)
+   id                  INTEGER PRIMARY KEY,
+   name                 TEXT                 null
 );
 
 /*==============================================================*/
@@ -39,7 +38,11 @@ create table game (
    op_score             INT4                 null,
    tournament_id        INT4                 null,
    season_id            INT4                 null,
-   viewers_count        INT4                 null,   
+   viewers_count        INT4                 null,
+   best_player_id       INT4                 null,  
+   constraint FK_GAME_REFERENCE_playe foreign key (best_player_id)
+      references player (id)
+      on delete restrict on update restrict, 
    constraint FK_GAME_REFERENCE_PLACE foreign key (place_id)
       references place (id)
       on delete restrict on update restrict,

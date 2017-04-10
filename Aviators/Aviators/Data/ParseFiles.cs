@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 
 namespace Aviators
@@ -29,6 +30,8 @@ namespace Aviators
 
         private static void ParseTXTFile(string file)
         {
+            Regex rxNums = new Regex(@"^\d+$"); // проверка на число
+
             //ростер - это состав
             List<Player> Roster = new List<Player>();
             Game Game = new Game();
@@ -181,19 +184,23 @@ namespace Aviators
 
                 }
 
-                if (lines[i] == "Лучший" && !lines[i + 1].Equals("Зрители")) // MVP ++
+                if (lines[i] == "Лучший") // MVP ++
                 {
-                    
+                    if(rxNums.IsMatch(lines[i + 1]))
+                        Game.BestPlayer = Roster.Find(p => p.Number == Convert.ToInt32(lines[i+1]));
                 }
 
-                if (lines[i] == "Зрители" && lines[i + 1] != "Место")
+                if (lines[i] == "Зрители" )
                 {
-                    Game.Viewers = Convert.ToInt32(lines[++i]);
+                    if (lines.Length > i + 1)
+                        if (rxNums.IsMatch(lines[i + 1]))
+                        Game.Viewers = Convert.ToInt32(lines[++i]);
                 }
 
-                if (lines[i] == "Место" && !lines[i + 1].Equals(null))
+                if (lines[i] == "Место")
                 {
-                    Game.Place = lines[++i];
+                    if (lines.Length > i + 1)
+                        Game.Place = new Place(lines[i + 1]);
                 }
 
                 i++;

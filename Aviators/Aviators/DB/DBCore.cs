@@ -6,6 +6,7 @@ using Mono.Data.Sqlite;
 using Aviators.Configs;
 using System.Globalization;
 using System.Linq;
+using System.Runtime.InteropServices;
 
 namespace Aviators
 {
@@ -238,7 +239,7 @@ namespace Aviators
 
     public class DBCommands
     {
-        public DBPlayerCommand Player = new DBPlayerCommand();
+        public DBPlayerCommand DBPlayer = new DBPlayerCommand();
        
 
         private void AddAction(int newgameId, int playerId, Action action)
@@ -359,6 +360,19 @@ namespace Aviators
                 var tournamentId = Convert.ToInt32(reader["tournament_id"].ToString());
                 game.Tournament = GetTournament(tournamentId);
 
+                var placeId = Convert.ToInt32(reader["place_id"].ToString());
+                game.Place = GetPlace(placeId);
+
+                game.Viewers = Convert.ToInt32(reader["viewers_count"].ToString());
+
+                var value = reader["best_player_id"].ToString();
+
+                if (value != "")
+                {
+                    var bestplayer = DBPlayer.GetPlayerById(Convert.ToInt32(value));
+                    DBPlayer.GetPlayerStatistic(bestplayer);
+                    game.BestPlayer = bestplayer;
+                }
                 game.Stat1 = GetGameStat(game.Id, 1);
                 game.Stat2 = GetGameStat(game.Id, opteam_id);
             }
@@ -414,6 +428,34 @@ namespace Aviators
 
             }
             return null;
+        }
+
+        private Place GetPlace(int placeId)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select * from place where id = {0}", placeId);
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Place place = new Place("");
+
+            while (reader.Read())
+            {
+                place.Id = Convert.ToInt32(reader["id"].ToString());
+                place.Name = reader["name"].ToString();
+                place.FullAdress = reader["adress"].ToString();
+                place.GeoPos = reader["geoposition"].ToString();
+            }
+
+            return place;
         }
 
         public List<Game> GetAllGames()
@@ -488,12 +530,14 @@ namespace Aviators
             //Добавляем игроков
             foreach (var player in roster)
             {
-                Player.GetPlayerOrInsert(player);
+                DBPlayer.GetPlayerOrInsert(player);
             }
             //получаем ид турнира //TODO как то тупо, видимо надо просто по ссылке
             game.Tournament = GetTournamentByNameOrInsert(game.Tournament.Name, 0);
+            game.Place = GetPlaceOrInsert(game.Place.Name);
 
-            var opteam_id = GetTeamId(game.Team2);
+            var opteam_id = GetTeamIdOrInsert(game.Team2);
+
 
             #region Добавляем игру
 
@@ -539,11 +583,17 @@ namespace Aviators
         private static void AddGame(Game game, int opteam_id)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+
+            //т.к. неонтяно как в склайт засунуть нулл, если у нас нул, то сделаем такую хрень
+            var bp = game.BestPlayer == null ? ")" : ",{7})";
+            var bp1 = game.BestPlayer == null ? ")" : ", best_player_id) ";
+
             cmd.CommandText = string.Format(
                 "INSERT INTO game " +
-                "(date, op_team_id, score, op_score,tournament_id, viewers_count) " +
-                "VALUES('{0}',{1}, {2}, {3}, {4},{5})",
-                game.Date, opteam_id, game.Score.Item1, game.Score.Item2, game.Tournament.Id, game.Viewers);
+                "(date, op_team_id, score, op_score,tournament_id, viewers_count, place_id" + bp1 +
+                "VALUES('{0}',{1}, {2}, {3}, {4},{5},{6} " + bp,
+                game.Date, opteam_id, game.Score.Item1, game.Score.Item2, game.Tournament.Id, game.Viewers,
+                game.Place.Id, game.BestPlayer?.Id ?? null);
 
             try
             {
@@ -637,7 +687,7 @@ namespace Aviators
 
         #region SelectOrInsert
 
-        private int GetTeamId(string teamname)
+        private int GetTeamIdOrInsert(string teamname)
         {
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -734,6 +784,40 @@ namespace Aviators
             }
             return season;
         }
+        private Place GetPlaceOrInsert(string s)
+        {
+            Place place  = new Place(s);
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select ID from place where name_lower = '{0}'",
+                 place.Name.ToLower());
+
+            try
+            {
+                object obj = cmd.ExecuteScalar();
+                if (obj == null)
+                {
+                    cmd.CommandText = $"INSERT INTO place(name, name_lower) VALUES ('{s}', '{s.ToLower()}')";
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"select last_insert_rowid()";
+                    place.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
+                }
+                else
+                {
+                    place.Id = Convert.ToInt32(obj);
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return place;
+        }
+
+
         #endregion
 
         public List<Game> GetGamesTeam(Team team)
