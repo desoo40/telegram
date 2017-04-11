@@ -31,7 +31,7 @@ namespace Aviators
 
         public string GameStat(Game game, bool isLastGame = false)
         {
-            Image bitmap = Image.FromFile("Images\\gameStat.jpg");
+            Image bitmap = Image.FromFile("Images\\Blanks\\gameStat.jpg");
 
             var enemyFont = new Font(statFonts.Families[2], 24);
             var viewersFont = new Font(statFonts.Families[1], 45);
@@ -64,7 +64,8 @@ namespace Aviators
                 var sOnGame = "На матче присутствовало";
 
                 var viewers = new Rectangle(598, 160, 400, 50);
-                var sViewers = kek.Next(1, 3000).ToString();
+                //var sViewers = kek.Next(1, 3000).ToString();
+                var sViewers = game.Viewers.ToString();
                 sViewers += " зрителей";
 
                 g.DrawString(sOnGame, viewersFont, Brushes.White, onGame, rightFormat);
@@ -76,10 +77,31 @@ namespace Aviators
 
                 #region Соперник
                 var enemy = new Rectangle(310, 24, 350, 30);
+                var enemyLogo = new Rectangle(395, 50, 130, 130);
+                var enemyName = game.Team2;
+                Image enLogo;
 
-                g.DrawString("ХК ДИНАМО", enemyFont, Brushes.White, enemy, leftFormat);
-                //g.DrawRectangle(Pens.Red, enemy);
+                //g.DrawString("ХК ДИНАМО", enemyFont, Brushes.White, enemy, leftFormat);
+                g.DrawString(enemyName, enemyFont, Brushes.White, enemy, leftFormat);
+
                 
+                enLogo = getTeamLogo(enemyName);
+
+                if (enLogo != null)
+                {
+                    
+                    //g.DrawRectangle(Pens.Red, enemyLogo);
+
+                    var resRect = GetInscribed(enemyLogo, enLogo.Size);
+
+                    //g.DrawRectangle(Pens.Red, resRect);
+
+                    g.DrawImage(enLogo, resRect);
+                }
+
+
+                //g.DrawRectangle(Pens.Red, enemy);
+
                 #endregion
 
                 #region Место + дата
@@ -87,7 +109,7 @@ namespace Aviators
                 var date = new Rectangle(600, 55, 400, 60);
 
 
-                g.DrawString("г. Зеленоград, ФОК \"Ледовый\"", placeFont, Brushes.White, place, rightFormat);
+                //g.DrawString(game.Place.Name, placeFont, Brushes.White, place, rightFormat);
                 g.DrawString(game.Date.ToString("dd.MM.yyyy"), dateFont, Brushes.White, date, rightFormat);
                 //g.DrawString(game.Place, placeFont, Brushes.White, place, rightFormat);
 
@@ -108,33 +130,33 @@ namespace Aviators
                     g.DrawString(game.Score.Item2.ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
                 }
 
-                g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, aviPucks, centerFormat);
-                g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
+                //g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, aviPucks, centerFormat);
+                //g.DrawString(kek.Next(1, 50).ToString(), scoreFont, Brushes.White, enemyPucks, centerFormat);
                 #endregion
 
                 #region Статистика
                 var statY = 240;
                 var statX = 15;
 
-                //var arrOfStat = new int[6, 2]
-                //{
-                //    {game.Stat1.Shots, game.Stat2.Shots},
-                //    {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
-                //    {game.Stat1.Faceoff, game.Stat2.Faceoff},
-                //    {game.Stat1.Hits, game.Stat2.Shots},
-                //    {game.Stat1.Penalty, game.Stat2.Penalty},
-                //    {game.Stat1.BlockShots, game.Stat2.BlockShots},
-                //};
-
                 var arrOfStat = new int[6, 2]
                 {
-                    {kek.Next(1, 50), kek.Next(1, 50)},
-                     {kek.Next(1, 50), kek.Next(1, 50)},
-                      {kek.Next(1, 50), kek.Next(1, 50)},
-                       {kek.Next(1, 50), kek.Next(1, 50)},
-                        {kek.Next(1, 50), kek.Next(1, 50)},
-                         {kek.Next(1, 50), kek.Next(1, 50)}
+                    {game.Stat1.Shots, game.Stat2.Shots},
+                    {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
+                    {game.Stat1.Faceoff, game.Stat2.Faceoff},
+                    {game.Stat1.Hits, game.Stat2.Shots},
+                    {game.Stat1.Penalty, game.Stat2.Penalty},
+                    {game.Stat1.BlockShots, game.Stat2.BlockShots},
                 };
+
+                //var arrOfStat = new int[6, 2]
+                //{
+                //    {kek.Next(1, 50), kek.Next(1, 50)},
+                //     {kek.Next(1, 50), kek.Next(1, 50)},
+                //      {kek.Next(1, 50), kek.Next(1, 50)},
+                //       {kek.Next(1, 50), kek.Next(1, 50)},
+                //        {kek.Next(1, 50), kek.Next(1, 50)},
+                //         {kek.Next(1, 50), kek.Next(1, 50)}
+                //};
 
 
                 for (int i = 0; i < 6; i++)
@@ -171,21 +193,19 @@ namespace Aviators
                 {
                     Image logo;
 
-                    game.Tournament = new Tournament("MoscowGames2016");
-
                     if (game.Tournament != null)
                     {
                      
-                        logo = getLogo(game.Tournament.Name);
+                        logo = getTournamentLogo(game.Tournament.Name);
 
                         if (logo != null)
                         {
                             Rectangle needRect = new Rectangle(50, 810, 410, 180);
-                            g.DrawRectangle(Pens.Red, needRect);
+                            //g.DrawRectangle(Pens.Red, needRect);
 
                             var resRect = GetInscribed(needRect, logo.Size);
 
-                            g.DrawRectangle(Pens.Red, resRect);
+                            //g.DrawRectangle(Pens.Red, resRect);
 
                             g.DrawImage(logo, resRect);
                         }
@@ -200,14 +220,27 @@ namespace Aviators
             return file;
         }
 
-        private Image getLogo(string name)
+        private Image getTournamentLogo(string name)
         {
+            if (name == "МСХЛ. Плей-офф")
+                name = "МСХЛ";
+
             var logoPath = $@"Images\Logo\{name}_logo.png";
 
             if (File.Exists(logoPath))
                 return Image.FromFile(logoPath);
            
            return null;
+        }
+
+        private Image getTeamLogo(string name)
+        {
+            var logoPath = $@"Images\Teams\{name}.png";
+
+            if (File.Exists(logoPath))
+                return Image.FromFile(logoPath);
+
+            return null;
         }
 
         private Rectangle GetInscribed(Rectangle baseRect, Size inputsize)

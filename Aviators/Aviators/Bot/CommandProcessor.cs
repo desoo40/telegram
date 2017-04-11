@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics.Eventing.Reader;
 using System.Drawing;
 using System.Drawing.Imaging;
 using System.IO;
@@ -59,6 +60,8 @@ namespace Aviators
                     return;
 
                 case "статистика":
+                    if (string.IsNullOrEmpty(command.Argument))
+                        break;
                     if (command.Argument == "команда")
                         GamesStatistic(chatFinded);
                     else
@@ -443,6 +446,7 @@ namespace Aviators
             }
             else
             {
+                return "tut viletaet((((";
                 //в случае букв ищем по имени или фамилии
                 player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNameOrSurname(arg);
             }

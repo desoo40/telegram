@@ -20,11 +20,11 @@ namespace Aviators
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-            var ig = new ImageGenerator();
+            //var ig = new ImageGenerator();
 
-            ig.GameStat(new Game());
+            //ig.GameStat(new Game());
 
-            return;
+            //return;
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")
             {
