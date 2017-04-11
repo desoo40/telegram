@@ -51,7 +51,7 @@ namespace Aviators
             Game.Team1 = "Авиаторы";
             Game.Team2 = lines[2];
 
-            int i = 5;
+            int i = 4;
             while (lines[i] != "Счет")
             {
                 if (lines[i] != "")
