@@ -207,11 +207,17 @@ namespace Aviators
 
                 #region Лучший игрок
 
+                var bestPlayer = game.BestPlayer;
+
+                if (bestPlayer == null)
+                    bestPlayer = new Player(100, "Алексей", "Данилин");
+
+
                 var arrOfBestPlayerAttributes = new string[4]
                 {
-                    game.BestPlayer.Name,
-                    game.BestPlayer.Surname,
-                    "#" + game.BestPlayer.Number.ToString(),
+                    bestPlayer.Name,
+                    bestPlayer.Surname,
+                    "#" + bestPlayer.Number,
                     "0+0"
                 };
 
@@ -230,7 +236,7 @@ namespace Aviators
 
                 var rectToDraw = new Rectangle(785,645,220,220);
                 int ramka = 8;
-                DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{game.BestPlayer.Number}_{game.BestPlayer.Surname}.jpg"), rectToDraw, ramka);
+                DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg"), rectToDraw, ramka);
 
                 #endregion
             }
