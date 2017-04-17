@@ -78,50 +78,57 @@ namespace Aviators
 
                 if (lines[i] == "Голы") // Боря допишет
                 {
-                    var goals = lines[++i].Split(';');
-                    foreach (var goal in goals)
+
+                    //проверяем первый символ на цифру
+                    if (rxNums.IsMatch(lines[i + 1][0].ToString())) //TODO как то может получше проверить
+
                     {
-                        var g = new Goal();
-                        //TODO по тупому, переделать на регекс
-                        if (goal.Contains("("))
+                        var goals = lines[++i].Split(';');
+                        foreach (var goal in goals)
                         {
-                            var a = goal.Split('(');
-                            int a_num = Convert.ToInt32(a[0]);
-                            var author = Roster.Find(p => p.Number == a_num);
-                            if (author == null) continue;
-
-                            g.Author = author;
-
-                            if (goal.Contains(","))
+                            var g = new Goal();
+                            //TODO по тупому, переделать на регекс
+                            if (goal.Contains("("))
                             {
-                                var ass = a[1].Split(',');
-                                int a1_num = Convert.ToInt32(ass[0]);
-                                var as1 = Roster.Find(p => p.Number == a1_num);
-                                if (as1 == null) continue;
-                                g.Assistant1 = as1;
+                                var a = goal.Split('(');
+                                int a_num = Convert.ToInt32(a[0]);
+                                var author = Roster.Find(p => p.Number == a_num);
+                                if (author == null) continue;
 
-                                int a2_num = Convert.ToInt32(ass[1].Replace(')',' '));
-                                var as2 = Roster.Find(p => p.Number == a2_num);
-                                if (as2 == null) continue;
-                                g.Assistant2 = as2;
+                                g.Author = author;
 
+                                if (goal.Contains(","))
+                                {
+                                    var ass = a[1].Split(',');
+                                    int a1_num = Convert.ToInt32(ass[0]);
+                                    var as1 = Roster.Find(p => p.Number == a1_num);
+                                    if (as1 == null) continue;
+                                    g.Assistant1 = as1;
+
+                                    int a2_num = Convert.ToInt32(ass[1].Replace(')', ' '));
+                                    var as2 = Roster.Find(p => p.Number == a2_num);
+                                    if (as2 == null) continue;
+                                    g.Assistant2 = as2;
+
+                                }
+                                else
+                                {
+                                    int a1_num = Convert.ToInt32(a[1].Replace(')', ' '));
+                                    var as1 = Roster.Find(p => p.Number == a1_num);
+                                    if (as1 == null) continue;
+                                    g.Assistant1 = as1;
+                                }
                             }
                             else
                             {
-                                int a1_num = Convert.ToInt32(a[1].Replace(')', ' '));
-                                var as1 = Roster.Find(p => p.Number == a1_num);
-                                if (as1 == null) continue;
-                                g.Assistant1 = as1;
+                                var author = Roster.Find(p => p.Number == Convert.ToInt32(goal));
+                                if (author == null) continue;
+                                g.Author = author;
                             }
+                            Game.Goal.Add(g);
                         }
-                        else
-                        {
-                            var author = Roster.Find(p => p.Number == Convert.ToInt32(goal));
-                            if (author == null) continue;
-                            g.Author = author;
-                        }
-                        Game.Goal.Add(g);
                     }
+                    
                 }
 
                 if (lines[i] == "Броски" && lines[i + 1].Contains("-"))
