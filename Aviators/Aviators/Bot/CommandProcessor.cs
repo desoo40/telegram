@@ -475,7 +475,7 @@ namespace Aviators
         private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
             string result = "";
-            List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(type, 5);
+            List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(type, 15);
 
             result = "Топ 5 *" +GetTypeDescription(type) + "* ХК \"Авиаторы\":\n";
 

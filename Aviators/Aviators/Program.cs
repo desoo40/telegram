@@ -20,11 +20,39 @@ namespace Aviators
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-            //var ig = new ImageGenerator();
+#region Тест для генератора статы
 
-            //ig.GameStat(new Game());
+
+            //var ig = new ImageGenerator();
+            
+            //Game g = new Game();
+            //g.Date = DateTime.Now;
+            //g.Viewers = 551;
+            //g.Team2 = "Динамо";
+            //g.Tournament = new Tournament("МСХЛ");
+            //g.Score = new Tuple<int, int>(7, 6);
+
+            //var kek = new Random();
+
+            //g.Stat1.Shots = kek.Next(0, 100);
+            //g.Stat2.Shots = kek.Next(0, 100);
+            //g.Stat1.ShotsIn = kek.Next(0, 100);
+            //g.Stat2.ShotsIn = kek.Next(0, 100);
+            //g.Stat1.Faceoff = kek.Next(0, 100);
+            //g.Stat2.Faceoff = kek.Next(0, 100);
+            //g.Stat1.Hits = kek.Next(0, 100);
+            //g.Stat2.Shots = kek.Next(0, 100);
+            //g.Stat1.Penalty = kek.Next(0, 100);
+            //g.Stat2.Penalty = kek.Next(0, 100);
+            //g.Stat1.BlockShots = kek.Next(0, 100);
+            //g.Stat2.BlockShots = kek.Next(0, 100);
+
+            //g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
+
+            //ig.GameStat(g);
 
             //return;
+#endregion
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")
             {

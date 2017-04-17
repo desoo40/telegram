@@ -57,7 +57,6 @@ namespace Aviators
                 rightFormat.Alignment = StringAlignment.Far;
                 rightFormat.LineAlignment = StringAlignment.Far;
 
-                var kek = new Random();
 
                 #region Зрители
                 var onGame = new Rectangle(598, 115, 400, 50);
@@ -105,13 +104,13 @@ namespace Aviators
                 #endregion
 
                 #region Место + дата
-                var place = new Rectangle(543, 23, 458, 43);
-                var date = new Rectangle(600, 55, 400, 60);
+                var place = new Rectangle(500, 23, 500, 43);
+                var date = new Rectangle(800, 55, 200, 60);
 
 
                 //g.DrawString(game.Place.Name, placeFont, Brushes.White, place, rightFormat);
                 g.DrawString(game.Date.ToString("dd.MM.yyyy"), dateFont, Brushes.White, date, rightFormat);
-                //g.DrawString(game.Place, placeFont, Brushes.White, place, rightFormat);
+                g.DrawString("ФОК \"Мещерский\", г. Н. Новгород", placeFont, Brushes.White, place, rightFormat);
 
                 //g.DrawRectangle(Pens.Red, place);
                 //g.DrawRectangle(Pens.Red, date);
@@ -148,15 +147,7 @@ namespace Aviators
                     {game.Stat1.BlockShots, game.Stat2.BlockShots},
                 };
 
-                //var arrOfStat = new int[6, 2]
-                //{
-                //    {kek.Next(1, 50), kek.Next(1, 50)},
-                //     {kek.Next(1, 50), kek.Next(1, 50)},
-                //      {kek.Next(1, 50), kek.Next(1, 50)},
-                //       {kek.Next(1, 50), kek.Next(1, 50)},
-                //        {kek.Next(1, 50), kek.Next(1, 50)},
-                //         {kek.Next(1, 50), kek.Next(1, 50)}
-                //};
+                
 
 
                 for (int i = 0; i < 6; i++)
@@ -184,7 +175,6 @@ namespace Aviators
                                  "ЛД МЕДВЕДКОВО", nextGameFont, Brushes.White, nextGame, centerFormat);
                     //g.DrawRectangle(Pens.Red, viewers);
 
-                    #endregion
 
                     //g.DrawRectangle(Pens.Red, aviGoals);
                     //g.DrawRectangle(Pens.Red, enemyGoals);
@@ -212,7 +202,14 @@ namespace Aviators
                     }
 
                 }
+                #endregion
 
+                #region Лучший игрок
+                
+                Image playerCircle = CropToCircle(Image.FromFile("DB\\PlayersPhoto\\1_черненков.jpg"), Color.FromArgb(0,0,0));
+
+                g.DrawImage(playerCircle, 500, 500);
+                #endregion
             }
 
             var file = $"Images\\game_as1.jpg";
@@ -265,6 +262,22 @@ namespace Aviators
             resRect = new Rectangle(x, y, width, height);
             
             return resRect;
+        }
+
+        public static Image CropToCircle(Image srcImage, Color backGround)
+        {
+            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
+            Graphics g = Graphics.FromImage(dstImage);
+            using (Brush br = new SolidBrush(backGround))
+            {
+                g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
+            }
+            GraphicsPath path = new GraphicsPath();
+            path.AddEllipse(0, 0, dstImage.Width, dstImage.Height);
+            g.SetClip(path);
+            g.DrawImage(srcImage, 0, 0);
+
+            return dstImage;
         }
     }
 }
