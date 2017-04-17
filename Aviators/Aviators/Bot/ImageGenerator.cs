@@ -40,7 +40,7 @@ namespace Aviators
             var scoreFont = new Font("Segoe UI", 56);
             var statFont = new Font(statFonts.Families[4], 42);
             var nextGameFont = new Font(statFonts.Families[3], 25);
-            var bestPlayerFont = new Font(statFonts.Families[1], 55);
+            var bestPlayerFont = new Font(statFonts.Families[1], 45);
 
            
 
@@ -211,13 +211,16 @@ namespace Aviators
                 {
                     game.BestPlayer.Name,
                     game.BestPlayer.Surname,
-                    game.BestPlayer.Number.ToString(),
+                    "#" + game.BestPlayer.Number.ToString(),
                     "0+0"
                 };
 
+                var bestX = 598;
+                var bestY = 700;
+
                 for (int i = 0; i < 4; i++)
                 {
-                    var tmp = new Rectangle(608, statY + i * 96, 80, 80);
+                    var tmp = new Rectangle(bestX, bestY + i * 41, 200, 80);
                     g.DrawString(arrOfBestPlayerAttributes[i], bestPlayerFont, Brushes.White, tmp, leftFormat);
                 }
 
@@ -227,7 +230,7 @@ namespace Aviators
 
                 var rectToDraw = new Rectangle(785,645,220,220);
                 int ramka = 8;
-                DrawImageInCircle(g, new Bitmap("DB\\PlayersPhoto\\88_сорокин.jpg"), rectToDraw, ramka);
+                DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{game.BestPlayer.Number}_{game.BestPlayer.Surname}.jpg"), rectToDraw, ramka);
 
                 #endregion
             }
