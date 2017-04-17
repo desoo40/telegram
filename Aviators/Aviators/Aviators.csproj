@@ -82,6 +82,7 @@
     <Compile Include="Configs\Config.cs" />
     <Compile Include="Data\ParseFiles.cs" />
     <Compile Include="DB\DBCore.cs" />
+    <Compile Include="DB\DBGameCommand .cs" />
     <Compile Include="DB\DBPlayerCommand.cs" />
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>

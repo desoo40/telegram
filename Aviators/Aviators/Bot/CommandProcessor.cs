@@ -131,7 +131,7 @@ namespace Aviators
                 }
                 else
                 {
-                    var file = ImageGen.GameStat(DB.DBCommands.GetGame(Convert.ToInt32(cQuery.Data)));
+                    var file = ImageGen.GameStat(DB.DBCommands.DBGame.GetGame(Convert.ToInt32(cQuery.Data)));
 
                     var photo = new Telegram.Bot.Types.FileToSend("gamestat",
                         (new StreamReader(file)).BaseStream);
@@ -497,7 +497,7 @@ namespace Aviators
         }
         private async void LastGame(Chat chatFinded)
         {
-            var file = ImageGen.GameStat(DB.DBCommands.GetLastGame());
+            var file = ImageGen.GameStat(DB.DBCommands.DBGame.GetLastGame());
 
             var photo = new Telegram.Bot.Types.FileToSend("gamestat",
                 (new StreamReader(file)).BaseStream);
@@ -524,7 +524,7 @@ namespace Aviators
         {
             var result = new List<string>();
 
-            List<Game> allGames = DB.DBCommands.GetAllGames();
+            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames();
 
             const int otstup = -20;
 
@@ -561,7 +561,7 @@ namespace Aviators
             var team = DB.DBCommands.GetTeam(command.Argument);
             if (team.Id < 1) result.Add("Соперник не найден");
 
-            var games = DB.DBCommands.GetGamesTeam(team);
+            var games = DB.DBCommands.DBGame.GetGamesTeam(team);
             if (games.Count < 1) result.Add("Игр не найдено");
 
             const int otstup = -15;
