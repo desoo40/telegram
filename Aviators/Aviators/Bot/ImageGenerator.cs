@@ -40,7 +40,9 @@ namespace Aviators
             var scoreFont = new Font("Segoe UI", 56);
             var statFont = new Font(statFonts.Families[4], 42);
             var nextGameFont = new Font(statFonts.Families[3], 25);
+            var bestPlayerFont = new Font(statFonts.Families[1], 55);
 
+           
 
 
             using (Graphics g = Graphics.FromImage(bitmap))
@@ -57,6 +59,10 @@ namespace Aviators
                 rightFormat.Alignment = StringAlignment.Far;
                 rightFormat.LineAlignment = StringAlignment.Far;
 
+                g.SmoothingMode = SmoothingMode.HighQuality;
+                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
+                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
+                g.TextRenderingHint = TextRenderingHint.AntiAlias;
 
                 #region Зрители
                 var onGame = new Rectangle(598, 115, 400, 50);
@@ -108,9 +114,8 @@ namespace Aviators
                 var date = new Rectangle(800, 55, 200, 60);
 
 
-                //g.DrawString(game.Place.Name, placeFont, Brushes.White, place, rightFormat);
+                g.DrawString(game.Place.Name, placeFont, Brushes.White, place, rightFormat);
                 g.DrawString(game.Date.ToString("dd.MM.yyyy"), dateFont, Brushes.White, date, rightFormat);
-                g.DrawString("ФОК \"Мещерский\", г. Н. Новгород", placeFont, Brushes.White, place, rightFormat);
 
                 //g.DrawRectangle(Pens.Red, place);
                 //g.DrawRectangle(Pens.Red, date);
@@ -205,16 +210,54 @@ namespace Aviators
                 #endregion
 
                 #region Лучший игрок
-                
-                Image playerCircle = CropToCircle(Image.FromFile("DB\\PlayersPhoto\\1_черненков.jpg"), Color.FromArgb(0,0,0));
 
-                g.DrawImage(playerCircle, 500, 500);
+                var arrOfBestPlayerAttributes = new string[4]
+                {
+                    game.BestPlayer.Name,
+                    game.BestPlayer.Surname,
+                    game.BestPlayer.Number.ToString(),
+                    "0+0"
+                };
+
+                for (int i = 0; i < 4; i++)
+                {
+                    var tmp = new Rectangle(608, statY + i * 96, 80, 80);
+                    g.DrawString(arrOfBestPlayerAttributes[i], bestPlayerFont, Brushes.White, tmp, leftFormat);
+                }
+
+                //Image playerCircle = CropToCircle(Image.FromFile("DB\\PlayersPhoto\\1_черненков.jpg"), Color.FromArgb(0,0,0));
+
+                //g.DrawImage(playerCircle, 500, 500);
+
                 #endregion
             }
 
             var file = $"Images\\game_as1.jpg";
-            bitmap.Save(file, ImageFormat.Jpeg);
+
+            EncoderParameters myEncoderParameters = new EncoderParameters(1);
+            System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
+            EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 100L);
+            myEncoderParameters.Param[0] = myEncoderParameter;
+
+            ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+
+            bitmap.Save(file, jpgEncoder, myEncoderParameters);
             return file;
+        }
+
+        private ImageCodecInfo GetEncoder(ImageFormat format)
+        {
+
+            ImageCodecInfo[] codecs = ImageCodecInfo.GetImageDecoders();
+
+            foreach (ImageCodecInfo codec in codecs)
+            {
+                if (codec.FormatID == format.Guid)
+                {
+                    return codec;
+                }
+            }
+            return null;
         }
 
         private Image getTournamentLogo(string name)

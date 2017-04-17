@@ -20,39 +20,42 @@ namespace Aviators
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
-#region Тест для генератора статы
+            #region Тест для генератора статы
 
 
-            //var ig = new ImageGenerator();
-            
-            //Game g = new Game();
-            //g.Date = DateTime.Now;
-            //g.Viewers = 551;
-            //g.Team2 = "Динамо";
-            //g.Tournament = new Tournament("МСХЛ");
-            //g.Score = new Tuple<int, int>(7, 6);
+            var ig = new ImageGenerator();
 
-            //var kek = new Random();
 
-            //g.Stat1.Shots = kek.Next(0, 100);
-            //g.Stat2.Shots = kek.Next(0, 100);
-            //g.Stat1.ShotsIn = kek.Next(0, 100);
-            //g.Stat2.ShotsIn = kek.Next(0, 100);
-            //g.Stat1.Faceoff = kek.Next(0, 100);
-            //g.Stat2.Faceoff = kek.Next(0, 100);
-            //g.Stat1.Hits = kek.Next(0, 100);
-            //g.Stat2.Shots = kek.Next(0, 100);
-            //g.Stat1.Penalty = kek.Next(0, 100);
-            //g.Stat2.Penalty = kek.Next(0, 100);
-            //g.Stat1.BlockShots = kek.Next(0, 100);
-            //g.Stat2.BlockShots = kek.Next(0, 100);
+            Game g = new Game();
+            g.Date = DateTime.Now;
+            g.Viewers = 551;
+            g.Team2 = "Динамо";
+            g.Tournament = new Tournament("МСХЛ");
+            g.Score = new Tuple<int, int>(7, 6);
 
-            //g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
+            var kek = new Random();
 
-            //ig.GameStat(g);
+            g.Stat1.Shots = kek.Next(0, 100);
+            g.Stat2.Shots = kek.Next(0, 100);
+            g.Stat1.ShotsIn = kek.Next(0, 100);
+            g.Stat2.ShotsIn = kek.Next(0, 100);
+            g.Stat1.Faceoff = kek.Next(0, 100);
+            g.Stat2.Faceoff = kek.Next(0, 100);
+            g.Stat1.Hits = kek.Next(0, 100);
+            g.Stat2.Shots = kek.Next(0, 100);
+            g.Stat1.Penalty = kek.Next(0, 100);
+            g.Stat2.Penalty = kek.Next(0, 100);
+            g.Stat1.BlockShots = kek.Next(0, 100);
+            g.Stat2.BlockShots = kek.Next(0, 100);
 
-            //return;
-#endregion
+            g.BestPlayer = new Player(59, "Андрей", "Калинин");
+
+            g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
+
+            ig.GameStat(g);
+
+            return;
+            #endregion
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")
             {
