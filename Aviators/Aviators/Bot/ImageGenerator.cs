@@ -58,11 +58,7 @@ namespace Aviators
                 StringFormat rightFormat = new StringFormat();
                 rightFormat.Alignment = StringAlignment.Far;
                 rightFormat.LineAlignment = StringAlignment.Far;
-
-                g.SmoothingMode = SmoothingMode.HighQuality;
-                g.InterpolationMode = InterpolationMode.HighQualityBicubic;
-                g.PixelOffsetMode = PixelOffsetMode.HighQuality;
-                g.TextRenderingHint = TextRenderingHint.AntiAlias;
+               
 
                 #region Зрители
                 var onGame = new Rectangle(598, 115, 400, 50);
@@ -229,6 +225,10 @@ namespace Aviators
 
                 //g.DrawImage(playerCircle, 500, 500);
 
+                var rectToDraw = new Rectangle(785,645,220,220);
+                int ramka = 8;
+                DrawImageInCircle(g, new Bitmap("DB\\PlayersPhoto\\88_сорокин.jpg"), rectToDraw, ramka);
+
                 #endregion
             }
 
@@ -307,20 +307,38 @@ namespace Aviators
             return resRect;
         }
 
-        public static Image CropToCircle(Image srcImage, Color backGround)
+        public Bitmap CropToSize(Bitmap srcImage, Size size)
         {
-            Image dstImage = new Bitmap(srcImage.Width, srcImage.Height, srcImage.PixelFormat);
+            Bitmap dstImage = new Bitmap(size.Width, size.Height);
             Graphics g = Graphics.FromImage(dstImage);
-            using (Brush br = new SolidBrush(backGround))
-            {
-                g.FillRectangle(br, 0, 0, dstImage.Width, dstImage.Height);
-            }
-            GraphicsPath path = new GraphicsPath();
-            path.AddEllipse(0, 0, dstImage.Width, dstImage.Height);
-            g.SetClip(path);
-            g.DrawImage(srcImage, 0, 0);
+            
+            var destRect = new Rectangle(0, 0, size.Width, size.Height);
+            var srcRect = new Rectangle(0, 0, srcImage.Width, srcImage.Width);
 
+            g.DrawImage(srcImage, destRect, srcRect, GraphicsUnit.Pixel);
+            //g.DrawEllipse(Pens.Red, 10, 10, 50, 50);
+
+            //g.FillPath(bra, path);
             return dstImage;
+            //return srcImage.Clone(srcRect, srcImage.PixelFormat);
+        }
+
+        private void DrawImageInCircle(Graphics g, Bitmap bitmap, Rectangle rectToDraw, int ramka)
+        {
+            var rectsize = new Rectangle(0, 0, rectToDraw.Width - ramka, rectToDraw.Height - ramka);
+
+
+            Bitmap playerCircle = CropToSize(bitmap, rectToDraw.Size);
+            //playerCircle.Save("Images\\circle.jpg", ImageFormat.Jpeg);
+
+            var bra = new TextureBrush(playerCircle, rectsize);
+
+            GraphicsPath path = new GraphicsPath();
+            path.AddEllipse(rectsize);
+
+            g.TranslateTransform(rectToDraw.X + ramka / 2, rectToDraw.Y + ramka / 2);
+            g.FillPath(bra, path);
+            g.TranslateTransform(-rectToDraw.X - ramka / 2, -rectToDraw.Y - ramka / 2);
         }
     }
 }
