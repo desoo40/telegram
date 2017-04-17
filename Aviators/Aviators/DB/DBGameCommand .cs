@@ -145,6 +145,8 @@ namespace Aviators
             game.Stat1 = GetGameStat(game.Id, 1);
             game.Stat2 = GetGameStat(game.Id, opteam_id);
 
+            game.Goal = GetGameGoals(game.Id);
+
             return game;
         }
 
@@ -177,6 +179,71 @@ namespace Aviators
             }
 
             return stat;
+        }
+
+
+        private List<Goal> GetGameGoals(int gameId)
+        {
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM goal WHERE game_id = {gameId}";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            List<Goal> goals = new List<Goal>();
+            while (reader.Read())
+            {
+                Goal goal = new Goal();
+                goal.Id = Convert.ToInt32(reader["id"].ToString());
+                goal.PowerPlay = Convert.ToBoolean(reader["pp"].ToString());
+                goal.ShortHand = Convert.ToBoolean(reader["sh"].ToString());
+
+                GetGoalPlayers(goal);
+                goals.Add(goal);
+            }
+
+            return goals;
+        }
+
+        private void GetGoalPlayers(Goal goal)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM goal_player WHERE goal_id = {goal.Id}";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+           
+            while (reader.Read())
+            {
+                bool isAssist = Convert.ToBoolean(reader["asist"].ToString());
+                int playerid = Convert.ToInt32(reader["player_id"].ToString());
+
+                if (!isAssist)
+                    goal.Author = DB.DBCommands.DBPlayer.GetPlayerById(playerid);
+                else
+                {
+                    if (goal.Assistant1 == null)
+                        goal.Assistant1 = DB.DBCommands.DBPlayer.GetPlayerById(playerid);
+                    else
+                        goal.Assistant2 = DB.DBCommands.DBPlayer.GetPlayerById(playerid);
+                }
+            }
         }
 
         public void AddGameStat(int gameId, TeamStat stat, int teamId)
