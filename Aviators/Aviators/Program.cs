@@ -24,13 +24,14 @@ namespace Aviators
             #region Тест для генератора статы
 
 
-            var ig = new ImageGenerator();
-            Game g = new Game();
-            g.BestPlayer = new Player(86, "Никита", "Кучеров");
-
-            ig.Roster(g);
-
+            //var ig = new ImageGenerator();
+            //Game g = new Game();
+            //g.BestPlayer = new Player(71, "Кирилл", "Зайцев");
+            //g.Team2 = "РЭУ";
             //g.Date = DateTime.Now;
+            //g.Tournament = new Tournament("МСХЛ");
+            //ig.Roster(g);
+            ///////////////////////////////////////////////////////
             //g.Viewers = 551;
             //g.Team2 = "Тампа-Бэй Лайтнинг";
             //g.Tournament = new Tournament("НХЛ");
@@ -58,7 +59,7 @@ namespace Aviators
 
             //ig.GameStat(g);
 
-            return;
+            //return;
             #endregion
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")

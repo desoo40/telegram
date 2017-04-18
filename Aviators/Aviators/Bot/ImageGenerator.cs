@@ -31,8 +31,8 @@ namespace Aviators
             statFonts.AddFontFile("Fonts/seguisb.ttf");
 
             rosterFonts = new PrivateFontCollection();
+            rosterFonts.AddFontFile("Fonts/segoeui.ttf");
             rosterFonts.AddFontFile("Fonts/tahoma.ttf");
-            rosterFonts.AddFontFile("Fonts/tahomabd.ttf");
 
         }
         void DrawOutlineText(Graphics g, String text, Font font, Rectangle r, Brush b)
@@ -66,14 +66,86 @@ namespace Aviators
         {
             Image bitmap = Image.FromFile("Images\\Blanks\\roster.jpg");
 
-            var numberFont = new Font(rosterFonts.Families[0], 29);
-            var nameFont = new Font(rosterFonts.Families[0], 26, FontStyle.Bold);
+            var dateFont = new Font(rosterFonts.Families[0], 52, FontStyle.Bold);
+            var descrFont = new Font(rosterFonts.Families[0], 72, FontStyle.Bold);
+
+            var numberFont = new Font(rosterFonts.Families[1], 29);
+            var nameFont = new Font(rosterFonts.Families[1], 26, FontStyle.Bold);
             var numberColor = new SolidBrush(Color.FromArgb(9, 55, 143));
+
+
 
             using (Graphics g = Graphics.FromImage(bitmap))
             {
+                StringFormat centerFormat = new StringFormat();
+                centerFormat.Alignment = StringAlignment.Center;
+                centerFormat.LineAlignment = StringAlignment.Center;
+
+                StringFormat leftFormat = new StringFormat();
+                leftFormat.Alignment = StringAlignment.Near;
+                leftFormat.LineAlignment = StringAlignment.Near;
+
+                StringFormat rightFormat = new StringFormat();
+                rightFormat.Alignment = StringAlignment.Far;
+                rightFormat.LineAlignment = StringAlignment.Far;
+
+                #region Лого турнира
+                Image logo;
+
+                if (game.Tournament != null)
+                {
+
+                    logo = getTournamentLogo(game.Tournament.Name);
+
+                    if (logo != null)
+                    {
+                        Rectangle needRect = new Rectangle(355, 28, 115, 115);
+                        //g.DrawRectangle(Pens.Red, needRect);
+
+                        var resRect = GetInscribed(needRect, logo.Size);
+
+                        //g.DrawRectangle(Pens.Red, resRect);
+
+                        g.DrawImage(logo, resRect);
+                    }
+                }
+                #endregion
+
+                #region Дата + описание
+
+                Rectangle dateRect = new Rectangle(445, 25, 300, 50);
+                Rectangle descrRect = new Rectangle(445, 55, 300, 100);
+
+
+                g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
+                //DrawOutlineText(g, "Финал", descrFont, descrRect, Brushes.White);
+                g.DrawString("Финал", descrFont, Brushes.White, descrRect, centerFormat);
+
+                //g.DrawRectangle(Pens.Crimson,dateRect);
+                #endregion
+                #region Лого противника
+
+                Image enLogo;
+                var enemyName = game.Team2;
+                var enemyLogo = new Rectangle(970, 40, 120, 120);
+                enLogo = getTeamLogo(enemyName);
+
+                if (enLogo != null)
+                {
+
+                    //g.DrawRectangle(Pens.Red, enemyLogo);
+
+                    var resRect = GetInscribed(enemyLogo, enLogo.Size);
+
+                    //g.DrawRectangle(Pens.Red, resRect);
+
+                    g.DrawImage(enLogo, resRect);
+                }
+                #endregion
+
+                #region Полевые
                 var player = game.BestPlayer;
-                int ramka = 8;
+                int ramka = 0;
 
                 for (int i = 0; i < 5; i++)
                 {
@@ -101,8 +173,9 @@ namespace Aviators
 
                     }
                 }
-
+                #endregion
             }
+
             var file = $"Images\\roster.jpg";
 
             EncoderParameters myEncoderParameters = new EncoderParameters(1);
