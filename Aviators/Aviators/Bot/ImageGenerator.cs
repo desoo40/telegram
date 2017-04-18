@@ -16,6 +16,8 @@ namespace Aviators
     public class ImageGenerator
     {
         PrivateFontCollection statFonts;
+        PrivateFontCollection rosterFonts;
+
 
         public ImageGenerator ()
         {
@@ -27,6 +29,72 @@ namespace Aviators
             statFonts.AddFontFile("Fonts/MyriadPro-Semibold.otf");
             statFonts.AddFontFile("Fonts/SegoeUILight.ttf");
             statFonts.AddFontFile("Fonts/seguisb.ttf");
+
+            rosterFonts = new PrivateFontCollection();
+            rosterFonts.AddFontFile("Fonts/tahomabd.ttf");
+
+        }
+        void DrawOutlineText(Graphics g, String text, Font font, Point p)
+        {
+            // set atialiasing
+            g.SmoothingMode = SmoothingMode.HighQuality;
+
+            // make thick pen for outlining
+            Pen pen = new Pen(Color.Black, 2);
+            // round line joins of the pen
+            pen.LineJoin = LineJoin.Round;
+
+            // create graphics path
+            GraphicsPath textPath = new GraphicsPath();
+
+            // convert string to path
+            textPath.AddString(text, font.FontFamily, (int)font.Style, font.Size, p, StringFormat.GenericTypographic);
+
+            // clone path to make outlining path
+            GraphicsPath outlinePath = (GraphicsPath)textPath.Clone();
+
+            // outline the path
+            outlinePath.Widen(pen);
+
+            // fill outline path with some color
+            g.FillPath(Brushes.Black, outlinePath);
+            // fill original text path with some color
+            g.FillPath(Brushes.White, textPath);
+        }
+        public string Roster(Game game)
+        {
+            Image bitmap = Image.FromFile("Images\\Blanks\\roster.jpg");
+
+            var test = new Font(rosterFonts.Families[0], 26);
+
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                DrawOutlineText(g, "I like eat apples", test, new Point(0,0));
+                //g.DrawString("Вадим Шрейдер", test, Brushes.White, new Point(0, 0), new StringFormat());
+
+                //GraphicsPath p = new GraphicsPath();
+                //p.AddString(
+                //    "Вадим Шрейдер", // text to draw
+                //    rosterFonts.Families[0], // or any other font family
+                //    (int) FontStyle.Regular, // font style (bold, italic, etc.)
+                //    g.DpiY*26/72, // em size
+                //    new Point(0, 0), // location where to draw text
+                //    new StringFormat()); // set options here (e.g. center alignment)
+                //g.DrawPath(Pens.Black, p);
+
+                
+            }
+            var file = $"Images\\roster.jpg";
+
+            EncoderParameters myEncoderParameters = new EncoderParameters(1);
+            System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
+            EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 100L);
+            myEncoderParameters.Param[0] = myEncoderParameter;
+
+            ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+
+            bitmap.Save(file, jpgEncoder, myEncoderParameters);
+            return file;
         }
 
         public string GameStat(Game game, bool isLastGame = false)
@@ -43,8 +111,6 @@ namespace Aviators
             var bestPlayerFont = new Font(statFonts.Families[1], 45);
 
 
-
-
             using (Graphics g = Graphics.FromImage(bitmap))
             {
                 StringFormat centerFormat = new StringFormat();
@@ -58,7 +124,6 @@ namespace Aviators
                 StringFormat rightFormat = new StringFormat();
                 rightFormat.Alignment = StringAlignment.Far;
                 rightFormat.LineAlignment = StringAlignment.Far;
-               
 
                 #region Зрители
                 var onGame = new Rectangle(598, 115, 400, 50);

@@ -24,9 +24,9 @@ namespace Aviators
             #region Тест для генератора статы
 
 
-            //var ig = new ImageGenerator();
+            var ig = new ImageGenerator();
 
-
+            ig.Roster(null);
             //Game g = new Game();
             //g.Date = DateTime.Now;
             //g.Viewers = 551;
@@ -57,7 +57,7 @@ namespace Aviators
 
             //ig.GameStat(g);
 
-            //return;
+            return;
             #endregion
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")
