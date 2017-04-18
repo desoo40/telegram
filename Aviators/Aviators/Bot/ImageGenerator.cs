@@ -42,7 +42,7 @@ namespace Aviators
             var nextGameFont = new Font(statFonts.Families[3], 25);
             var bestPlayerFont = new Font(statFonts.Families[1], 45);
 
-           
+
 
 
             using (Graphics g = Graphics.FromImage(bitmap))
@@ -205,6 +205,41 @@ namespace Aviators
                 }
                 #endregion
 
+                #region Заброшенные шайбы
+
+                var k = 0;
+                var fontSize = 25;
+
+                if (game.Goal.Count > 12)
+                {
+                    fontSize -= 5;
+                }
+                var pucksFont = new Font(statFonts.Families[3], fontSize, FontStyle.Bold);
+
+                foreach (var goal in game.Goal)
+                {
+                    var pucksRectangle = new Rectangle(580, k * (fontSize + 2) + 282, 420, 33);
+                    var goalString = "• " + goal.Author.Surname;
+
+                    if (goal.Assistant1 != null)
+                    {
+                        goalString += " (";
+                        goalString += goal.Assistant1.Surname;
+
+                        if (goal.Assistant2 != null)
+                        {
+                            goalString += ", ";
+                            goalString += goal.Assistant2.Surname;
+                        }
+                        goalString += ")";
+                    }
+                     
+                    g.DrawString(goalString, pucksFont, Brushes.White, pucksRectangle, leftFormat);
+                    ++k;
+                }
+
+                #endregion
+
                 #region Лучший игрок
 
                 var bestPlayer = game.BestPlayer;
@@ -212,13 +247,15 @@ namespace Aviators
                 if (bestPlayer == null)
                     bestPlayer = new Player(100, "Алексей", "Данилин");
 
+                string bestStat =
+                    $"{game.Goal.Count(go => go.Author.Id == bestPlayer.Id)}+{game.Goal.Count(go => go.Assistant1 != null && go.Assistant1.Id == bestPlayer.Id) + game.Goal.Count(go => go.Assistant2 != null && go.Assistant2.Id == bestPlayer.Id)}";
 
                 var arrOfBestPlayerAttributes = new string[4]
                 {
                     bestPlayer.Name,
                     bestPlayer.Surname,
                     "#" + bestPlayer.Number,
-                    "0+0"
+                    bestStat
                 };
 
                 var bestX = 598;

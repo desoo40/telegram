@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using Aviators.Bot;
 
@@ -29,8 +30,8 @@ namespace Aviators
             //Game g = new Game();
             //g.Date = DateTime.Now;
             //g.Viewers = 551;
-            //g.Team2 = "Динамо";
-            //g.Tournament = new Tournament("МСХЛ");
+            //g.Team2 = "Тампа-Бэй Лайтнинг";
+            //g.Tournament = new Tournament("НХЛ");
             //g.Score = new Tuple<int, int>(7, 6);
 
             //var kek = new Random();
@@ -48,7 +49,9 @@ namespace Aviators
             //g.Stat1.BlockShots = kek.Next(0, 100);
             //g.Stat2.BlockShots = kek.Next(0, 100);
 
-            //g.BestPlayer = new Player(59, "Андрей", "Калинин");
+            //g.BestPlayer = new Player(86, "Никита", "Кучеров");
+
+           
 
             //g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
 
