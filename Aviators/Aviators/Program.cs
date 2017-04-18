@@ -25,9 +25,11 @@ namespace Aviators
 
 
             var ig = new ImageGenerator();
+            Game g = new Game();
+            g.BestPlayer = new Player(86, "Никита", "Кучеров");
 
-            ig.Roster(null);
-            //Game g = new Game();
+            ig.Roster(g);
+
             //g.Date = DateTime.Now;
             //g.Viewers = 551;
             //g.Team2 = "Тампа-Бэй Лайтнинг";
@@ -49,9 +51,8 @@ namespace Aviators
             //g.Stat1.BlockShots = kek.Next(0, 100);
             //g.Stat2.BlockShots = kek.Next(0, 100);
 
-            //g.BestPlayer = new Player(86, "Никита", "Кучеров");
 
-           
+
 
             //g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
 

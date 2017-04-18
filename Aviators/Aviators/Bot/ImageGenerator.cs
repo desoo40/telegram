@@ -31,16 +31,17 @@ namespace Aviators
             statFonts.AddFontFile("Fonts/seguisb.ttf");
 
             rosterFonts = new PrivateFontCollection();
+            rosterFonts.AddFontFile("Fonts/tahoma.ttf");
             rosterFonts.AddFontFile("Fonts/tahomabd.ttf");
 
         }
-        void DrawOutlineText(Graphics g, String text, Font font, Point p)
+        void DrawOutlineText(Graphics g, String text, Font font, Rectangle r, Brush b)
         {
             // set atialiasing
             g.SmoothingMode = SmoothingMode.HighQuality;
 
             // make thick pen for outlining
-            Pen pen = new Pen(Color.Black, 2);
+            Pen pen = new Pen(Color.Black, 3);
             // round line joins of the pen
             pen.LineJoin = LineJoin.Round;
 
@@ -48,7 +49,7 @@ namespace Aviators
             GraphicsPath textPath = new GraphicsPath();
 
             // convert string to path
-            textPath.AddString(text, font.FontFamily, (int)font.Style, font.Size, p, StringFormat.GenericTypographic);
+            textPath.AddString(text, font.FontFamily, (int)font.Style, font.Size, r, StringFormat.GenericTypographic);
 
             // clone path to make outlining path
             GraphicsPath outlinePath = (GraphicsPath)textPath.Clone();
@@ -59,30 +60,48 @@ namespace Aviators
             // fill outline path with some color
             g.FillPath(Brushes.Black, outlinePath);
             // fill original text path with some color
-            g.FillPath(Brushes.White, textPath);
+            g.FillPath(b, textPath);
         }
         public string Roster(Game game)
         {
             Image bitmap = Image.FromFile("Images\\Blanks\\roster.jpg");
 
-            var test = new Font(rosterFonts.Families[0], 26);
+            var numberFont = new Font(rosterFonts.Families[0], 29);
+            var nameFont = new Font(rosterFonts.Families[0], 26, FontStyle.Bold);
+            var numberColor = new SolidBrush(Color.FromArgb(9, 55, 143));
 
             using (Graphics g = Graphics.FromImage(bitmap))
             {
-                DrawOutlineText(g, "I like eat apples", test, new Point(0,0));
-                //g.DrawString("Вадим Шрейдер", test, Brushes.White, new Point(0, 0), new StringFormat());
+                var player = game.BestPlayer;
+                int ramka = 8;
 
-                //GraphicsPath p = new GraphicsPath();
-                //p.AddString(
-                //    "Вадим Шрейдер", // text to draw
-                //    rosterFonts.Families[0], // or any other font family
-                //    (int) FontStyle.Regular, // font style (bold, italic, etc.)
-                //    g.DpiY*26/72, // em size
-                //    new Point(0, 0), // location where to draw text
-                //    new StringFormat()); // set options here (e.g. center alignment)
-                //g.DrawPath(Pens.Black, p);
+                for (int i = 0; i < 5; i++)
+                {
+                    var distX = 182;
+                    var distY = 196;
+                    var distNumX = 155;
+                    var distNameY = 120;
+                    var distNameX = 6;
+                    var kekterval = 0;
 
-                
+                    if (i > 2)
+                        kekterval = 180;
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        
+                        var rectToDraw = new Rectangle(distX * i + 36 + kekterval, distY * j + 290, 132, 132);
+                        var numRect = new Rectangle(distX * i + kekterval + distNumX, distY * j + 295, 70, 50);
+                        var nameRect = new Rectangle(distX * i + 36 + kekterval + distNameX, distY * j + 295 + distNameY, 200, 100);
+
+
+                        DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{player.Number}_{player.Surname}.jpg"), rectToDraw, ramka);
+                        DrawOutlineText(g, $"#{player.Number}", numberFont, numRect, numberColor);
+                        DrawOutlineText(g, $"{player.Name}\n{player.Surname}", nameFont, nameRect, Brushes.White);
+
+                    }
+                }
+
             }
             var file = $"Images\\roster.jpg";
 
