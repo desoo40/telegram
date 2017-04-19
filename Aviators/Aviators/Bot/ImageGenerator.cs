@@ -16,6 +16,8 @@ namespace Aviators
     public class ImageGenerator
     {
         PrivateFontCollection statFonts;
+        PrivateFontCollection rosterFonts;
+
 
         public ImageGenerator ()
         {
@@ -27,22 +29,50 @@ namespace Aviators
             statFonts.AddFontFile("Fonts/MyriadPro-Semibold.otf");
             statFonts.AddFontFile("Fonts/SegoeUILight.ttf");
             statFonts.AddFontFile("Fonts/seguisb.ttf");
+
+            rosterFonts = new PrivateFontCollection();
+            rosterFonts.AddFontFile("Fonts/segoeui.ttf");
+            rosterFonts.AddFontFile("Fonts/tahoma.ttf");
+
         }
-
-        public string GameStat(Game game, bool isLastGame = false)
+        void DrawOutlineText(Graphics g, String text, Font font, Rectangle r, Brush b)
         {
-            Image bitmap = Image.FromFile("Images\\Blanks\\gameStat.jpg");
+            // set atialiasing
+            g.SmoothingMode = SmoothingMode.HighQuality;
 
-            var enemyFont = new Font(statFonts.Families[2], 24);
-            var viewersFont = new Font(statFonts.Families[1], 45);
-            var placeFont = new  Font(statFonts.Families[1], 38);
-            var dateFont = new Font(statFonts.Families[1], 50);
-            var scoreFont = new Font("Segoe UI", 56);
-            var statFont = new Font(statFonts.Families[4], 42);
-            var nextGameFont = new Font(statFonts.Families[3], 25);
-            var bestPlayerFont = new Font(statFonts.Families[1], 45);
+            // make thick pen for outlining
+            Pen pen = new Pen(Color.Black, 3);
+            // round line joins of the pen
+            pen.LineJoin = LineJoin.Round;
 
-           
+            // create graphics path
+            GraphicsPath textPath = new GraphicsPath();
+
+            // convert string to path
+            textPath.AddString(text, font.FontFamily, (int)font.Style, font.Size, r, StringFormat.GenericTypographic);
+
+            // clone path to make outlining path
+            GraphicsPath outlinePath = (GraphicsPath)textPath.Clone();
+
+            // outline the path
+            outlinePath.Widen(pen);
+
+            // fill outline path with some color
+            g.FillPath(Brushes.Black, outlinePath);
+            // fill original text path with some color
+            g.FillPath(b, textPath);
+        }
+        public string Roster(Game game)
+        {
+            Image bitmap = Image.FromFile("Images\\Blanks\\roster.jpg");
+
+            var dateFont = new Font(rosterFonts.Families[0], 52, FontStyle.Bold);
+            var descrFont = new Font(rosterFonts.Families[0], 72, FontStyle.Bold);
+
+            var numberFont = new Font(rosterFonts.Families[1], 29);
+            var nameFont = new Font(rosterFonts.Families[1], 26, FontStyle.Bold);
+            var numberColor = new SolidBrush(Color.FromArgb(9, 55, 143));
+
 
 
             using (Graphics g = Graphics.FromImage(bitmap))
@@ -58,7 +88,134 @@ namespace Aviators
                 StringFormat rightFormat = new StringFormat();
                 rightFormat.Alignment = StringAlignment.Far;
                 rightFormat.LineAlignment = StringAlignment.Far;
-               
+
+                #region Лого турнира
+                Image logo;
+
+                if (game.Tournament != null)
+                {
+
+                    logo = getTournamentLogo(game.Tournament.Name);
+
+                    if (logo != null)
+                    {
+                        Rectangle needRect = new Rectangle(355, 28, 115, 115);
+                        //g.DrawRectangle(Pens.Red, needRect);
+
+                        var resRect = GetInscribed(needRect, logo.Size);
+
+                        //g.DrawRectangle(Pens.Red, resRect);
+
+                        g.DrawImage(logo, resRect);
+                    }
+                }
+                #endregion
+
+                #region Дата + описание
+
+                Rectangle dateRect = new Rectangle(445, 25, 300, 50);
+                Rectangle descrRect = new Rectangle(445, 55, 300, 100);
+
+
+                g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
+                //DrawOutlineText(g, "Финал", descrFont, descrRect, Brushes.White);
+                g.DrawString("Финал", descrFont, Brushes.White, descrRect, centerFormat);
+
+                //g.DrawRectangle(Pens.Crimson,dateRect);
+                #endregion
+                #region Лого противника
+
+                Image enLogo;
+                var enemyName = game.Team2;
+                var enemyLogo = new Rectangle(970, 40, 120, 120);
+                enLogo = getTeamLogo(enemyName);
+
+                if (enLogo != null)
+                {
+
+                    //g.DrawRectangle(Pens.Red, enemyLogo);
+
+                    var resRect = GetInscribed(enemyLogo, enLogo.Size);
+
+                    //g.DrawRectangle(Pens.Red, resRect);
+
+                    g.DrawImage(enLogo, resRect);
+                }
+                #endregion
+
+                #region Полевые
+                var player = game.BestPlayer;
+                int ramka = 0;
+
+                for (int i = 0; i < 5; i++)
+                {
+                    var distX = 182;
+                    var distY = 196;
+                    var distNumX = 155;
+                    var distNameY = 120;
+                    var distNameX = 6;
+                    var kekterval = 0;
+
+                    if (i > 2)
+                        kekterval = 180;
+
+                    for (int j = 0; j < 4; j++)
+                    {
+                        
+                        var rectToDraw = new Rectangle(distX * i + 36 + kekterval, distY * j + 290, 132, 132);
+                        var numRect = new Rectangle(distX * i + kekterval + distNumX, distY * j + 295, 70, 50);
+                        var nameRect = new Rectangle(distX * i + 36 + kekterval + distNameX, distY * j + 295 + distNameY, 200, 100);
+
+
+                        DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{player.Number}_{player.Surname}.jpg"), rectToDraw, ramka);
+                        DrawOutlineText(g, $"#{player.Number}", numberFont, numRect, numberColor);
+                        DrawOutlineText(g, $"{player.Name}\n{player.Surname}", nameFont, nameRect, Brushes.White);
+
+                    }
+                }
+                #endregion
+            }
+
+            var file = $"Images\\roster.jpg";
+
+            EncoderParameters myEncoderParameters = new EncoderParameters(1);
+            System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;
+            EncoderParameter myEncoderParameter = new EncoderParameter(myEncoder, 100L);
+            myEncoderParameters.Param[0] = myEncoderParameter;
+
+            ImageCodecInfo jpgEncoder = GetEncoder(ImageFormat.Jpeg);
+
+            bitmap.Save(file, jpgEncoder, myEncoderParameters);
+            return file;
+        }
+
+        public string GameStat(Game game, bool isLastGame = false)
+        {
+            Image bitmap = Image.FromFile("Images\\Blanks\\gameStat.jpg");
+
+            var enemyFont = new Font(statFonts.Families[2], 24);
+            var viewersFont = new Font(statFonts.Families[1], 45);
+            var placeFont = new  Font(statFonts.Families[1], 38);
+            var dateFont = new Font(statFonts.Families[1], 50);
+            var scoreFont = new Font("Segoe UI", 56);
+            var statFont = new Font(statFonts.Families[4], 42);
+            var nextGameFont = new Font(statFonts.Families[3], 25);
+            var bestPlayerFont = new Font(statFonts.Families[1], 45);
+
+
+            using (Graphics g = Graphics.FromImage(bitmap))
+            {
+                StringFormat centerFormat = new StringFormat();
+                centerFormat.Alignment = StringAlignment.Center;
+                centerFormat.LineAlignment = StringAlignment.Center;
+
+                StringFormat leftFormat = new StringFormat();
+                leftFormat.Alignment = StringAlignment.Near;
+                leftFormat.LineAlignment = StringAlignment.Near;
+
+                StringFormat rightFormat = new StringFormat();
+                rightFormat.Alignment = StringAlignment.Far;
+                rightFormat.LineAlignment = StringAlignment.Far;
 
                 #region Зрители
                 var onGame = new Rectangle(598, 115, 400, 50);
@@ -205,14 +362,57 @@ namespace Aviators
                 }
                 #endregion
 
+                #region Заброшенные шайбы
+
+                var k = 0;
+                var fontSize = 25;
+
+                if (game.Goal.Count > 12)
+                {
+                    fontSize -= 5;
+                }
+                var pucksFont = new Font(statFonts.Families[3], fontSize, FontStyle.Bold);
+
+                foreach (var goal in game.Goal)
+                {
+                    var pucksRectangle = new Rectangle(580, k * (fontSize + 2) + 282, 420, 33);
+                    var goalString = "• " + goal.Author.Surname;
+
+                    if (goal.Assistant1 != null)
+                    {
+                        goalString += " (";
+                        goalString += goal.Assistant1.Surname;
+
+                        if (goal.Assistant2 != null)
+                        {
+                            goalString += ", ";
+                            goalString += goal.Assistant2.Surname;
+                        }
+                        goalString += ")";
+                    }
+                     
+                    g.DrawString(goalString, pucksFont, Brushes.White, pucksRectangle, leftFormat);
+                    ++k;
+                }
+
+                #endregion
+
                 #region Лучший игрок
+
+                var bestPlayer = game.BestPlayer;
+
+                if (bestPlayer == null)
+                    bestPlayer = new Player(100, "Алексей", "Данилин");
+
+                string bestStat =
+                    $"{game.Goal.Count(go => go.Author.Id == bestPlayer.Id)}+{game.Goal.Count(go => go.Assistant1 != null && go.Assistant1.Id == bestPlayer.Id) + game.Goal.Count(go => go.Assistant2 != null && go.Assistant2.Id == bestPlayer.Id)}";
 
                 var arrOfBestPlayerAttributes = new string[4]
                 {
-                    game.BestPlayer.Name,
-                    game.BestPlayer.Surname,
-                    "#" + game.BestPlayer.Number.ToString(),
-                    "0+0"
+                    bestPlayer.Name,
+                    bestPlayer.Surname,
+                    "#" + bestPlayer.Number,
+                    bestStat
                 };
 
                 var bestX = 598;
@@ -230,7 +430,7 @@ namespace Aviators
 
                 var rectToDraw = new Rectangle(785,645,220,220);
                 int ramka = 8;
-                DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{game.BestPlayer.Number}_{game.BestPlayer.Surname}.jpg"), rectToDraw, ramka);
+                DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg"), rectToDraw, ramka);
 
                 #endregion
             }
