@@ -24,11 +24,23 @@ namespace Aviators
             foreach (var fileInfo in files)
             {
                 Console.Write("Обрабатываем файл: " + fileInfo.Name + " ... ");
-                ParseTXTFile(fileInfo.FullName);
+                var game = ParseTXTFile(fileInfo.FullName);
+                if (game== null) continue;
+
+                var findGame = DB.DBCommands.DBGame.FindGame(game);
+                if(findGame == null)
+                    DB.DBCommands.AddNewGameAndPlayers(game);
+                else
+                    DB.DBCommands.UpdateGameAndPlayer(findGame, game);
+               
+
+                var name  = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), game.Id);
+
+                File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
             }
         }
 
-        private static void ParseTXTFile(string file)
+        private static Game ParseTXTFile(string file)
         {
             Regex rxNums = new Regex(@"^\d+$"); // проверка на число
 
@@ -41,7 +53,7 @@ namespace Aviators
             if (lines.Length == 0)
             {
                 Console.WriteLine("ERROR(файл не содержит строк)");
-                return;
+                return null;
             }
 
             Game.Date = Convert.ToDateTime(lines[0]);
@@ -51,7 +63,20 @@ namespace Aviators
             Game.Team1 = "Авиаторы";
             Game.Team2 = lines[2];
 
-            int i = 4;
+            int i = 1;
+            while (lines.Length > i - 1 && lines[i - 1] != "Описание")
+            {
+                i++;
+            }
+
+            if (lines.Length > i && lines[i] != "Состав")
+                Game.Description = lines[i];
+
+            i = 1;
+            while (lines[i-1] != "Состав")
+            {
+                i++;
+            }
             while (lines[i] != "Счет")
             {
                 if (lines[i] != "")
@@ -69,7 +94,7 @@ namespace Aviators
 
             while (i < lines.Length - 1)
             {
-                if (lines[i] == "Счет")
+                if (lines[i] == "Счет" && lines[i + 1].Contains("-"))
                 {
                     var score = lines[++i].Split('-');
 
@@ -215,11 +240,15 @@ namespace Aviators
 
             #endregion
 
-            DB.DBCommands.AddNewGameAndPlayers(Game, Roster);
-
-
+            //Добавляем игроков в игру(пока сделаем через Action)
+            foreach (var player in Roster)
+            {
+                //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
+                Game.Actions.Add(new GameAction(player, "0", Action.Игра));
+            }
             Console.WriteLine("OK");
 
+            return Game;
         }
     }
 }

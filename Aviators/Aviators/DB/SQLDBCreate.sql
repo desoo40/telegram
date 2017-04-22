@@ -196,3 +196,18 @@ create table players_stat (
       references player (id)
       on delete restrict on update restrict
 );
+
+
+/*==============================================================*/
+/* Table: file_action                                           */
+/*==============================================================*/
+create table file_action (
+   id                    INTEGER PRIMARY KEY,
+   game_id              INT4                 null,
+   date            TEXT                 null,
+   filename               TEXT                 null,
+   action               int4                 null,      
+   constraint FK_file_ACT_REFERENCE_GAME foreign key (game_id)
+      references game (id)
+      on delete restrict on update restrict
+);

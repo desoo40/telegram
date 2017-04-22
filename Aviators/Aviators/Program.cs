@@ -12,7 +12,7 @@ namespace Aviators
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
         private static bool InitFromCode = false;
-        private static bool LoadIncome = false;
+        private static bool LoadIncome = true;
 
         static void Main(string[] args)
         {

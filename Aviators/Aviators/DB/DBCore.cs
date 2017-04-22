@@ -339,10 +339,10 @@ namespace Aviators
 
       
 
-        public void AddNewGameAndPlayers(Game game, List<Player> roster)
+        public void AddNewGameAndPlayers(Game game)
         {
             //Добавляем игроков
-            foreach (var player in roster)
+            foreach (var player in game.Roster)
             {
                 DBPlayer.GetPlayerOrInsert(player);
             }
@@ -363,7 +363,7 @@ namespace Aviators
             #endregion
 
             //Добавляем игроков в игру(пока сделаем через Action)
-            foreach (var player in roster)
+            foreach (var player in game.Roster)
             {
                 //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
                 DBGame.AddAction(game.Id, player.Id, Action.Игра);
@@ -374,7 +374,61 @@ namespace Aviators
                 DBGame.AddGoal(goal, game.Id);
             }
         }
-        
+        internal void UpdateGameAndPlayer(Game findGame, Game game)
+        {
+            game.Id = findGame.Id;
+            //Добавляем игроков
+            foreach (var player in game.Roster)
+            {
+                DBPlayer.GetPlayerOrInsert(player);
+            }
+
+            game.Place = GetPlaceOrInsert(game.Place.Name);
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"UPDATE game SET " +
+                              $"place_id ={game.Place.Id}, score = {game.Score.Item1}, op_score = {game.Score.Item2}, viewers_count = {game.Viewers}, best_player_id = {game.BestPlayer.Id} " +
+                              $"Where id = {findGame.Id}";
+            try
+            {
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            if (findGame.Actions.Count == 0)
+                foreach (var gameAction in game.Actions)
+                {
+                    DB.DBCommands.DBGame.AddAction(findGame.Id, gameAction.Player.Id, gameAction.Action);
+                }
+            if (findGame.Goal.Count == 0)
+                foreach (var goal in game.Goal)
+                {
+                    DB.DBCommands.DBGame.AddGoal(goal, findGame.Id);
+                }
+
+
+            cmd.CommandText = $"DELETE FROM game_stat where game_id = {findGame.Id}";
+            try
+            {
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            var team = DB.DBCommands.GetTeam(game.Team2);
+
+            DBGame.AddGameStat(findGame.Id, game.Stat1, 1);
+            DBGame.AddGameStat(findGame.Id, game.Stat2, team.Id);
+
+        }
+
         public Team GetTeam(string teamname)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -563,5 +617,37 @@ namespace Aviators
             }
             return teams;
         }
+
+
+        public string AddParseFile(string fileInfoName, int gameId)
+        {
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select count(*) from file_action where game_id = '{0}'", gameId);
+
+            var fileName = fileInfoName;
+
+            try
+            {
+                int ucount = Convert.ToInt32(cmd.ExecuteScalar().ToString());
+
+                
+                if (ucount != 0)
+                {
+                    fileName += "_update" + ucount;
+                }
+              
+                cmd.CommandText = "INSERT INTO file_action(date, filename, game_id, action)" +
+                                  $"VALUES ('{DateTime.Now}', '{fileName}', {gameId}, {ucount})";
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return fileName;
+        }
+        
     }
 }

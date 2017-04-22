@@ -358,5 +358,36 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
         }
+
+        /// <summary>
+        /// Поиск игр по сопернику и дате (нужен для обновления игр)
+        /// </summary>
+        public Game FindGame(Game game)
+        {
+            var team = DB.DBCommands.GetTeam(game.Team2);
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select ID from game where op_team_id = '{0}' AND date = '{1}'", team.Id, game.Date);
+
+            try
+            {
+                object obj = cmd.ExecuteScalar();
+                if (obj == null)
+                {
+                    return null;
+                }
+                else
+                {
+                    return GetGame(Convert.ToInt32(obj.ToString()));
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return null;
+        }
     }
 }

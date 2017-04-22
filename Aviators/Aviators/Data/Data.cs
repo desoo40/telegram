@@ -105,10 +105,22 @@ namespace Aviators
 
         public Player BestPlayer { get; set; }
 
+        public List<Player> Roster
+        {
+            get
+            {
+                return Actions.Where(a => a.Action == Action.Игра).Select(p => p.Player).ToList();
+            }
+        }
+
+        public string Description { get; set; }
+
         public Game()
         {
             Actions= new List<GameAction>();
             Goal = new List<Goal>();
+
+            Score = new Tuple<int, int>(0,0);
 
             Stat1 = new TeamStat();
             Stat2 = new TeamStat();
