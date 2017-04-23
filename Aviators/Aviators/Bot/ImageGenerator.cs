@@ -115,10 +115,10 @@ namespace Aviators
                 Rectangle dateRect = new Rectangle(445, 25, 300, 50);
                 Rectangle descrRect = new Rectangle(445, 55, 300, 100);
                 var description = game.Description;
-                var descrFont = new Font(rosterFonts.Families[0], 72, FontStyle.Bold);
+                int fontSize = (descrRect.Width + 125)/description.Length;
+                var descrFont = new Font(rosterFonts.Families[0], fontSize, FontStyle.Bold);
 
                 g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
-                //DrawOutlineText(g, "Финал", descrFont, descrRect, Brushes.White);
                 g.DrawString(description, descrFont, Brushes.White, descrRect, centerFormat);
 
                 //g.DrawRectangle(Pens.Crimson,dateRect);
