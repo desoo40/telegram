@@ -144,7 +144,7 @@ namespace Aviators
 
             if (command.Name == "состав")
             {
-                SendGameSostav(chatFinded, Convert.ToInt32(command.Name));
+                SendGameSostav(chatFinded, Convert.ToInt32(command.Argument));
             }
 
         }

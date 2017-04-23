@@ -119,7 +119,7 @@ namespace Aviators
 
                 g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
                 //DrawOutlineText(g, "Финал", descrFont, descrRect, Brushes.White);
-                g.DrawString("Финал", descrFont, Brushes.White, descrRect, centerFormat);
+                g.DrawString(description, descrFont, Brushes.White, descrRect, centerFormat);
 
                 //g.DrawRectangle(Pens.Crimson,dateRect);
                 #endregion
