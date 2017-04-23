@@ -147,6 +147,8 @@ namespace Aviators
 
             game.Goal = GetGameGoals(game.Id);
 
+            game.Actions = GetGameActions(game);
+
             return game;
         }
 
@@ -181,7 +183,6 @@ namespace Aviators
             return stat;
         }
 
-
         private List<Goal> GetGameGoals(int gameId)
         {
 
@@ -211,6 +212,36 @@ namespace Aviators
             }
 
             return goals;
+        }
+
+        private List<GameAction> GetGameActions(Game game)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM game_action WHERE game_id = {game.Id}";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            List<GameAction> actions = new List<GameAction>();
+            while (reader.Read())
+            {
+                int playerid = Convert.ToInt32(reader["player_id"].ToString());
+                var player = DB.DBCommands.DBPlayer.GetPlayerById(playerid);
+                var act = Convert.ToInt32(reader["action"].ToString());
+
+                GameAction action = new GameAction(player, game, (Action) act);
+                action.Id = Convert.ToInt32(reader["id"].ToString());
+
+                actions.Add(action);
+            }
+            return actions;
         }
 
         private void GetGoalPlayers(Goal goal)

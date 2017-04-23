@@ -190,6 +190,13 @@ namespace Aviators
             Action = action;
         }
 
+        public GameAction(Player player, Game game, Action action)
+        {
+            Player = player;
+            Game = game;
+            Action = action;
+        }
+
         public int Id { get; set; }
         public Player Player { get; set; }
         public Game Game { get; set; }
