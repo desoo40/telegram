@@ -142,6 +142,9 @@
     <Content Include="DB\PlayersPhoto\71_зайцев.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="DB\PlayersPhoto\73_ярцев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\81_вовченко.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
