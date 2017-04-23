@@ -131,23 +131,22 @@ namespace Aviators
                 }
                 else
                 {
-                    var file = ImageGen.GameStat(DB.DBCommands.DBGame.GetGame(Convert.ToInt32(cQuery.Data)));
-
-                    var photo = new Telegram.Bot.Types.FileToSend("gamestat",
-                        (new StreamReader(file)).BaseStream);
-
-                    Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
+                    SendGameStat(chatFinded, DB.DBCommands.DBGame.GetGame(Convert.ToInt32(cQuery.Data)));
                 }
-
-
             }
 
-            else
+            if (command.Name == "статистика")
             {
-                var statistic = GetPlayerStatistic(command.Name).Replace("*", "");
+                var statistic = GetPlayerStatistic(command.Argument).Replace("*", "");
 
                 await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
             }
+
+            if (command.Name == "состав")
+            {
+                SendGameSostav(chatFinded, Convert.ToInt32(command.Name));
+            }
+
         }
 
         #region неиспользумое
@@ -416,8 +415,9 @@ namespace Aviators
                         var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
                         Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup: keyboard);
-                        command.Message = mes;
-                        chatFinded.WaitingCommands.Add(command);
+                        var newcom = new Command(new [] {"статистика", command.Name});
+                        newcom.Message = mes;
+                        chatFinded.WaitingCommands.Add(newcom);
                     }
                     else
                     {
@@ -497,12 +497,8 @@ namespace Aviators
         }
         private async void LastGame(Chat chatFinded)
         {
-            var file = ImageGen.GameStat(DB.DBCommands.DBGame.GetLastGame());
-
-            var photo = new Telegram.Bot.Types.FileToSend("gamestat",
-                (new StreamReader(file)).BaseStream);
-
-            Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo);
+            var game = DB.DBCommands.DBGame.GetLastGame();
+            SendGameStat(chatFinded, game);
         }
 
         private async void TeamList(Chat chatFinded, Command command)
@@ -553,6 +549,32 @@ namespace Aviators
             result.Add($"`{"% выигр.вбрасываний",otstup}` {(allGames.Sum(g => g.Stat1.Faceoff) / (float)(allGames.Sum(g => g.Stat1.Faceoff) + allGames.Sum(g => g.Stat2.Faceoff)) * 100).ToString("F") + "%"}");
 
             await Bot.SendTextMessageAsync(chatFinded.Id, string.Join("\n", result), parseMode: ParseMode.Markdown);
+        }
+        private async void SendGameStat(Chat chatFinded, Game game)
+        {
+            //var game = DB.DBCommands.DBGame.GetGame(gameId);
+            var file = ImageGen.GameStat(game);
+
+            var photo = new Telegram.Bot.Types.FileToSend("gamestat",
+                (new StreamReader(file)).BaseStream);
+
+            var button = new InlineKeyboardButton("Состав");
+            button.CallbackData = game.Id.ToString();
+            var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
+
+            Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo, replyMarkup: keyboard);
+            var newCom = new Command(new [] {"состав", game.Id.ToString()});
+            newCom.Message = mes;
+            chatFinded.WaitingCommands.Add(newCom);
+        }
+        private async void SendGameSostav(Chat chatFinded, int gameId)
+        {
+            var game = DB.DBCommands.DBGame.GetGame(gameId);
+            var file = ImageGen.Roster(game);
+
+            var photo = new Telegram.Bot.Types.FileToSend("gamestat",
+               (new StreamReader(file)).BaseStream);
+            await Bot.SendPhotoAsync(chatFinded.Id, photo);
         }
 
         private async void EnemyTeam(Chat chatFinded, Command command)
