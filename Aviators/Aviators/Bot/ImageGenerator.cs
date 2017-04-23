@@ -18,7 +18,6 @@ namespace Aviators
         PrivateFontCollection statFonts;
         PrivateFontCollection rosterFonts;
 
-
         public ImageGenerator ()
         {
             //Добавляем шрифт из указанного файла в em.Drawing.Text.PrivateFontCollection
@@ -62,12 +61,12 @@ namespace Aviators
             // fill original text path with some color
             g.FillPath(b, textPath);
         }
+
         public string Roster(Game game)
         {
             Image bitmap = Image.FromFile("Images\\Blanks\\roster.jpg");
 
             var dateFont = new Font(rosterFonts.Families[0], 52, FontStyle.Bold);
-            var descrFont = new Font(rosterFonts.Families[0], 72, FontStyle.Bold);
 
             var numberFont = new Font(rosterFonts.Families[1], 29);
             var nameFont = new Font(rosterFonts.Families[1], 26, FontStyle.Bold);
@@ -115,7 +114,8 @@ namespace Aviators
 
                 Rectangle dateRect = new Rectangle(445, 25, 300, 50);
                 Rectangle descrRect = new Rectangle(445, 55, 300, 100);
-
+                var description = game.Description;
+                var descrFont = new Font(rosterFonts.Families[0], 72, FontStyle.Bold);
 
                 g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
                 //DrawOutlineText(g, "Финал", descrFont, descrRect, Brushes.White);
@@ -143,35 +143,60 @@ namespace Aviators
                 }
                 #endregion
 
-                #region Полевые
-                var player = game.BestPlayer;
-                int ramka = 0;
-
-                for (int i = 0; i < 5; i++)
+                
+                #region Состав
+                
+                var roster = game.Roster;
+                var sizePhoto = new Size(132, 132);
+                var sizeNum = new Size(70, 50);
+                var sizeName = new Size(200, 100);
+                
+                for (int i = 0; i < roster.Count; ++i)
                 {
-                    var distX = 182;
-                    var distY = 196;
-                    var distNumX = 155;
-                    var distNameY = 120;
-                    var distNameX = 6;
-                    var kekterval = 0;
+                    var point = GetPointOfPlayer(i);
+                    var player = roster[i];
 
-                    if (i > 2)
-                        kekterval = 180;
+                    var shiftNumX = 125;
+                    var shiftNumY = 5;
 
-                    for (int j = 0; j < 4; j++)
+                    var shiftNameY = 128;
+
+                    Rectangle rectToDraw;
+                    Rectangle numRect;
+                    Rectangle nameRect;
+
+                    if (i < 2)
                     {
-                        
-                        var rectToDraw = new Rectangle(distX * i + 36 + kekterval, distY * j + 290, 132, 132);
-                        var numRect = new Rectangle(distX * i + kekterval + distNumX, distY * j + 295, 70, 50);
-                        var nameRect = new Rectangle(distX * i + 36 + kekterval + distNameX, distY * j + 295 + distNameY, 200, 100);
+                        var distNumXG = 180;
 
+                        var distNameXG = 300;
 
-                        DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{player.Number}_{player.Surname}.jpg"), rectToDraw, ramka);
-                        DrawOutlineText(g, $"#{player.Number}", numberFont, numRect, numberColor);
-                        DrawOutlineText(g, $"{player.Name}\n{player.Surname}", nameFont, nameRect, Brushes.White);
+                        var shfitNameX = 150;
+                        var shfitNameY = 60;
 
+                        var shfitNumX = 50;
+                        var shfitNumY = 5;
+
+                        rectToDraw = new Rectangle(point, sizePhoto);
+                        numRect = new Rectangle(point.X + distNumXG * i - shfitNumX, point.Y + shfitNumY, sizeNum.Width, sizeNum.Height);
+                        nameRect = new Rectangle(point.X + distNameXG * i - shfitNameX, point.Y + shfitNameY, sizeName.Width, sizeName.Height);
                     }
+                    else
+                    {
+                        rectToDraw = new Rectangle(point, sizePhoto);
+                        numRect = new Rectangle(point.X + shiftNumX, point.Y + shiftNumY, sizeNum.Width, sizeNum.Height);
+                        nameRect = new Rectangle(point.X, point.Y + shiftNameY, sizeName.Width, sizeName.Height);
+                    }
+
+                    string path = $"DB\\PlayersPhoto\\{player.Number}_{player.Surname}.jpg";
+
+                    if (!File.Exists(path))
+                        path = $"DB\\PlayersPhoto\\no_photo.jpg";
+
+
+                    DrawImageInCircle(g, new Bitmap(path), rectToDraw, 0);
+                    DrawOutlineText(g, $"#{player.Number}", numberFont, numRect, numberColor);
+                    DrawOutlineText(g, $"{player.Name}\n{player.Surname}", nameFont, nameRect, Brushes.White);
                 }
                 #endregion
             }
@@ -447,6 +472,43 @@ namespace Aviators
             bitmap.Save(file, jpgEncoder, myEncoderParameters);
             return file;
         }
+
+        private Point GetPointOfPlayer(int ind)
+        {
+            var point = new Point();
+
+            var startX = 36;
+            var startY = 290;
+
+            var distX = 190;
+            var distY = 196;
+
+            var kekterval = 0;
+
+            if (ind < 2)
+            {
+                var distXGoalie = 180;
+                var startXGoalie = 420;
+                var startYGoalie = 150;
+
+                point.X = startXGoalie + ind*distXGoalie;
+                point.Y = startYGoalie;
+            }
+            else
+            {
+                var column = (ind - 2)%5;
+                var row = (ind - 2)/5;
+
+                if (column > 2)
+                    kekterval = 140;
+
+                point.X = startX + distX*column + kekterval;
+                point.Y = startY + distY*row;
+            }
+
+            return point;
+        }
+
 
         private ImageCodecInfo GetEncoder(ImageFormat format)
         {

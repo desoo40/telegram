@@ -617,7 +617,13 @@ namespace Aviators
         }
         private async void NextGame(Chat chatFinded)
         {
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я следующая игра");
+            var file = ImageGen.Roster(DB.DBCommands.DBGame.GetLastGame());
+
+            var photo = new Telegram.Bot.Types.FileToSend("gamestat",
+                (new StreamReader(file)).BaseStream);
+
+            await Bot.SendPhotoAsync(chatFinded.Id, photo);
+            //await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я следующая игра");
         }
 
         private async void TimeTable(Chat chatFinded, int n)
