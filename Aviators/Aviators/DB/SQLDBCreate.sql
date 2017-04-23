@@ -39,7 +39,8 @@ create table game (
    tournament_id        INT4                 null,
    season_id            INT4                 null,
    viewers_count        INT4                 null,
-   best_player_id       INT4                 null,  
+   best_player_id       INT4                 null, 
+   description                 TEXT                 null, 
    constraint FK_GAME_REFERENCE_playe foreign key (best_player_id)
       references player (id)
       on delete restrict on update restrict, 

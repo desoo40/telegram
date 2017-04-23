@@ -132,6 +132,7 @@ namespace Aviators
             game.Place = DB.DBCommands.GetPlace(placeId);
 
             game.Viewers = Convert.ToInt32(reader["viewers_count"].ToString());
+            game.Description = reader["description"].ToString();
 
             var value = reader["best_player_id"].ToString();
 
@@ -301,15 +302,15 @@ namespace Aviators
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
 
             //т.к. неонтяно как в склайт засунуть нулл, если у нас нул, то сделаем такую хрень
-            var bp = game.BestPlayer == null ? ")" : ",{7})";
+            var bp = game.BestPlayer == null ? ")" : ",{8})";
             var bp1 = game.BestPlayer == null ? ")" : ", best_player_id) ";
 
             cmd.CommandText = string.Format(
                 "INSERT INTO game " +
-                "(date, op_team_id, score, op_score,tournament_id, viewers_count, place_id" + bp1 +
-                "VALUES('{0}',{1}, {2}, {3}, {4},{5},{6} " + bp,
+                "(date, op_team_id, score, op_score,tournament_id, viewers_count, place_id, description" + bp1 +
+                "VALUES('{0}',{1}, {2}, {3}, {4},{5},{6},'{7}' " + bp,
                 game.Date, opteam_id, game.Score.Item1, game.Score.Item2, game.Tournament.Id, game.Viewers,
-                game.Place.Id, game.BestPlayer?.Id ?? null);
+                game.Place.Id, game.Description, game.BestPlayer?.Id ?? null);
 
             try
             {
