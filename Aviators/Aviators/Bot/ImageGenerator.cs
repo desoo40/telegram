@@ -71,6 +71,7 @@ namespace Aviators
             var numberFont = new Font(rosterFonts.Families[1], 29);
             var nameFont = new Font(rosterFonts.Families[1], 26, FontStyle.Bold);
             var numberColor = new SolidBrush(Color.FromArgb(9, 55, 143));
+            var assOrKfont = new Font(rosterFonts.Families[1], 50, FontStyle.Bold);
 
 
 
@@ -115,7 +116,7 @@ namespace Aviators
                 Rectangle dateRect = new Rectangle(445, 25, 300, 50);
                 Rectangle descrRect = new Rectangle(445, 55, 300, 100);
                 var description = game.Description;
-                int fontSize = (descrRect.Width + 125)/description.Length;
+                int fontSize = (descrRect.Width + 100)/description.Length;
                 var descrFont = new Font(rosterFonts.Families[0], fontSize, FontStyle.Bold);
 
                 g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
@@ -193,10 +194,16 @@ namespace Aviators
                     if (!File.Exists(path))
                         path = $"DB\\PlayersPhoto\\no_photo.jpg";
 
-
                     DrawImageInCircle(g, new Bitmap(path), rectToDraw, 0);
                     DrawOutlineText(g, $"#{player.Number}", numberFont, numRect, numberColor);
                     DrawOutlineText(g, $"{player.Name}\n{player.Surname}", nameFont, nameRect, Brushes.White);
+
+                    if (player.Number == 17 || player.Number == 5 || player.Number == 9)
+                    {
+                        Rectangle assOrK = new Rectangle(point.X + 100, point.Y + 80, sizeNum.Width, sizeNum.Height);
+
+                        g.DrawString(player.Number == 17 ? "K" : "A", assOrKfont, Brushes.Red, assOrK, leftFormat);
+                    }
                 }
                 #endregion
             }
