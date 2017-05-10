@@ -147,6 +147,11 @@ namespace Aviators
                 SendGameSostav(chatFinded, Convert.ToInt32(command.Argument));
             }
 
+            if (command.Name == "состав")
+            {
+                SendGameSostav(chatFinded, Convert.ToInt32(command.Argument));
+            }
+
         }
 
         #region неиспользумое
@@ -472,12 +477,28 @@ namespace Aviators
             await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
         }
 
-        private async void Top(Chat chatFinded, Top type) // говнокодище Дениса, update говнокод затерт, Денис молодец
+        private async void Top(Chat chatFinded, Top type, int count = 5) // говнокодище Дениса, update говнокод затерт, Денис молодец
+        {
+            string result = GetTop(type, count);
+
+            var button = new InlineKeyboardButton("Состав");
+            button.CallbackData = type.ToString();
+            var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
+
+
+            var mes = await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
+
+            var newCom = new Command(new[] { "топ", count.ToString() });
+            newCom.Message = mes;
+            chatFinded.WaitingCommands.Add(newCom);
+        }
+
+        private string GetTop(Top type, int count)
         {
             string result = "";
-            List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(type, 15);
+            List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(type, count);
 
-            result = "Топ 5 *" +GetTypeDescription(type) + "* ХК \"Авиаторы\":\n";
+            result = "Топ 5 *" + GetTypeDescription(type) + "* ХК \"Авиаторы\":\n";
 
             foreach (var topPlayer in topPlayers)
             {
@@ -488,7 +509,7 @@ namespace Aviators
 
             }
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
+            return result;
         }
 
         private async void Slogans(Chat chatFinded)
@@ -537,7 +558,7 @@ namespace Aviators
             result.Add($"`{"Сухие победы",otstup}` {allGames.Count(g => g.Score.Item2 == 0 && g.Score.Item1 != g.Score.Item2)}");
             result.Add($"`{"Забитые",otstup}` {goals + " (" + (goals / (float)shotsIn * 100).ToString("F") + "%)"}");
             result.Add($"`{"Пропущеные",otstup}` {opGoals}");
-            result.Add($"`{"КДРАТИО",otstup}` {goals / (float)opGoals:F}");
+            //result.Add($"`{"КДРАТИО",otstup}` {goals / (float)opGoals:F}");
             result.Add($"`{"Броски",otstup}` {shots}");
             result.Add($"`{"Броски в створ",otstup}` {shotsIn + " (" + (shotsIn / (float)shots * 100).ToString("F") + "%)"}");
             result.Add($"`{"ср.голов",otstup}` {goals / (float)allGamesCount:F}");
