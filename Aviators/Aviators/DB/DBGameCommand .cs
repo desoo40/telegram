@@ -133,6 +133,7 @@ namespace Aviators
 
             game.Viewers = Convert.ToInt32(reader["viewers_count"].ToString());
             game.Description = reader["description"].ToString();
+            game.PenaltyGame = Convert.ToBoolean(reader["penaltygame"].ToString());
 
             var value = reader["best_player_id"].ToString();
 
@@ -149,6 +150,21 @@ namespace Aviators
             game.Goal = GetGameGoals(game.Id);
 
             game.Actions = GetGameActions(game);
+
+            //проставляем в состав капитана и ассистента.
+            //вообще говно, надо как то по-другому
+            var kap = game.Actions.Find(a => a.Action == Action.Капитан);
+            if (kap != null)
+            {
+                var k = game.Roster.Find(i => i.Id == kap.Player.Id);
+                if (k != null) k.isK = true;
+            }
+
+            foreach (var ass in game.Actions.FindAll(a => a.Action == Action.Ассистент))
+            {
+                var a = game.Roster.Find(i => i.Id == ass.Player.Id);
+                if (a != null) a.isA = true;
+            }
 
             return game;
         }
@@ -207,6 +223,7 @@ namespace Aviators
                 goal.Id = Convert.ToInt32(reader["id"].ToString());
                 goal.PowerPlay = Convert.ToBoolean(reader["pp"].ToString());
                 goal.ShortHand = Convert.ToBoolean(reader["sh"].ToString());
+                goal.isPenalty = Convert.ToBoolean(reader["penalty"].ToString());
 
                 GetGoalPlayers(goal);
                 goals.Add(goal);
@@ -307,10 +324,10 @@ namespace Aviators
 
             cmd.CommandText = string.Format(
                 "INSERT INTO game " +
-                "(date, op_team_id, score, op_score,tournament_id, viewers_count, place_id, description" + bp1 +
-                "VALUES('{0}',{1}, {2}, {3}, {4},{5},{6},'{7}' " + bp,
+                "(date, op_team_id, score, op_score,tournament_id, viewers_count, place_id, description, penaltygame" + bp1 +
+                "VALUES('{0}',{1}, {2}, {3}, {4},{5},{6},'{7}', '{9}' " + bp,
                 game.Date, opteam_id, game.Score.Item1, game.Score.Item2, game.Tournament.Id, game.Viewers,
-                game.Place.Id, game.Description, game.BestPlayer?.Id ?? null);
+                game.Place.Id, game.Description, game.BestPlayer?.Id ?? null, game.PenaltyGame);
 
             try
             {
@@ -330,9 +347,9 @@ namespace Aviators
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = string.Format(
                 "INSERT INTO goal " +
-                "(game_id, pp, sh) " +
-                "VALUES({0},'{1}', '{2}')",
-                game_id, goal.PowerPlay, goal.ShortHand);
+                "(game_id, pp, sh, penalty) " +
+                "VALUES({0},'{1}', '{2}', '{3}')",
+                game_id, goal.PowerPlay, goal.ShortHand, goal.isPenalty);
 
             try
             {

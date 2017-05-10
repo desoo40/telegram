@@ -40,6 +40,8 @@ create table game (
    season_id            INT4                 null,
    viewers_count        INT4                 null,
    best_player_id       INT4                 null, 
+   penaltygame          text                 null,	
+
    description                 TEXT                 null, 
    constraint FK_GAME_REFERENCE_playe foreign key (best_player_id)
       references player (id)
@@ -87,7 +89,8 @@ create table goal (
    id                    INTEGER PRIMARY KEY,
    game_id              INT4                 null,
    pp            BOOL                 null,
-   sh               BOOL                 null,   
+   sh               BOOL                 null, 
+   penalty            text                 null,	  
    constraint FK_GAME_ACT_REFERENCE_GAME foreign key (game_id)
       references game (id)
       on delete restrict on update restrict

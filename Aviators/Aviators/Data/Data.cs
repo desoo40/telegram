@@ -13,6 +13,9 @@ namespace Aviators
         public string Surname { get; set; }
         public string Lastname { get; set; }
 
+        public bool isK { get; set; }
+        public bool isA { get; set; }
+
 
         //Временная хуйня наверное
         public int StatGoal { get; set; }
@@ -102,6 +105,7 @@ namespace Aviators
         public List<Goal> Goal { get; set; }
         public int MVP { get; set; }
 
+        public bool PenaltyGame { get; set; }
 
         public Player BestPlayer { get; set; }
 
@@ -211,6 +215,7 @@ namespace Aviators
         public Player Assistant1 { get; set; }
         public Player Assistant2 { get; set; }
 
+        public bool isPenalty { get; set; }
         public bool PowerPlay { get; set; }
         public bool ShortHand { get; set; }
 
@@ -224,6 +229,10 @@ namespace Aviators
         Пас,
         Штраф,
         Плюс,
-        Минус
+        Минус,
+
+        Лучший,
+        Капитан,
+        Ассистент
     }
 }

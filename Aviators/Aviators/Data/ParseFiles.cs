@@ -81,9 +81,19 @@ namespace Aviators
             {
                 if (lines[i] != "")
                 {
+                    bool isK = false, isA = false;
+                    if (lines[i].Contains("("))
+                    {
+                        var p = lines[i].Substring(lines[i].IndexOf("("));
+                        if (p[1] == 'К') isK = true;
+                        if (p[1] == 'А') isA = true;
+                    }
+
                     var s = lines[i].Replace("\t", " ");
                     var playerInfo = s.Split();
                     var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[2], playerInfo[1]);
+                    newplayer.isA = isA;
+                    newplayer.isK = isK;
                     Roster.Add(newplayer);
                 }
 
@@ -96,7 +106,15 @@ namespace Aviators
             {
                 if (lines[i] == "Счет" && lines[i + 1].Contains("-"))
                 {
-                    var score = lines[++i].Split('-');
+                    var s = lines[++i];
+
+                    if (s.Contains("Б"))
+                    {
+                        Game.PenaltyGame = true;
+                        s = s.Replace("(Б)", "");
+                    }
+                    
+                    var score = s.Split('-');
 
                     Game.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));
                 }
@@ -138,10 +156,16 @@ namespace Aviators
                                 }
                                 else
                                 {
-                                    int a1_num = Convert.ToInt32(a[1].Replace(')', ' '));
-                                    var as1 = Roster.Find(p => p.Number == a1_num);
-                                    if (as1 == null) continue;
-                                    g.Assistant1 = as1;
+                                    var ass = a[1].Replace(')', ' ').Trim();
+                                    if (rxNums.IsMatch(ass))
+                                    {
+                                        int a1_num = Convert.ToInt32(ass);
+                                        var as1 = Roster.Find(p => p.Number == a1_num);
+                                        if (as1 == null) continue;
+                                        g.Assistant1 = as1;
+                                    }
+                                    else if (ass == "Б")
+                                        g.isPenalty = true;
                                 }
                             }
                             else

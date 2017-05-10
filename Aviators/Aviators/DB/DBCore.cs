@@ -367,6 +367,12 @@ namespace Aviators
             {
                 //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
                 DBGame.AddAction(game.Id, player.Id, Action.Игра);
+                if(player.isA)
+                    DBGame.AddAction(game.Id, player.Id, Action.Ассистент);
+                if (player.isK)
+                    DBGame.AddAction(game.Id, player.Id, Action.Капитан);
+
+
             }
 
             foreach (var goal in game.Goal)
