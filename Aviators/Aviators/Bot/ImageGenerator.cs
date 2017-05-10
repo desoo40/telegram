@@ -198,11 +198,11 @@ namespace Aviators
                     DrawOutlineText(g, $"#{player.Number}", numberFont, numRect, numberColor);
                     DrawOutlineText(g, $"{player.Name}\n{player.Surname}", nameFont, nameRect, Brushes.White);
 
-                    if (player.Number == 17 || player.Number == 5 || player.Number == 9)
+                    if (player.isK || player.isA)
                     {
                         Rectangle assOrK = new Rectangle(point.X + 100, point.Y + 80, sizeNum.Width, sizeNum.Height);
 
-                        g.DrawString(player.Number == 17 ? "K" : "A", assOrKfont, Brushes.Red, assOrK, leftFormat);
+                        g.DrawString(player.isK ? "K" : "A", assOrKfont, Brushes.Red, assOrK, leftFormat);
                     }
                 }
                 #endregion
