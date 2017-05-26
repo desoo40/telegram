@@ -154,8 +154,12 @@ namespace Aviators
                 
                 for (int i = 0; i < roster.Count; ++i)
                 {
-                    var point = GetPointOfPlayer(i);
                     var player = roster[i];
+
+                    if (i == roster.Count - 1)
+                        i++;
+
+                    var point = GetPointOfPlayer(i);
 
                     var shiftNumX = 125;
                     var shiftNumY = 5;
@@ -165,6 +169,7 @@ namespace Aviators
                     Rectangle rectToDraw;
                     Rectangle numRect;
                     Rectangle nameRect;
+
 
                     if (i < 2)
                     {
@@ -221,9 +226,12 @@ namespace Aviators
             return file;
         }
 
-        public string GameStat(Game game, bool isLastGame = false)
+        public string GameStat(Game game, bool isLastGame = true)
         {
             Image bitmap = Image.FromFile("Images\\Blanks\\gameStat.jpg");
+
+            if (isLastGame)
+                bitmap = Image.FromFile("Images\\Blanks\\lastStat.jpg");
 
             var enemyFont = new Font(statFonts.Families[2], 24);
             var viewersFont = new Font(statFonts.Families[1], 45);
@@ -231,7 +239,7 @@ namespace Aviators
             var dateFont = new Font(statFonts.Families[1], 50);
             var scoreFont = new Font("Segoe UI", 56);
             var statFont = new Font(statFonts.Families[4], 42);
-            var nextGameFont = new Font(statFonts.Families[3], 25);
+            var nextGameFont = new Font(statFonts.Families[3], 35);
             var bestPlayerFont = new Font(statFonts.Families[1], 45);
 
 
@@ -332,7 +340,7 @@ namespace Aviators
                     {game.Stat1.Shots, game.Stat2.Shots},
                     {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
                     {game.Stat1.Faceoff, game.Stat2.Faceoff},
-                    {game.Stat1.Hits, game.Stat2.Shots},
+                    {game.Stat1.Hits, game.Stat2.Hits},
                     {game.Stat1.Penalty, game.Stat2.Penalty},
                     {game.Stat1.BlockShots, game.Stat2.BlockShots},
                 };
@@ -358,12 +366,10 @@ namespace Aviators
                 {
 
 
-                    var nextGame = new Rectangle(47, 865, 404, 115);
+                    var nextGame = new Rectangle(20, 860, 424, 120);
 
-                    g.DrawString("ХК АВИАТОРЫ МАИ - ХК РЭУ\n" +
-                                 "21,05,2015 | 20:30\n" +
-                                 "ЛД МЕДВЕДКОВО", nextGameFont, Brushes.White, nextGame, centerFormat);
-                    //g.DrawRectangle(Pens.Red, viewers);
+                    g.DrawString("СЕЗОН ОКОНЧЕН", nextGameFont, Brushes.White, nextGame, centerFormat);
+                    //g.DrawRectangle(Pens.Red, nextGame);
 
 
                     //g.DrawRectangle(Pens.Red, aviGoals);
@@ -408,17 +414,52 @@ namespace Aviators
                 foreach (var goal in game.Goal)
                 {
                     var pucksRectangle = new Rectangle(580, k * (fontSize + 2) + 282, 420, 33);
-                    var goalString = "• " + goal.Author.Surname;
+                    var surname = goal.Author.Surname;
+
+                    if (surname == "Зайцев")
+                    {
+                        if (goal.Author.Number == 71)
+                            surname += " К.И.";
+                        else
+                            surname += " К.А.";
+                    }
+
+                    if (surname == "Гуськов")
+                    {
+                        if (goal.Author.Number == 21)
+                            surname += " E.";
+                        else
+                            surname += " С.";
+
+                    }
+
+                    var goalString = "• " + surname;
 
                     if (goal.Assistant1 != null)
                     {
                         goalString += " (";
                         goalString += goal.Assistant1.Surname;
 
+                        if (goal.Assistant1.Surname == "Зайцев")
+                        {
+                            if (goal.Assistant1.Number == 71)
+                                goalString += " К.И.";
+                            else
+                                goalString += " К.А.";
+                        }
+
                         if (goal.Assistant2 != null)
                         {
                             goalString += ", ";
                             goalString += goal.Assistant2.Surname;
+
+                            if (goal.Assistant2.Surname == "Зайцев")
+                            {
+                                if (goal.Assistant2.Number == 71)
+                                    goalString += " К.И.";
+                                else
+                                    goalString += " К.А.";
+                            }
                         }
                         goalString += ")";
                     }
