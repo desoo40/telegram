@@ -119,7 +119,7 @@ namespace Aviators
         {
             var msgid = cQuery.Message.MessageId;
 
-            var command = chatFinded.WaitingCommands.FirstOrDefault(m => m.Message.MessageId == msgid);
+            var command = chatFinded.WaitingCommands.LastOrDefault(m => m.Message.MessageId == msgid);
             if(command == null) return;
 
             if (command.Name == "соперник")
@@ -147,9 +147,28 @@ namespace Aviators
                 SendGameSostav(chatFinded, Convert.ToInt32(command.Argument));
             }
 
-            if (command.Name == "состав")
+            if (command.Name == "топ")
             {
-                SendGameSostav(chatFinded, Convert.ToInt32(command.Argument));
+                var count = Convert.ToInt32(command.Argument) + 5;
+
+                string result = GetTop((Top)(Convert.ToInt32(cQuery.Data)), count);
+
+                if (result == "")
+                {
+                    await Bot.EditMessageTextAsync(chatFinded.Id, msgid, command.Message.Text, parseMode: ParseMode.Markdown);
+                    return;
+                }
+                
+                var button = new InlineKeyboardButton("Еще");
+                button.CallbackData = cQuery.Data;
+                var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
+
+
+                var mes = await Bot.EditMessageTextAsync(chatFinded.Id, msgid, result, parseMode: ParseMode.Markdown, replyMarkup: keyboard);
+
+                var newCom = new Command(new[] { "топ", count.ToString() });
+                newCom.Message = mes;
+                chatFinded.WaitingCommands.Add(newCom);
             }
 
         }
@@ -481,12 +500,12 @@ namespace Aviators
         {
             string result = GetTop(type, count);
 
-            var button = new InlineKeyboardButton("Состав");
-            button.CallbackData = type.ToString();
+            var button = new InlineKeyboardButton("Еще");
+            button.CallbackData = ((int)type).ToString();
             var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
 
-            var mes = await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
+            var mes = await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown, replyMarkup: keyboard);
 
             var newCom = new Command(new[] { "топ", count.ToString() });
             newCom.Message = mes;
@@ -498,7 +517,8 @@ namespace Aviators
             string result = "";
             List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(type, count);
 
-            result = "Топ 5 *" + GetTypeDescription(type) + "* ХК \"Авиаторы\":\n";
+            if (topPlayers.Count < count - 5) return "";
+            result = $"Топ {topPlayers.Count} *{GetTypeDescription(type)}* ХК \"Авиаторы\":\n";
 
             foreach (var topPlayer in topPlayers)
             {

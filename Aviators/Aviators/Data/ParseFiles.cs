@@ -32,11 +32,12 @@ namespace Aviators
                     DB.DBCommands.AddNewGameAndPlayers(game);
                 else
                     DB.DBCommands.UpdateGameAndPlayer(findGame, game);
-               
 
                 var name  = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), game.Id);
 
                 File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
+
+                Console.WriteLine("OK");
             }
         }
 
@@ -270,7 +271,6 @@ namespace Aviators
                 //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
                 Game.Actions.Add(new GameAction(player, "0", Action.Игра));
             }
-            Console.WriteLine("OK");
 
             return Game;
         }
