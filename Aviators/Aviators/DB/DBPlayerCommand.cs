@@ -33,10 +33,33 @@ namespace Aviators
 
                 var player = new Player(number, name, lastname);
                 player.Id = Convert.ToInt32(reader["id"].ToString());
-                player.Position = reader["positionid"].ToString();
+                player.Position = (PlayerPosition)Convert.ToInt32(reader["positionid"].ToString());
                 players.Add(player);
             }
             return players;
+        }
+
+        internal void UpdatePlayersInfo(List<Player> players)
+        {
+            foreach (var player in players)
+            {
+                var p = GetPlayerOrInsert(player);
+
+                SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+                cmd.CommandText = string.Format("UPDATE player SET positionid = {1} WHERE id = {0};" +
+                                                "DELETE FROM player_info WHere player_id = {0}; " +
+                                                "INSERT INTO player_info (player_id, vk, insta) VALUES({0}, '{2}', '{3}')",
+                    p.Id, (int)player.Position, player.VK, player.INSTA);
+
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqliteException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
         }
 
         /// <summary>

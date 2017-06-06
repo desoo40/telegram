@@ -26,7 +26,7 @@ namespace Aviators
 
 
         public string PhotoFile { get; set; }
-        public string Position { get; set; }
+        public PlayerPosition Position { get; set; }
         public string VK { get; set; }
         public string INSTA { get; set; }
 
@@ -67,6 +67,14 @@ namespace Aviators
         {
             return Number + " - " + Name + " " + Surname;
         }
+    }
+
+    public enum PlayerPosition
+    {
+       Вратарь, 
+       Нападающий,
+       Защитник,
+       Тренер
     }
 
     public class PlayerStat
