@@ -24,18 +24,30 @@ namespace Aviators
             foreach (var fileInfo in files)
             {
                 Console.Write("Обрабатываем файл: " + fileInfo.Name + " ... ");
-                var game = ParseTXTFile(fileInfo.FullName);
-                if (game== null) continue;
 
-                var findGame = DB.DBCommands.DBGame.FindGame(game);
-                if(findGame == null)
-                    DB.DBCommands.AddNewGameAndPlayers(game);
+                if (fileInfo.Name.Contains("PlayersInfo"))
+                {
+                    var players = ParsePlayerInfo(fileInfo.FullName);
+                    DB.DBCommands.DBPlayer.UpdatePlayersInfo(players);
+
+                    //File.Move(fileInfo.FullName, "Complete\\" + fileInfo.Name);
+
+                }
                 else
-                    DB.DBCommands.UpdateGameAndPlayer(findGame, game);
+                {
+                    var game = ParseTXTFile(fileInfo.FullName);
+                    if (game == null) continue;
 
-                var name  = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), game.Id);
+                    var findGame = DB.DBCommands.DBGame.FindGame(game);
+                    if (findGame == null)
+                        DB.DBCommands.AddNewGameAndPlayers(game);
+                    else
+                        DB.DBCommands.UpdateGameAndPlayer(findGame, game);
 
-                File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
+                    var name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), game.Id);
+
+                    File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
+                }
 
                 Console.WriteLine("OK");
             }
@@ -273,6 +285,47 @@ namespace Aviators
             }
 
             return Game;
+        }
+
+        private static List<Player> ParsePlayerInfo(string file)
+        {
+            var playersString = File.ReadAllLines(file);
+
+            var players = new List<Player>();
+
+            foreach (var s in playersString)
+            {
+                var spl = s.Split(';');
+
+                var player = new Player(Convert.ToInt32(spl[0]), spl[2], spl[1]);
+
+                PlayerPosition pp;
+                PlayerPosition.TryParse(spl[3],true, out pp);
+                player.Position = pp;
+
+                player.VK = spl[4];
+                player.INSTA = spl[5];
+
+                //switch (spl[2])
+                //{
+                //    case "Вратарь": 
+                //        player.Position =  PlayerPosition.Вратарь;
+                //        break;
+                //    case "Нападающий":
+                //        player.Position = PlayerPosition.Нападающий;
+                //        break;
+                //    case "Защитник":
+                //        player.Position = PlayerPosition.Защитник;
+                //        break;
+                //    case "Тренер":
+                //        player.Position = PlayerPosition.Тренер;
+                //        break;
+
+                //}
+                players.Add(player);
+            }
+
+            return players;
         }
     }
 }

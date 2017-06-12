@@ -587,6 +587,7 @@ namespace Aviators
             result.Add($"`{"ср.пропущенных",otstup}` {opGoals / (float)allGamesCount:F}");
             result.Add($"`{"Силовые",otstup}` {allGames.Sum(g => g.Stat1.Hits)}");
             result.Add($"`{"Заблокированные",otstup}` {allGames.Sum(g => g.Stat1.BlockShots)}");
+            result.Add($"`{"Штрафы",otstup}` {allGames.Sum(g => g.Stat1.Penalty)}");
             result.Add($"`{"% выигр.вбрасываний",otstup}` {(allGames.Sum(g => g.Stat1.Faceoff) / (float)(allGames.Sum(g => g.Stat1.Faceoff) + allGames.Sum(g => g.Stat2.Faceoff)) * 100).ToString("F") + "%"}");
 
             await Bot.SendTextMessageAsync(chatFinded.Id, string.Join("\n", result), parseMode: ParseMode.Markdown);
