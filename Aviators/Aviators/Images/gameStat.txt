@@ -1,0 +1,139 @@
+Images
+Logo1
+-
+Logo2
+395, 50, 130, 130
+Tournament
+50, 810, 410, 180
+Best
+785, 645, 220, 220
+
+Texts
+Team1
+-
+Repeatability
+Font
+Font size
+Font style
+Color
+Formatting
+
+Team2
+310, 24, 350, 30
+Repeatability
+-
+Font
+Myriad Pro
+Font size
+24
+Font style
+Regular
+Color
+White
+Formatting
+Left
+
+Place
+500, 23, 500, 43
+Repeatability
+-
+Font
+Myriad Pro
+Font size
+38
+Font style
+Regular
+Color
+White
+Formatting
+Right
+
+Date
+800, 55, 200, 60
+Repeatability
+-
+Font
+Myriad Pro
+Font size
+50
+Font style
+Regular
+Color
+White
+Formatting
+Right
+
+Score
+167, 75, 90, 90
+Repeatability
+137 0
+Font
+Segoe UI
+Font size
+56
+Font style
+Regular
+Color
+White
+Formatting
+Center
+
+Stat
+15, 240, 80, 80
+Repeatability
+399 96
+Font
+Segoe UI
+Font size
+42
+Font style
+Regular
+Color
+Black
+Formatting
+Center
+
+NextGame
+20, 860, 424, 120
+Repeatability
+-
+Font
+Myriad Pro
+Font size
+35
+Font style
+Regular
+Color
+White
+Formatting
+Center
+
+Pucks
+580, 282, 420, 33
+Repeatability
+-
+Font
+Myriad Pro
+Font size
+25
+Font style
+Bold
+Color
+White
+Formatting
+Left
+
+Best
+598, 700, 200, 80
+Repeatability
+0 41
+Font
+Myriad Pro
+Font size
+45
+Font style
+Bold
+Color
+White
+Formatting
+Left
