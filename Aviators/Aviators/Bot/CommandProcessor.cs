@@ -113,8 +113,6 @@ namespace Aviators
             //ProcessCommands(chatFinded, fromId);            
         }
 
-
-
         public async void ContinueCommand(Chat chatFinded, CallbackQuery cQuery)
         {
             var msgid = cQuery.Message.MessageId;
