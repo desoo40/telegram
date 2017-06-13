@@ -82,6 +82,8 @@
     <Compile Include="Bot\ImageGenerator\GameStat.cs" />
     <Compile Include="Bot\ImageGenerator\ImageGenerator2.cs" />
     <Compile Include="Bot\ImageGenerator\ImageGenerator.cs" />
+    <Compile Include="Bot\ImageGenerator\TextInImg.cs" />
+    <Compile Include="Bot\TextHelper.cs" />
     <Compile Include="Configs\Config.cs" />
     <Compile Include="Data\ParseFiles.cs" />
     <Compile Include="DB\DBCore.cs" />

@@ -9,6 +9,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using Aviators.Bot;
 using Aviators.Bot.ImageGenerator;
 using Aviators.Properties;
 
@@ -244,14 +245,11 @@ namespace Aviators
                 var onGame = new Rectangle(598, 115, 400, 50);
                 var sOnGame = "На матче присутствовало";
 
-                //var sViewers = kek.Next(1, 3000).ToString();
                 var sViewers = game.Viewers.ToString();
                 sViewers += " зрителей";
 
                 DrawStr(g, sViewers, r.Viewers);
                 g.DrawString(sOnGame, r.Viewers.Font, Brushes.White, onGame, r.Viewers.StrFormatting);
-                //g.DrawRectangle(Pens.Red, viewers);
-                //g.DrawRectangle(Pens.Red, onGame);
 
                 #endregion
 
@@ -341,8 +339,9 @@ namespace Aviators
                 #region Заброшенные шайбы
 
                 var k = 0;
+                var extermSizeOfFont = 12;
 
-                if (game.Goal.Count > 12)
+                if (game.Goal.Count > extermSizeOfFont)
                 {
                     var newSize = (int) r.Pucks.Font.Size - 5;
                     r.Pucks.Font = new Font(r.Pucks.Font.FontFamily, newSize);
@@ -350,57 +349,25 @@ namespace Aviators
 
                 r.Pucks.OffsetY = (int)r.Pucks.Font.Size + 2;
 
+                TextHelper th = new TextHelper();
+                
                 foreach (var goal in game.Goal)
                 {
-                    var surname = goal.Author.Surname;
-
-                    if (surname == "Зайцев")
-                    {
-                        if (goal.Author.Number == 71)
-                            surname += " К.И.";
-                        else
-                            surname += " К.А.";
-                    }
-
-                    if (surname == "Гуськов")
-                    {
-                        if (goal.Author.Number == 21)
-                            surname += " E.";
-                        else
-                            surname += " С.";
-
-                    }
-
-                    var goalString = "• " + surname;
+                    var goalString = "• " + th.SimpleNameFinder(game, goal.Author); ;
 
                     if (goal.Assistant1 != null)
                     {
-                        goalString += " (";
-                        goalString += goal.Assistant1.Surname;
-
-                        if (goal.Assistant1.Surname == "Зайцев")
-                        {
-                            if (goal.Assistant1.Number == 71)
-                                goalString += " К.И.";
-                            else
-                                goalString += " К.А.";
-                        }
+                        goalString += " (" + th.SimpleNameFinder(game, goal.Assistant1);
 
                         if (goal.Assistant2 != null)
-                        {
-                            goalString += ", ";
-                            goalString += goal.Assistant2.Surname;
+                            goalString += ", " + th.SimpleNameFinder(game, goal.Assistant2);
 
-                            if (goal.Assistant2.Surname == "Зайцев")
-                            {
-                                if (goal.Assistant2.Number == 71)
-                                    goalString += " К.И.";
-                                else
-                                    goalString += " К.А.";
-                            }
-                        }
                         goalString += ")";
                     }
+
+                    if (goal.isPenalty)
+                        goalString += " [Б]";
+
                     r.Pucks.Position = UpdateRectangle(r.Pucks, k, 0);
                     DrawStr(g, goalString, r.Pucks);
                     r.Pucks.Position = BackRectangleAtr(r.Pucks, k, 0);
@@ -427,18 +394,14 @@ namespace Aviators
                     bestStat
                 };
 
-                for (int i = 0; i < 4; i++)
+                for (int i = 0; i < arrOfBestPlayerAttributes.Length; i++)
                 {
                     r.Best.Position = UpdateRectangle(r.Best, i, 0);
                     DrawStr(g, arrOfBestPlayerAttributes[i], r.Best);
                     r.Best.Position = BackRectangleAtr(r.Best, i, 0);
                 }
 
-                //Image playerCircle = CropToCircle(Image.FromFile("DB\\PlayersPhoto\\1_черненков.jpg"), Color.FromArgb(0,0,0));
-
-                //g.DrawImage(playerCircle, 500, 500);
-
-               
+  
                 int ramka = 8;
                 DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg"), r.BestPlayerImage, ramka);
 
@@ -458,7 +421,7 @@ namespace Aviators
             return file;
         }
 
-        private Rectangle BackRectangleAtr(GameStat.Text stat, int i, int j)
+        private Rectangle BackRectangleAtr(TextInImg stat, int i, int j)
         {
             return new Rectangle(stat.Position.X - j * stat.OffsetX,
                                   stat.Position.Y - i * stat.OffsetY,
@@ -466,7 +429,7 @@ namespace Aviators
                                   stat.Position.Height);
         }
 
-        private Rectangle UpdateRectangle(GameStat.Text stat, int i, int j)
+        private Rectangle UpdateRectangle(TextInImg stat, int i, int j)
         {
             return  new Rectangle(j * stat.OffsetX + stat.Position.X,
                                   i * stat.OffsetY + stat.Position.Y,
@@ -476,10 +439,10 @@ namespace Aviators
 
 
 
-        private void DrawStr(Graphics g, string s, GameStat.Text stat)
+        private void DrawStr(Graphics g, string s, TextInImg stat)
         {
             g.DrawString(s, stat.Font, stat.Color, stat.Position, stat.StrFormatting);
-            //g.DrawRectangle(Pens.Red, stat.Position);
+            g.DrawRectangle(Pens.Red, stat.Position);
         }
     
         private Point GetPointOfPlayer(int ind)
