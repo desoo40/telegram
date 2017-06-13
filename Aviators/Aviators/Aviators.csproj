@@ -80,7 +80,10 @@
     <Compile Include="Bot\CommandProcessor.cs" />
     <Compile Include="Bot\ImageGenerator\Format.cs" />
     <Compile Include="Bot\ImageGenerator\GameStat.cs" />
+    <Compile Include="Bot\ImageGenerator\ImageGenerator2.cs" />
     <Compile Include="Bot\ImageGenerator\ImageGenerator.cs" />
+    <Compile Include="Bot\ImageGenerator\TextInImg.cs" />
+    <Compile Include="Bot\TextHelper.cs" />
     <Compile Include="Configs\Config.cs" />
     <Compile Include="Data\ParseFiles.cs" />
     <Compile Include="DB\DBCore.cs" />
@@ -274,6 +277,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Blanks\roster.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\gameStat.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Logo\MoscowGames2016_logo.png">

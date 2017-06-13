@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Aviators.Bot;
+using Aviators.Bot.ImageGenerator;
 
 namespace Aviators
 {
@@ -12,7 +13,7 @@ namespace Aviators
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
         private static bool InitFromCode = false;
-        private static bool LoadIncome = true;
+        private static bool LoadIncome = false;
 
         static void Main(string[] args)
         {
@@ -24,7 +25,7 @@ namespace Aviators
             #region Тест для генератора статы
 
 
-            //var ig = new ImageGenerator();
+            //var ig = new ImageGenerator2();
             //Game g = new Game();
             //g.BestPlayer = new Player(71, "Кирилл", "Зайцев");
             //g.Team2 = "РЭУ";
@@ -57,9 +58,14 @@ namespace Aviators
 
             //g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
 
-            //ig.GameStat(g);
+            //ig.GameStatistic(g);
 
             //return;
+            //#endregion
+            //#region тест для подгрузки разметки статы
+
+            //GameStat stat1 = new GameStat("Images\\gameStat.txt");
+
             #endregion
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")

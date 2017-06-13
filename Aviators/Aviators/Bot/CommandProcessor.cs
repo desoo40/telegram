@@ -26,7 +26,7 @@ namespace Aviators
     {
         private TelegramBotClient Bot;
         private readonly Randomiser Gen;
-        private ImageGenerator ImageGen;
+        private ImageGenerator2 ImageGen;
         //private DBCore DB;
         Regex rxNums = new Regex(@"^\d+$"); // проверка на число
 
@@ -35,7 +35,7 @@ namespace Aviators
         {
             Bot = bot;
             Gen = new Randomiser();
-            ImageGen = new ImageGenerator();
+            ImageGen = new ImageGenerator2();
             //DB = new DBCore();
         }
 
@@ -593,7 +593,7 @@ namespace Aviators
         private async void SendGameStat(Chat chatFinded, Game game)
         {
             //var game = DB.DBCommands.DBGame.GetGame(gameId);
-            var file = ImageGen.GameStat(game);
+            var file = ImageGen.GameStatistic(game);
 
             var photo = new Telegram.Bot.Types.FileToSend("gamestat",
                 (new StreamReader(file)).BaseStream);

@@ -7,18 +7,13 @@ Tournament
 50, 810, 410, 180
 Best
 785, 645, 220, 220
-
+*
 Texts
 Team1
 -
-Repeatability
-Font
-Font size
-Font style
-Color
-Formatting
-
+*
 Team2
+Position
 310, 24, 350, 30
 Repeatability
 -
@@ -32,8 +27,9 @@ Color
 White
 Formatting
 Left
-
+*
 Place
+Position
 500, 23, 500, 43
 Repeatability
 -
@@ -47,8 +43,9 @@ Color
 White
 Formatting
 Right
-
+*
 Date
+Position
 800, 55, 200, 60
 Repeatability
 -
@@ -62,11 +59,12 @@ Color
 White
 Formatting
 Right
-
+*
 Score
+Position
 167, 75, 90, 90
 Repeatability
-137 0
+133 0
 Font
 Segoe UI
 Font size
@@ -77,8 +75,9 @@ Color
 White
 Formatting
 Center
-
+*
 Stat
+Position
 15, 240, 80, 80
 Repeatability
 399 96
@@ -87,13 +86,14 @@ Segoe UI
 Font size
 42
 Font style
-Regular
+Bold
 Color
 Black
 Formatting
 Center
-
+*
 NextGame
+Position
 20, 860, 424, 120
 Repeatability
 -
@@ -107,8 +107,9 @@ Color
 White
 Formatting
 Center
-
+*
 Pucks
+Position
 580, 282, 420, 33
 Repeatability
 -
@@ -122,8 +123,9 @@ Color
 White
 Formatting
 Left
-
+*
 Best
+Position
 598, 700, 200, 80
 Repeatability
 0 41
@@ -137,3 +139,20 @@ Color
 White
 Formatting
 Left
+*
+Viewers
+Position
+598, 160, 400, 50
+Repeatability
+-
+Font
+Myriad Pro
+Font size
+45
+Font style
+Regular
+Color
+White
+Formatting
+Right
+*
