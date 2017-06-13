@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Aviators.Bot;
+using Aviators.Bot.ImageGenerator;
 
 namespace Aviators
 {
@@ -12,7 +13,7 @@ namespace Aviators
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
         private static bool InitFromCode = false;
-        private static bool LoadIncome = true;
+        private static bool LoadIncome = false;
 
         static void Main(string[] args)
         {
@@ -24,42 +25,47 @@ namespace Aviators
             #region Тест для генератора статы
 
 
-            //var ig = new ImageGenerator();
-            //Game g = new Game();
-            //g.BestPlayer = new Player(71, "Кирилл", "Зайцев");
-            //g.Team2 = "РЭУ";
-            //g.Date = DateTime.Now;
-            //g.Tournament = new Tournament("МСХЛ");
-            //ig.Roster(g);
-            ///////////////////////////////////////////////////////
-            //g.Viewers = 551;
-            //g.Team2 = "Тампа-Бэй Лайтнинг";
-            //g.Tournament = new Tournament("НХЛ");
-            //g.Score = new Tuple<int, int>(7, 6);
+            //            var ig = new ImageGenerator2();
+            //            Game g = new Game();
+            //            g.BestPlayer = new Player(71, "Кирилл", "Зайцев");
+            //            g.Team2 = "РЭУ";
+            //            g.Date = DateTime.Now;
+            //            g.Tournament = new Tournament("МСХЛ");
 
-            //var kek = new Random();
+            //            /////////////////////////////////////////////////////
+            //            g.Viewers = 551;
+            //            g.Team2 = "Тампа-Бэй Лайтнинг";
+            //            g.Tournament = new Tournament("НХЛ");
+            //            g.Score = new Tuple<int, int>(7, 6);
 
-            //g.Stat1.Shots = kek.Next(0, 100);
-            //g.Stat2.Shots = kek.Next(0, 100);
-            //g.Stat1.ShotsIn = kek.Next(0, 100);
-            //g.Stat2.ShotsIn = kek.Next(0, 100);
-            //g.Stat1.Faceoff = kek.Next(0, 100);
-            //g.Stat2.Faceoff = kek.Next(0, 100);
-            //g.Stat1.Hits = kek.Next(0, 100);
-            //g.Stat2.Shots = kek.Next(0, 100);
-            //g.Stat1.Penalty = kek.Next(0, 100);
-            //g.Stat2.Penalty = kek.Next(0, 100);
-            //g.Stat1.BlockShots = kek.Next(0, 100);
-            //g.Stat2.BlockShots = kek.Next(0, 100);
+            //            var kek = new Random();
 
-
+            //            g.Stat1.Shots = kek.Next(0, 100);
+            //            g.Stat2.Shots = kek.Next(0, 100);
+            //            g.Stat1.ShotsIn = kek.Next(0, 100);
+            //            g.Stat2.ShotsIn = kek.Next(0, 100);
+            //            g.Stat1.Faceoff = kek.Next(0, 100);
+            //            g.Stat2.Faceoff = kek.Next(0, 100);
+            //            g.Stat1.Hits = kek.Next(0, 100);
+            //            g.Stat2.Shots = kek.Next(0, 100);
+            //            g.Stat1.Penalty = kek.Next(0, 100);
+            //            g.Stat2.Penalty = kek.Next(0, 100);
+            //            g.Stat1.BlockShots = kek.Next(0, 100);
+            //            g.Stat2.BlockShots = kek.Next(0, 100);
 
 
-            //g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
 
-            //ig.GameStat(g);
 
-            //return;
+            //            g.Place = new Place(@"Малая Арена ВТБ, г. Москва");
+
+            //            ig.GameStatistic(g);
+
+            //            return;
+            //            #endregion
+            //            #region тест для подгрузки разметки статы
+
+            //            GameStat stat1 = new GameStat("Images\\gameStat.txt");
+
             #endregion
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")

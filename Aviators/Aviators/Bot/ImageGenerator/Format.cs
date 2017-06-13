@@ -5,21 +5,22 @@ namespace Aviators.Bot.ImageGenerator
 {
     public class Format
     {
-        StringFormat centerFormat;
-        StringFormat leftFormat;
-        StringFormat rightFormat;
+        public StringFormat centerFormat { get; set; }
+        public StringFormat leftFormat { get; set; }
+        public StringFormat rightFormat { get; set; }
 
         public Format()
         {
-            StringFormat centerFormat = new StringFormat();
+            centerFormat = new StringFormat();
+            leftFormat = new StringFormat();
+            rightFormat = new StringFormat();
+
             centerFormat.Alignment = StringAlignment.Center;
             centerFormat.LineAlignment = StringAlignment.Center;
 
-            StringFormat leftFormat = new StringFormat();
             leftFormat.Alignment = StringAlignment.Near;
             leftFormat.LineAlignment = StringAlignment.Near;
 
-            StringFormat rightFormat = new StringFormat();
             rightFormat.Alignment = StringAlignment.Far;
             rightFormat.LineAlignment = StringAlignment.Far;
         }
