@@ -17,6 +17,8 @@ namespace Aviators
         public bool RemoveMode { get; set; }  = false;
         public List<Command> WaitingCommands { get; set; }
 
+        public Tournament Tournament { get; set; }
+
 
         public Chat(long id)
         {

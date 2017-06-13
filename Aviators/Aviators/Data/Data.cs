@@ -114,6 +114,7 @@ namespace Aviators
         public int MVP { get; set; }
 
         public bool PenaltyGame { get; set; }
+        public bool OvertimeGame { get; set; }
 
         public Player BestPlayer { get; set; }
 

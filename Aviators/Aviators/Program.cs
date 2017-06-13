@@ -30,7 +30,7 @@ namespace Aviators
             //g.Team2 = "РЭУ";
             //g.Date = DateTime.Now;
             //g.Tournament = new Tournament("МСХЛ");
-            //ig.Roster(g);
+            ////ig.Roster(g);
             ///////////////////////////////////////////////////////
             //g.Viewers = 551;
             //g.Team2 = "Тампа-Бэй Лайтнинг";
