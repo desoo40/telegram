@@ -8,7 +8,11 @@ namespace Aviators
 {
     public class Chat
     {
-        public long Id { get; set; }
+        public Telegram.Bot.Types.Chat BotChat { get; set; }
+
+        public long Id => BotChat.Id;
+
+        public bool IsAdmin { get; set; } = false;
 
         public bool WhoMode { get; set; }  = false;
         public bool PersonalStatMode { get; set; }  = false;
@@ -17,14 +21,18 @@ namespace Aviators
         public bool RemoveMode { get; set; }  = false;
         public List<Command> WaitingCommands { get; set; }
 
+        public Tournament Tournament { get; set; }
 
-        public Chat(long id)
+        public bool isTextOnly { get; set; } = false;
+
+
+        public Chat(Telegram.Bot.Types.Chat botChat)
         {
-            Id = id;
+            BotChat = botChat;
             WaitingCommands = new List<Command>();
-
-
         }
+
+
         internal void ResetMode()
         {
             WhoMode = false;

@@ -659,6 +659,43 @@ namespace Aviators
             }
             return fileName;
         }
-        
+
+        public Chat FindOrInsertChat(Telegram.Bot.Types.Chat incomeChat)
+        {
+            Chat chat = new Chat(incomeChat);
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"select * from chat where id = '{incomeChat.Id}'";
+
+            try
+            {
+                var reader = cmd.ExecuteReader();
+                if (!reader.HasRows)
+                {
+                    reader.Close();
+                    cmd.CommandText =
+                        $"INSERT INTO chat(id, username, firstname, lastname) VALUES ('{incomeChat.Id}', '{incomeChat.Username}', '{incomeChat.FirstName}', '{incomeChat.LastName}')";
+                    cmd.ExecuteNonQuery();
+
+                }
+                else
+                {
+                    while (reader.Read())
+                    {
+                        var value = reader["isAdmin"].ToString();
+                        if (value != "") chat.IsAdmin = Convert.ToBoolean(value);
+                        value = reader["tournament_id"].ToString();
+                        if (value != "") chat.Tournament = GetTournament(Convert.ToInt32(value));
+                    }
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return chat;
+        }
     }
 }

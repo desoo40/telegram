@@ -56,8 +56,11 @@ namespace Aviators.Bot
             var chatFinded = Chats.FindLast(chat => chat.Id == cid);
             if (chatFinded == null)
             {
-                chatFinded = new Chat(cid);
-                Chats.Add(chatFinded);
+                Chat chat = DB.DBCommands.FindOrInsertChat(e.Message.Chat);
+                Chats.Add(chat);
+
+                //chatFinded = new Chat(cid);
+                //Chats.Add(chatFinded);
             }
 
             if (msg == null) return;
