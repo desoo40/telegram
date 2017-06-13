@@ -212,3 +212,30 @@ create table file_action (
    filename               TEXT                 null,
    action               int4                 null
 );
+
+/*==============================================================*/
+/* Table: chat                                           */
+/*==============================================================*/
+create table chat (
+   id                    INTEGER PRIMARY KEY,
+   username            TEXT                 null,
+   firstname        TEXT                 null,
+   lastname            TEXT                 null,
+   isAdmin               TEXT                 null,
+   isTextOInly               TEXT                 null,
+   tournament_id               int4                 null
+);
+
+/*==============================================================*/
+/* Table: chat_action                                           */
+/*==============================================================*/
+create table chat_action (
+   id                    INTEGER PRIMARY KEY,
+   chat_id              INT4                 null,
+   date            TEXT                 null,
+   text               TEXT                 null,
+   action               int4                 null,
+   constraint FK_PLAYfgdERS__REFERENdfgCE_PLAYER foreign key (chat_id)
+      references chat (id)
+      on delete cascade on update cascade
+);
