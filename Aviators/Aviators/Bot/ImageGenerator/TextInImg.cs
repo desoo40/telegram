@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Text;
 
 namespace Aviators.Bot.ImageGenerator
 {
@@ -12,12 +13,13 @@ namespace Aviators.Bot.ImageGenerator
         public Brush Color { get; set; }
         public StringFormat StrFormatting { get; set; }
 
+        PrivateFontCollection coll = new PrivateFontCollection();
+
         public TextInImg() {}
 
         public TextInImg(string[] lines, int i)
         {
             Format format = new Format();
-
             if (CheckForNothing(lines[i]))
                 return;
 
@@ -103,7 +105,18 @@ namespace Aviators.Bot.ImageGenerator
                 ++i;
             }
 
-            Font = new Font(tmpFont, tmpFontSize, tmpFontStyle);
+            if (IsFontFromFile(tmpFont))
+            {
+                coll.AddFontFile(tmpFont);
+                Font = new Font(coll.Families[0], tmpFontSize, tmpFontStyle);
+            }
+            else
+                Font = new Font(tmpFont, tmpFontSize, tmpFontStyle);
+        }
+
+        private bool IsFontFromFile(string tmpFont)
+        {
+            return tmpFont.Contains(".") || tmpFont.Contains("/");
         }
 
         internal Rectangle GetRectFromLine(string s)

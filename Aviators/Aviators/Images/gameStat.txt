@@ -14,11 +14,11 @@ Team1
 *
 Team2
 Position
-310, 24, 350, 30
+295, 24, 350, 30
 Repeatability
 -
 Font
-Myriad Pro
+Fonts/MyriadPro-Semibold.otf
 Font size
 24
 Font style
@@ -26,7 +26,7 @@ Regular
 Color
 White
 Formatting
-Left
+left
 *
 Place
 Position
@@ -34,7 +34,7 @@ Position
 Repeatability
 -
 Font
-Myriad Pro
+Fonts/MyriadPro-Regular.otf
 Font size
 38
 Font style
@@ -50,7 +50,7 @@ Position
 Repeatability
 -
 Font
-Myriad Pro
+Fonts/MyriadPro-Regular.otf
 Font size
 50
 Font style
@@ -82,7 +82,7 @@ Position
 Repeatability
 399 96
 Font
-Segoe UI
+Fonts/seguisb.ttf
 Font size
 42
 Font style
@@ -98,7 +98,7 @@ Position
 Repeatability
 -
 Font
-Myriad Pro
+Fonts/SegoeUILight.ttf
 Font size
 35
 Font style
@@ -114,7 +114,7 @@ Position
 Repeatability
 -
 Font
-Myriad Pro
+Fonts/SegoeUILight.ttf
 Font size
 25
 Font style
@@ -130,7 +130,7 @@ Position
 Repeatability
 0 41
 Font
-Myriad Pro
+Fonts/MyriadPro-Regular.otf
 Font size
 45
 Font style
@@ -146,7 +146,7 @@ Position
 Repeatability
 -
 Font
-Myriad Pro
+Fonts/MyriadPro-Regular.otf
 Font size
 45
 Font style
@@ -155,4 +155,20 @@ Color
 White
 Formatting
 Right
+*
+OverPenalty
+Position
+235, 150, 60, 40
+Repeatability
+40 0
+Font
+Segoe UI
+Font size
+30
+Font style
+Regular
+Color
+White
+Formatting
+left
 *

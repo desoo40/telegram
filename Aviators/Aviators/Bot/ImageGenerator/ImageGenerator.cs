@@ -14,12 +14,12 @@
 
 //namespace Aviators
 //{
-//    public class ImageGenerator2
+//    public class ImageGenerator
 //    {
 //        PrivateFontCollection statFonts;
 //        PrivateFontCollection rosterFonts;
 
-//        public ImageGenerator2 ()
+//        public ImageGenerator()
 //        {
 //            //Добавляем шрифт из указанного файла в em.Drawing.Text.PrivateFontCollection
 //            statFonts = new PrivateFontCollection();
@@ -117,7 +117,7 @@
 //                Rectangle dateRect = new Rectangle(445, 25, 300, 50);
 //                Rectangle descrRect = new Rectangle(445, 55, 300, 100);
 //                var description = game.Description;
-//                int fontSize = (descrRect.Width + 100)/description.Length;
+//                int fontSize = (descrRect.Width + 100) / description.Length;
 //                var descrFont = new Font(rosterFonts.Families[0], fontSize, FontStyle.Bold);
 
 //                g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
@@ -145,14 +145,14 @@
 //                }
 //                #endregion
 
-                
+
 //                #region Состав
-                
+
 //                var roster = game.Roster;
 //                var sizePhoto = new Size(132, 132);
 //                var sizeNum = new Size(70, 50);
 //                var sizeName = new Size(200, 100);
-                
+
 //                for (int i = 0; i < roster.Count; ++i)
 //                {
 //                    var player = roster[i];
@@ -238,7 +238,7 @@
 
 //            var enemyFont = new Font(statFonts.Families[2], 24);
 //            var viewersFont = new Font(statFonts.Families[1], 45);
-//            var placeFont = new  Font(statFonts.Families[1], 38);
+//            var placeFont = new Font(statFonts.Families[1], 38);
 //            var dateFont = new Font(statFonts.Families[1], 50);
 //            var scoreFont = new Font("Segoe UI", 56);
 //            var statFont = new Font(statFonts.Families[4], 42);
@@ -285,12 +285,12 @@
 //                //g.DrawString("ХК ДИНАМО", enemyFont, Brushes.White, enemy, leftFormat);
 //                g.DrawString(enemyName, enemyFont, Brushes.White, enemy, leftFormat);
 
-                
+
 //                enLogo = getTeamLogo(enemyName);
 
 //                if (enLogo != null)
 //                {
-                    
+
 //                    //g.DrawRectangle(Pens.Red, enemyLogo);
 
 //                    var resRect = GetInscribed(enemyLogo, enLogo.Size);
@@ -320,7 +320,7 @@
 
 //                #region Счет
 //                var aviPucks = new Rectangle(167, 75, 90, 90); // Х У вернего левого, ширина высота
-//                var enemyPucks= new Rectangle(300, 75, 90, 90);
+//                var enemyPucks = new Rectangle(300, 75, 90, 90);
 
 //                //TextRenderer.DrawText(g, "dfgdf", Myraid, aviPucks,Color.Red);
 
@@ -348,19 +348,15 @@
 //                    {game.Stat1.BlockShots, game.Stat2.BlockShots},
 //                };
 
-                
+
 
 
 //                for (int i = 0; i < 6; i++)
 //                {
 //                    for (int j = 0; j < 2; j++)
 //                    {
-//                        razmetka.Stat.Position = new Rectangle(i * razmetka.Stat.OffsetX + razmetka.Stat.Position.X,
-//                           j * razmetka.Stat.OffsetY + razmetka.Stat.Position.Y,
-//                           razmetka.Stat.Position.Width,
-//                            razmetka.Stat.Position.Height);
-
-//                        DrawStr(arrOfStat[i, j].ToString(), g, razmetka.Stat);
+//                        var tmp = new Rectangle(statX + j * 399, statY + i * 96, 80, 80);
+//                        g.DrawString(arrOfStat[i, j].ToString(), statFont, Brushes.Black, tmp, centerFormat);
 
 //                    }
 //                }
@@ -388,7 +384,7 @@
 
 //                    if (game.Tournament != null)
 //                    {
-                     
+
 //                        logo = getTournamentLogo(game.Tournament.Name);
 
 //                        if (logo != null)
@@ -470,7 +466,7 @@
 //                        }
 //                        goalString += ")";
 //                    }
-                     
+
 //                    g.DrawString(goalString, pucksFont, Brushes.White, pucksRectangle, leftFormat);
 //                    ++k;
 //                }
@@ -508,7 +504,7 @@
 
 //                //g.DrawImage(playerCircle, 500, 500);
 
-//                var rectToDraw = new Rectangle(785,645,220,220);
+//                var rectToDraw = new Rectangle(785, 645, 220, 220);
 //                int ramka = 8;
 //                DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg"), rectToDraw, ramka);
 
@@ -528,11 +524,6 @@
 //            return file;
 //        }
 
-//        private void DrawStr(string s, Graphics g, GameStat.Text stat)
-//        {
-//            g.DrawString(s, stat.Font, stat.Color, stat.Position, stat.StrFormatting);
-//        }
-    
 //        private Point GetPointOfPlayer(int ind)
 //        {
 //            var point = new Point();
@@ -551,19 +542,19 @@
 //                var startXGoalie = 420;
 //                var startYGoalie = 150;
 
-//                point.X = startXGoalie + ind*distXGoalie;
+//                point.X = startXGoalie + ind * distXGoalie;
 //                point.Y = startYGoalie;
 //            }
 //            else
 //            {
-//                var column = (ind - 2)%5;
-//                var row = (ind - 2)/5;
+//                var column = (ind - 2) % 5;
+//                var row = (ind - 2) / 5;
 
 //                if (column > 2)
 //                    kekterval = 140;
 
-//                point.X = startX + distX*column + kekterval;
-//                point.Y = startY + distY*row;
+//                point.X = startX + distX * column + kekterval;
+//                point.Y = startY + distY * row;
 //            }
 
 //            return point;
@@ -594,8 +585,8 @@
 
 //            if (File.Exists(logoPath))
 //                return Image.FromFile(logoPath);
-           
-//           return null;
+
+//            return null;
 //        }
 
 //        private Image getTeamLogo(string name)
@@ -613,22 +604,22 @@
 //            Rectangle resRect = baseRect;
 
 //            //соотнашение сторон
-//            float ratio = inputsize.Width / (float) inputsize.Height;
+//            float ratio = inputsize.Width / (float)inputsize.Height;
 
 //            int height = baseRect.Height;
-//            int width = (int) (height * ratio);
+//            int width = (int)(height * ratio);
 
 //            if (width > baseRect.Width)
 //            {
 //                width = baseRect.Width;
-//                height = (int) (width / ratio);
+//                height = (int)(width / ratio);
 //            }
 
 //            var x = baseRect.X + baseRect.Width / 2 - width / 2;
 //            var y = baseRect.Y + baseRect.Height / 2 - height / 2;
 
 //            resRect = new Rectangle(x, y, width, height);
-            
+
 //            return resRect;
 //        }
 
@@ -636,7 +627,7 @@
 //        {
 //            Bitmap dstImage = new Bitmap(size.Width, size.Height);
 //            Graphics g = Graphics.FromImage(dstImage);
-            
+
 //            var destRect = new Rectangle(0, 0, size.Width, size.Height);
 //            var srcRect = new Rectangle(0, 0, srcImage.Width, srcImage.Width);
 

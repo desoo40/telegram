@@ -19,5 +19,21 @@
             }
             return player.Surname;
         }
+
+        public string FullNameFinder(string s)
+        {
+            var inStr = s.ToLower();
+
+            if (inStr == "рэу" || inStr == "плешка")
+                return "ХК РЭУ им. Плеханова";
+
+            if (inStr == "миэт" || inStr == "зеленоград")
+                return "ХК \"Электроник\" МИЭТ";
+
+            if (inStr == "мгту" || inStr == "бауманка")
+                return "ХК МГТУ им. Баумана";
+
+            return s;
+        }
     }
 }

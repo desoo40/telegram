@@ -30,6 +30,8 @@ namespace Aviators.Bot.ImageGenerator
         public TextInImg Pucks { get; set; }
         public TextInImg Best { get; set; }
         public TextInImg Viewers { get; set; }
+        public TextInImg OverPenalty { get; set; }
+
         #endregion
 
         public GameStat(string path)
@@ -85,6 +87,9 @@ namespace Aviators.Bot.ImageGenerator
 
                 if (lines[i] == "Viewers")
                     Viewers = new TextInImg(lines, ++i);
+
+                if (lines[i] == "OverPenalty")
+                    OverPenalty = new TextInImg(lines, ++i);
 
                 ++i;
 
