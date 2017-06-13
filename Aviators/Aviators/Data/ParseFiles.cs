@@ -30,8 +30,9 @@ namespace Aviators
                     var players = ParsePlayerInfo(fileInfo.FullName);
                     DB.DBCommands.DBPlayer.UpdatePlayersInfo(players);
 
-                    //File.Move(fileInfo.FullName, "Complete\\" + fileInfo.Name);
+                    var name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), -1);
 
+                    File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
                 }
                 else
                 {

@@ -625,6 +625,11 @@ namespace Aviators
         }
 
 
+        /// <summary>
+        /// Добавляет информацию в базу об обработанном текстовом файле
+        /// </summary>
+        /// <param name="gameId">(-1 будет файл с инфой по игрокам; остальное игры)</param>
+        /// <returns></returns>
         public string AddParseFile(string fileInfoName, int gameId)
         {
 
