@@ -84,7 +84,10 @@ namespace Aviators
                     reader["name"].ToString(),
                     reader["lastname"].ToString());
                 player.Id = Convert.ToInt32(reader["id"].ToString());
-                //player.Position = reader["pos"].ToString();
+
+                var value = reader["positionid"].ToString();
+                if (value != "")
+                    player.Position =(PlayerPosition) Convert.ToInt32(value);
                 //player.VK = reader["vk_href"].ToString();
                 //player.INSTA = reader["insta_href"].ToString();
 

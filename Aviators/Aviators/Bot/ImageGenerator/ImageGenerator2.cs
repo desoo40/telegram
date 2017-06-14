@@ -429,7 +429,7 @@ namespace Aviators
                 #endregion
             }
 
-            var file = $"Images\\game_as1.jpg";
+            var file = $"Images\\{game.Id}.jpg";
 
             EncoderParameters myEncoderParameters = new EncoderParameters(1);
             System.Drawing.Imaging.Encoder myEncoder = System.Drawing.Imaging.Encoder.Quality;

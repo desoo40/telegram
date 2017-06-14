@@ -34,7 +34,7 @@ Position
 Repeatability
 -
 Font
-Fonts/MyriadPro-Regular.otf
+Fonts/MyriadPro-Cond.otf
 Font size
 38
 Font style
@@ -50,7 +50,7 @@ Position
 Repeatability
 -
 Font
-Fonts/MyriadPro-Regular.otf
+Fonts/MyriadPro-Cond.otf
 Font size
 50
 Font style
@@ -114,7 +114,7 @@ Position
 Repeatability
 -
 Font
-Fonts/SegoeUILight.ttf
+Segoe UI
 Font size
 25
 Font style
@@ -130,7 +130,7 @@ Position
 Repeatability
 0 41
 Font
-Fonts/MyriadPro-Regular.otf
+Fonts/MyriadPro-Cond.otf
 Font size
 45
 Font style
@@ -146,7 +146,7 @@ Position
 Repeatability
 -
 Font
-Fonts/MyriadPro-Regular.otf
+Fonts/MyriadPro-Cond.otf
 Font size
 45
 Font style
@@ -158,7 +158,7 @@ Right
 *
 OverPenalty
 Position
-235, 150, 60, 40
+235, 142, 60, 40
 Repeatability
 40 0
 Font

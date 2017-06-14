@@ -660,6 +660,8 @@ namespace Aviators
             return fileName;
         }
 
+        #region Chat
+
         public Chat FindOrInsertChat(Telegram.Bot.Types.Chat incomeChat)
         {
             Chat chat = new Chat(incomeChat);
@@ -697,5 +699,23 @@ namespace Aviators
             }
             return chat;
         }
+
+        public void AddChatIncomeMsg(Chat chatFinded, string msg)
+        {
+            try
+            {
+                SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+                cmd.CommandText =
+                    $"INSERT INTO chat_action(chat_id, action, text, date) VALUES ({chatFinded.Id}, 1, '{msg}', '{DateTime.Now}')";
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+        }
+
+        #endregion
     }
 }

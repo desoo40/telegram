@@ -80,6 +80,10 @@ namespace Aviators
                     LastGame(chatFinded);
                     return;
 
+                case "всеигры":
+                    GetAllGames(chatFinded);
+                    return;
+
                 case "соперник":
                     if (string.IsNullOrEmpty(command.Argument)) TeamList(chatFinded, command);
                     else EnemyTeam(chatFinded, command);
@@ -111,6 +115,16 @@ namespace Aviators
             }
 
             //ProcessCommands(chatFinded, fromId);            
+        }
+
+        private void GetAllGames(Chat chatFinded)
+        {
+            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames();
+
+            foreach (var allGame in allGames)
+            {
+                SendGameStat(chatFinded, allGame);
+            }
         }
 
         public async void ContinueCommand(Chat chatFinded, CallbackQuery cQuery)

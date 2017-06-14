@@ -56,8 +56,8 @@ namespace Aviators.Bot
             var chatFinded = Chats.FindLast(chat => chat.Id == cid);
             if (chatFinded == null)
             {
-                Chat chat = DB.DBCommands.FindOrInsertChat(e.Message.Chat);
-                Chats.Add(chat);
+                chatFinded = DB.DBCommands.FindOrInsertChat(e.Message.Chat);
+                Chats.Add(chatFinded);
 
                 //chatFinded = new Chat(cid);
                 //Chats.Add(chatFinded);
@@ -68,6 +68,8 @@ namespace Aviators.Bot
             msg = msg.Trim('/');
             msg = msg.Replace(AviaBot.Username.ToLower(), "");
             msg = msg.Replace("@","");
+
+            DB.DBCommands.AddChatIncomeMsg(chatFinded, msg);
 
             try
             {
