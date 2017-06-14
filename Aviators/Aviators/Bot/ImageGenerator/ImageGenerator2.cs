@@ -17,20 +17,12 @@ namespace Aviators
 {
     public class ImageGenerator2
     {
-        PrivateFontCollection statFonts;
         PrivateFontCollection rosterFonts;
         TextHelper th = new TextHelper();
 
         public ImageGenerator2()
         {
             //Добавляем шрифт из указанного файла в em.Drawing.Text.PrivateFontCollection
-            statFonts = new PrivateFontCollection();
-
-            statFonts.AddFontFile("Fonts/MyriadPro-Cond.otf");
-            statFonts.AddFontFile("Fonts/MyriadPro-Regular.otf");
-            statFonts.AddFontFile("Fonts/MyriadPro-Semibold.otf");
-            statFonts.AddFontFile("Fonts/SegoeUILight.ttf");
-            statFonts.AddFontFile("Fonts/seguisb.ttf");
 
             rosterFonts = new PrivateFontCollection();
             rosterFonts.AddFontFile("Fonts/segoeui.ttf");
@@ -553,7 +545,7 @@ namespace Aviators
         {
             Rectangle resRect = baseRect;
 
-            //соотнашение сторон
+            //соотношение сторон
             float ratio = inputsize.Width / (float)inputsize.Height;
 
             int height = baseRect.Height;
@@ -582,11 +574,8 @@ namespace Aviators
             var srcRect = new Rectangle(0, 0, srcImage.Width, srcImage.Width);
 
             g.DrawImage(srcImage, destRect, srcRect, GraphicsUnit.Pixel);
-            //g.DrawEllipse(Pens.Red, 10, 10, 50, 50);
 
-            //g.FillPath(bra, path);
             return dstImage;
-            //return srcImage.Clone(srcRect, srcImage.PixelFormat);
         }
 
         private void DrawImageInCircle(Graphics g, Bitmap bitmap, Rectangle rectToDraw, int ramka)
@@ -595,7 +584,6 @@ namespace Aviators
 
 
             Bitmap playerCircle = CropToSize(bitmap, rectToDraw.Size);
-            //playerCircle.Save("Images\\circle.jpg", ImageFormat.Jpeg);
 
             var bra = new TextureBrush(playerCircle, rectsize);
 
