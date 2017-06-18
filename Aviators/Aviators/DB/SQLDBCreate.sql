@@ -149,7 +149,7 @@ create table game_stat (
 /* Table: goalies                                               */
 /*==============================================================*/
 create table goalies (
-   id                   INT4                 not null,
+   id                  INTEGER PRIMARY KEY,
    player_id            INT4                 null,
    shots                INT4                 null,
    saves                INT4                 null,
@@ -157,7 +157,6 @@ create table goalies (
    GAA                  INT4                 null,
    wins                 INT4                 null,
    shotout              INT4                 null,
-   constraint PK_GOALIES primary key (id),
    constraint FK_GOALIES_REFERENCE_PLAYER foreign key (player_id)
       references player (id)
       on delete restrict on update restrict
@@ -167,12 +166,11 @@ create table goalies (
 /* Table: player_info                                           */
 /*==============================================================*/
 create table player_info (
-   id                   SERIAL               not null,
+   id                    INTEGER PRIMARY KEY,
    player_id            INT4                 null,
    vk                   TEXT                 null,
    insta                TEXT                 null,
    photo                TEXT                 null,
-   constraint PK_PLAYER_INFO primary key (id),
    constraint FK_PLAYER_I_REFERENCE_PLAYER foreign key (player_id)
       references player (id)
       on delete restrict on update restrict
