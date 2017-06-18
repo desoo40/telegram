@@ -60,29 +60,10 @@ namespace Aviators
         public string Roster(Game game)
         {
             Image bitmap = Image.FromFile("Images\\Blanks\\roster.jpg");
-
-            var dateFont = new Font(rosterFonts.Families[0], 52, FontStyle.Bold);
-
-            var numberFont = new Font(rosterFonts.Families[1], 29);
-            var nameFont = new Font(rosterFonts.Families[1], 26, FontStyle.Bold);
-            var numberColor = new SolidBrush(Color.FromArgb(9, 55, 143));
-            var assOrKfont = new Font(rosterFonts.Families[1], 50, FontStyle.Bold);
-
-
+            RosterImg r = new RosterImg("Images\\roster.txt");
 
             using (Graphics g = Graphics.FromImage(bitmap))
             {
-                StringFormat centerFormat = new StringFormat();
-                centerFormat.Alignment = StringAlignment.Center;
-                centerFormat.LineAlignment = StringAlignment.Center;
-
-                StringFormat leftFormat = new StringFormat();
-                leftFormat.Alignment = StringAlignment.Near;
-                leftFormat.LineAlignment = StringAlignment.Near;
-
-                StringFormat rightFormat = new StringFormat();
-                rightFormat.Alignment = StringAlignment.Far;
-                rightFormat.LineAlignment = StringAlignment.Far;
 
                 #region Лого турнира
                 Image logo;
@@ -94,12 +75,7 @@ namespace Aviators
 
                     if (logo != null)
                     {
-                        Rectangle needRect = new Rectangle(355, 28, 115, 115);
-                        //g.DrawRectangle(Pens.Red, needRect);
-
-                        var resRect = GetInscribed(needRect, logo.Size);
-
-                        //g.DrawRectangle(Pens.Red, resRect);
+                        var resRect = GetInscribed(r.TournamentLogo, logo.Size);
 
                         g.DrawImage(logo, resRect);
                     }
@@ -123,18 +99,11 @@ namespace Aviators
 
                 Image enLogo;
                 var enemyName = game.Team2;
-                var enemyLogo = new Rectangle(970, 40, 120, 120);
                 enLogo = getTeamLogo(enemyName);
 
                 if (enLogo != null)
                 {
-
-                    //g.DrawRectangle(Pens.Red, enemyLogo);
-
-                    var resRect = GetInscribed(enemyLogo, enLogo.Size);
-
-                    //g.DrawRectangle(Pens.Red, resRect);
-
+                    var resRect = GetInscribed(r.EnemyLogo, enLogo.Size);
                     g.DrawImage(enLogo, resRect);
                 }
                 #endregion
