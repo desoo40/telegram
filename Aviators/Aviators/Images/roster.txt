@@ -1,0 +1,80 @@
+Images
+Tournament
+Position
+355, 28, 115, 115
+Repeatability
+-
+*
+EnemyLogo
+Position
+970, 40, 120, 120
+Repeatability
+-
+*
+Forwards
+Position
+Repeatability
+*
+Defenders
+Position
+Repeatability
+*
+Goalies
+Position
+Repeatability
++
+Texts
+Description
+Position
+Repeatability
+-
+Font
+Font size
+Font style
+Color
+Formatting
+Date
+Position
+Repeatability
+-
+Font
+Font size
+Font style
+Color
+Formatting
+Name
+Position
+Repeatability
+-
+Font
+Font size
+Font style
+Color
+Formatting
+Surname
+Position
+Repeatability
+-
+Font
+Font size
+Font style
+Color
+Formatting
+IsKorA
+Position
+Repeatability
+-
+Font
+Font size
+Font style
+Color
+Formatting
+Number
+Position
+Repeatability
+-
+Font
+Font size
+Font style
+Color
+Formatting
