@@ -41,7 +41,6 @@ create table game (
    viewers_count        INT4                 null,
    best_player_id       INT4                 null, 
    penaltygame          text                 null,	
-
    description                 TEXT                 null, 
    constraint FK_GAME_REFERENCE_playe foreign key (best_player_id)
       references player (id)

@@ -21,6 +21,9 @@ namespace Aviators
             if (files.Length == 0)
                 Console.WriteLine("Входящих файлов не обнаружено");
 
+            string name;
+
+
             foreach (var fileInfo in files)
             {
                 Console.Write("Обрабатываем файл: " + fileInfo.Name + " ... ");
@@ -30,9 +33,8 @@ namespace Aviators
                     var players = ParsePlayerInfo(fileInfo.FullName);
                     DB.DBCommands.DBPlayer.UpdatePlayersInfo(players);
 
-                    var name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), -1);
+                    name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), -1);
 
-                    File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
                 }
                 else
                 {
@@ -45,11 +47,14 @@ namespace Aviators
                     else
                         DB.DBCommands.UpdateGameAndPlayer(findGame, game);
 
-                    var name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), game.Id);
+                    name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), game.Id);
 
-                    File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
                 }
 
+                if (!Directory.Exists("Complete"))
+                    Directory.CreateDirectory("Complete");
+
+                File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
                 Console.WriteLine("OK");
             }
         }

@@ -27,13 +27,16 @@ namespace Aviators
             var players = new List<Player>();
             while (reader.Read())
             {
-                int number = Convert.ToInt32(reader["number"].ToString());
-                string name = reader["name"].ToString();
-                string lastname = reader["lastname"].ToString();
-
-                var player = new Player(number, name, lastname);
+                var player = new Player(Convert.ToInt32(reader["number"].ToString()),
+                   reader["name"].ToString(),
+                   reader["lastname"].ToString());
                 player.Id = Convert.ToInt32(reader["id"].ToString());
-                player.Position = (PlayerPosition)Convert.ToInt32(reader["positionid"].ToString());
+
+                var value = reader["positionid"].ToString();
+                if (value != "")
+                    player.Position = (PlayerPosition)Convert.ToInt32(value);
+                //player.VK = reader["vk_href"].ToString();
+                //player.INSTA = reader["insta_href"].ToString();
                 players.Add(player);
             }
             return players;

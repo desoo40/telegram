@@ -117,15 +117,7 @@ namespace Aviators
             //ProcessCommands(chatFinded, fromId);            
         }
 
-        private void GetAllGames(Chat chatFinded)
-        {
-            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames();
-
-            foreach (var allGame in allGames)
-            {
-                SendGameStat(chatFinded, allGame);
-            }
-        }
+     
 
         public async void ContinueCommand(Chat chatFinded, CallbackQuery cQuery)
         {
@@ -383,8 +375,10 @@ namespace Aviators
         /// </summary>
         private async void Help(Chat chatFinded)
         {
+            var n = 0;
             var p = DB.DBCommands.DBPlayer.GetAllPlayerWitoutStatistic();
-            var n = p[(new Random()).Next(p.Count - 1)].Number;
+            if (p.Count != 0)
+                n = p[(new Random()).Next(p.Count - 1)].Number;
 
             var help =
 @"Управление:
@@ -567,8 +561,6 @@ namespace Aviators
 
         }
 
-       
-
         private async void GamesStatistic(Chat chatFinded)
         {
             var result = new List<string>();
@@ -683,6 +675,16 @@ namespace Aviators
         private async void TimeTable(Chat chatFinded, int n)
         {
             await Bot.SendTextMessageAsync(chatFinded.Id, "Привет, я расписание",parseMode: ParseMode.Markdown);
+        }
+
+        private void GetAllGames(Chat chatFinded)
+        {
+            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames();
+
+            foreach (var allGame in allGames)
+            {
+                SendGameStat(chatFinded, allGame);
+            }
         }
         #endregion
 
