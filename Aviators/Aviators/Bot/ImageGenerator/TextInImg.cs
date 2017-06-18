@@ -1,12 +1,15 @@
 ﻿using System;
 using System.Drawing;
+using System.Drawing.Configuration;
 using System.Drawing.Text;
 
 namespace Aviators.Bot.ImageGenerator
 {
     public class TextInImg
     {
+        // в дальнейшем может пригодиться ввести флаг отличающий оффсетные тексты от обычных...
         public Rectangle Position { get; set; }
+        public Size RectSize { get; set; }
         public int OffsetX { get; set; }
         public int OffsetY { get; set; }
         public Font Font { get; set; }
@@ -32,8 +35,11 @@ namespace Aviators.Bot.ImageGenerator
                 if (lines[i] == "Position")
                     Position = GetRectFromLine(lines[++i]);
 
+                if (lines[i] == "Size")
+                    RectSize = GetSizeFromLine(lines[++i]);
 
-                if (lines[i] == "Repeatability")
+
+                if (lines[i] == "Repeatability" || lines[i] == "Offset")
                 {
                     if (CheckForNothing(lines[++i]))
                     {
@@ -76,14 +82,24 @@ namespace Aviators.Bot.ImageGenerator
                 {
                     if (!CheckForNothing(lines[++i]))
                     {
-                        if (lines[i].ToLower() == "white")
-                            Color = Brushes.White;
+                        if (lines[i].Contains(","))
+                        {
+                            Color = GetColorFromLine(lines[i]);
+                        }
+                        else
+                        {
+                            if (lines[i].ToLower() == "white")
+                                Color = Brushes.White;
 
-                        if (lines[i].ToLower() == "black")
-                            Color = Brushes.Black;
+                            if (lines[i].ToLower() == "black")
+                                Color = Brushes.Black;
 
-                        if (lines[i].ToLower() == "blue")
-                            Color = Brushes.Blue;
+                            if (lines[i].ToLower() == "blue")
+                                Color = Brushes.Blue;
+
+                            if (lines[i].ToLower() == "red")
+                                Color = Brushes.Red;
+                        }
                     }
                 }
 
@@ -112,6 +128,25 @@ namespace Aviators.Bot.ImageGenerator
             }
             else
                 Font = new Font(tmpFont, tmpFontSize, tmpFontStyle);
+        }
+
+        private Brush GetColorFromLine(string s)
+        {
+            var spl = s.Split(',');
+
+            return new SolidBrush(System.Drawing.Color.FromArgb(Convert.ToInt32(spl[0]),
+                Convert.ToInt32(spl[1]),
+                Convert.ToInt32(spl[2])));
+        }
+
+        internal Size GetSizeFromLine(string s)
+        {
+            if (CheckForNothing(s))
+                return new Size();
+
+            var spl = s.Split(' ');
+            return new Size(Convert.ToInt32(spl[0]),
+                Convert.ToInt32(spl[1]));
         }
 
         private bool IsFontFromFile(string tmpFont)

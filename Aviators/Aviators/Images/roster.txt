@@ -13,68 +13,98 @@ Repeatability
 *
 Forwards
 Position
+36, 290, 132, 132
 Repeatability
+190, 196
 *
 Defenders
 Position
+556, 290, 132, 132
 Repeatability
+190, 196
 *
 Goalies
 Position
+420, 150, 132, 132
 Repeatability
+180 0
 +
 Texts
 Description
 Position
+445, 55, 300, 100
 Repeatability
 -
 Font
+Fonts/segoeui.ttf
 Font size
+25
 Font style
+Bold
 Color
+White
 Formatting
+Center
+*
 Date
 Position
+445, 25, 300, 50
 Repeatability
 -
 Font
+Fonts/segoeui.ttf
 Font size
+52
 Font style
+Bold
 Color
+White
 Formatting
+center
++
+OffsetTexts
 Name
-Position
-Repeatability
--
+Size
+200 100
+Offset
+0 128
 Font
+Fonts/tahoma.ttf
 Font size
+26
 Font style
+bold
 Color
+white
 Formatting
-Surname
-Position
-Repeatability
 -
-Font
-Font size
-Font style
-Color
-Formatting
+*
 IsKorA
-Position
-Repeatability
--
+Size
+70 50
+Offset
+100 50
 Font
+Fonts/tahoma.ttf
 Font size
+50
 Font style
+bold
 Color
+Red
 Formatting
+left
+*
 Number
-Position
-Repeatability
--
+Size
+70 50
+Offset
+50 5
 Font
+Fonts/tahoma.ttf
 Font size
 Font style
 Color
+9, 55, 143
 Formatting
+-
