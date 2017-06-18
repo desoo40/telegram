@@ -167,14 +167,27 @@ namespace Aviators
                 button.CallbackData = cQuery.Data;
                 var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
+                Message mes;
 
-                var mes = await Bot.EditMessageTextAsync(chatFinded.Id, msgid, result, parseMode: ParseMode.Markdown, replyMarkup: keyboard);
+                //TODO переделать по нормальному
+                try
+                {
+                    mes = await Bot.EditMessageTextAsync(chatFinded.Id, msgid, result, parseMode: ParseMode.Markdown, replyMarkup: keyboard);
+
+                }
+                catch (Exception)
+                {
+                    
+                    Console.WriteLine("Ошибка отправки сообщения");
+                    return;
+                }
 
                 var newCom = new Command(new[] { "топ", count.ToString() });
                 newCom.Message = mes;
                 chatFinded.WaitingCommands.Add(newCom);
             }
 
+            chatFinded.WaitingCommands.Remove(command);
         }
 
         #region неиспользумое
@@ -427,9 +440,11 @@ namespace Aviators
                 {
                     var playerDescription = Gen.GetPlayerDescr();
                     playerDescription += $"#{player.Number} {player.Name} {player.Surname}\n\n" +
-                                         $"{player.Position}\n\n" +
-                                         $"VK: {player.VK}\n" +
-                                         $"Inst: {player.INSTA}";
+                                         $"{player.Position}\n\n";
+
+                    if (!string.IsNullOrEmpty(player.VK)) playerDescription += $"VK: {player.VK}\n";
+                    if (!string.IsNullOrEmpty(player.INSTA)) playerDescription += $"Inst: {player.INSTA}\n";
+                    //$"Inst: {player.INSTA}";
 
 
                     var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);

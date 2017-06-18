@@ -94,9 +94,31 @@ namespace Aviators
                 //player.VK = reader["vk_href"].ToString();
                 //player.INSTA = reader["insta_href"].ToString();
 
+                GetPlayerInfo(player);
+
                 return player;
             }
             return null;
+        }
+
+        private void GetPlayerInfo(Player player)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM player_info WHERE player_id =" + player.Id;
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            while (reader.Read())
+            {
+                player.VK = reader["vk"].ToString();
+                player.INSTA = reader["insta"].ToString();
+            }
         }
 
         public Player GetPlayerByNumber(int number)
