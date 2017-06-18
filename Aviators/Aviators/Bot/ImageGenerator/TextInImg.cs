@@ -8,6 +8,7 @@ namespace Aviators.Bot.ImageGenerator
     public class TextInImg
     {
         // в дальнейшем может пригодиться ввести флаг отличающий оффсетные тексты от обычных...
+        public bool IsOffset { get; set; }
         public Rectangle Position { get; set; }
         public Size RectSize { get; set; }
         public int OffsetX { get; set; }

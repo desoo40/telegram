@@ -13,9 +13,6 @@ namespace Aviators.Bot.ImageGenerator
             public TextInImg Name { get; set; }
             public TextInImg Number { get; set; }
             public TextInImg AorK { get; set; }
-
-
-
         }
 
         public class Photo
@@ -23,6 +20,11 @@ namespace Aviators.Bot.ImageGenerator
             public Rectangle Position { get; set; }
             public int OffsetX { get; set; }
             public int OffsetY { get; set; }
+        }
+
+        public RosterImg(string path)
+        {
+            
         }
     }
 }
