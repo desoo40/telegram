@@ -17,25 +17,15 @@ namespace Aviators
 {
     public class ImageGenerator2
     {
-        PrivateFontCollection rosterFonts;
         TextHelper th = new TextHelper();
 
-        public ImageGenerator2()
-        {
-            //Добавляем шрифт из указанного файла в em.Drawing.Text.PrivateFontCollection
-
-            rosterFonts = new PrivateFontCollection();
-            rosterFonts.AddFontFile("Fonts/segoeui.ttf");
-            rosterFonts.AddFontFile("Fonts/tahoma.ttf");
-
-        }
-        void DrawOutlineText(Graphics g, String text, Font font, Rectangle r, Brush b)
+        void DrawOutlineText(Graphics g, String text, Font font, Rectangle r, Brush b, Color line)
         {
             // set atialiasing
             g.SmoothingMode = SmoothingMode.HighQuality;
 
             // make thick pen for outlining
-            Pen pen = new Pen(Color.Black, 3);
+            Pen pen = new Pen(line, 3);
             // round line joins of the pen
             pen.LineJoin = LineJoin.Round;
 
@@ -50,9 +40,9 @@ namespace Aviators
 
             // outline the path
             outlinePath.Widen(pen);
-
+            Brush br = new SolidBrush(line);
             // fill outline path with some color
-            g.FillPath(Brushes.Black, outlinePath);
+            g.FillPath(br, outlinePath);
             // fill original text path with some color
             g.FillPath(b, textPath);
         }
@@ -84,16 +74,12 @@ namespace Aviators
 
                 #region Дата + описание
 
-                Rectangle dateRect = new Rectangle(445, 25, 300, 50);
-                Rectangle descrRect = new Rectangle(445, 55, 300, 100);
                 var description = game.Description;
-                int fontSize = (descrRect.Width + 100) / description.Length;
-                var descrFont = new Font(rosterFonts.Families[0], fontSize, FontStyle.Bold);
+                int fontSize = (r.Description.Position.Width + 100) / description.Length;
+                r.Description.Font = new Font(r.Description.Font.FontFamily, fontSize, r.Description.Font.Style);
 
-                g.DrawString(game.Date.ToString(), dateFont, Brushes.White, dateRect, centerFormat);
-                g.DrawString(description, descrFont, Brushes.White, descrRect, centerFormat);
-
-                //g.DrawRectangle(Pens.Crimson,dateRect);
+                DrawStr(g, description, r.Description);
+                DrawStr(g, game.Date.ToString(), r.Date);
                 #endregion
                 #region Лого противника
 
@@ -112,68 +98,29 @@ namespace Aviators
                 #region Состав
 
                 var roster = game.Roster;
-                var sizePhoto = new Size(132, 132);
-                var sizeNum = new Size(70, 50);
-                var sizeName = new Size(200, 100);
 
-                for (int i = 0; i < roster.Count; ++i)
+                for (int i = 0, gl = 0, dfd = 0, fwd = 0; i < roster.Count; ++i)
                 {
                     var player = roster[i];
 
-                    if (i == roster.Count - 1)
-                        i++;
-
-                    var point = GetPointOfPlayer(i);
-
-                    var shiftNumX = 125;
-                    var shiftNumY = 5;
-
-                    var shiftNameY = 128;
-
-                    Rectangle rectToDraw;
-                    Rectangle numRect;
-                    Rectangle nameRect;
-
-
-                    if (i < 2)
+                    if (player.Position == PlayerPosition.Нападающий)
                     {
-                        var distNumXG = 180;
-
-                        var distNameXG = 300;
-
-                        var shfitNameX = 150;
-                        var shfitNameY = 60;
-
-                        var shfitNumX = 50;
-                        var shfitNumY = 5;
-
-                        rectToDraw = new Rectangle(point, sizePhoto);
-                        numRect = new Rectangle(point.X + distNumXG * i - shfitNumX, point.Y + shfitNumY, sizeNum.Width, sizeNum.Height);
-                        nameRect = new Rectangle(point.X + distNameXG * i - shfitNameX, point.Y + shfitNameY, sizeName.Width, sizeName.Height);
+                        DrawPlayer(g, r.Forward, player, fwd);
+                        ++fwd;
                     }
-                    else
+                    if (player.Position == PlayerPosition.Защитник)
                     {
-                        rectToDraw = new Rectangle(point, sizePhoto);
-                        numRect = new Rectangle(point.X + shiftNumX, point.Y + shiftNumY, sizeNum.Width, sizeNum.Height);
-                        nameRect = new Rectangle(point.X, point.Y + shiftNameY, sizeName.Width, sizeName.Height);
+                        DrawPlayer(g, r.Defender, player, dfd);
+                        ++dfd;
                     }
 
-                    string path = $"DB\\PlayersPhoto\\{player.Number}_{player.Surname}.jpg";
-
-                    if (!File.Exists(path))
-                        path = $"DB\\PlayersPhoto\\no_photo.jpg";
-
-                    DrawImageInCircle(g, new Bitmap(path), rectToDraw, 0);
-                    DrawOutlineText(g, $"#{player.Number}", numberFont, numRect, numberColor);
-                    DrawOutlineText(g, $"{player.Name}\n{player.Surname}", nameFont, nameRect, Brushes.White);
-
-                    if (player.isK || player.isA)
+                    if (player.Position == PlayerPosition.Вратарь)
                     {
-                        Rectangle assOrK = new Rectangle(point.X + 100, point.Y + 80, sizeNum.Width, sizeNum.Height);
-
-                        g.DrawString(player.isK ? "K" : "A", assOrKfont, Brushes.Red, assOrK, leftFormat);
+                        DrawPlayer(g, r.Goalie, player, gl);
+                        ++gl;
                     }
                 }
+
                 #endregion
             }
 
@@ -189,6 +136,50 @@ namespace Aviators
             bitmap.Save(file, jpgEncoder, myEncoderParameters);
             return file;
         }
+
+        private void DrawPlayer(Graphics g, RosterImg.Player r, Player player, int param)
+        {
+            int i = 0;
+            int j = 0;
+
+            if (player.Position == PlayerPosition.Нападающий)
+            {
+                i = param/3;
+                j = param%3;
+            }
+            if (player.Position == PlayerPosition.Защитник || player.Position == PlayerPosition.Вратарь)
+            {
+                i = param / 2;
+                j = param % 2;
+            }
+
+            string path = $"DB\\PlayersPhoto\\{player.Number}_{player.Surname}.jpg";
+
+            if (!File.Exists(path))
+                path = $"DB\\PlayersPhoto\\no_photo.jpg";
+
+
+            var rect = UpdateRectangle(r.Position, r.OffsetX, r.OffsetY, i, j);
+            DrawImageInCircle(g, new Bitmap(path), rect, 3);
+
+            Point pntName = new Point(rect.X + r.Name.OffsetX, rect.Y + r.Name.OffsetY);
+            Point pntNum = new Point(rect.X + r.Number.OffsetX, rect.Y + r.Number.OffsetY);
+            Point pntAorK = new Point(rect.X + r.AorK.OffsetX, rect.Y + r.AorK.OffsetY);
+
+            r.Name.Position = new Rectangle(pntName, r.Name.RectSize);
+            DrawStr(g, $"{player.Name}\n{player.Surname}", r.Name);
+
+            r.Number.Position = new Rectangle(pntNum, r.Number.RectSize);
+            DrawStr(g, $"#{player.Number}", r.Number);
+
+            if (player.isA || player.isK)
+            {
+                r.AorK.Position = new Rectangle(pntAorK, r.AorK.RectSize);
+
+                DrawStr(g, player.isK ? "K" : "A", r.AorK);
+            }
+        }
+
 
         public string GameStatistic(Game game, bool isLastGame = false)
         {
@@ -245,13 +236,13 @@ namespace Aviators
                 if (game.Score != null)
                 {
                     DrawStr(g, game.Score.Item1.ToString(), r.Score);
-                    r.Score.Position = UpdateRectangle(r.Score, 0, 1);
+                    r.Score.Position = UpdateRectangle(r.Score.Position, r.Score.OffsetX, r.Score.OffsetY, 0, 1);
                     DrawStr(g, game.Score.Item2.ToString(), r.Score);
 
                     if (game.PenaltyGame)
                     {
                         if (game.Score.Item1 < game.Score.Item2)
-                            r.OverPenalty.Position = UpdateRectangle(r.OverPenalty, 0, 1);
+                            r.OverPenalty.Position = UpdateRectangle(r.OverPenalty.Position, r.OverPenalty.OffsetX, r.OverPenalty.OffsetY, 0, 1);
 
                         DrawStr(g, "Б", r.OverPenalty);
                     }
@@ -276,9 +267,9 @@ namespace Aviators
                     for (int j = 0; j < 2; j++)
                     {
 
-                        r.Stat.Position = UpdateRectangle(r.Stat, i, j);
+                        r.Stat.Position = UpdateRectangle(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j);
                         DrawStr(g, arrOfStat[i, j].ToString(), r.Stat);
-                        r.Stat.Position = BackRectangleAtr(r.Stat, i, j); // потому что соскакивают все атрибуты
+                        r.Stat.Position = BackRectangleAtr(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j); // потому что соскакивают все атрибуты
                     }
                 }
 
@@ -338,7 +329,7 @@ namespace Aviators
                         goalString += " [Б]";
 
                     
-                    r.Pucks.Position = UpdateRectangle(r.Pucks, k, 0);
+                    r.Pucks.Position = UpdateRectangle(r.Pucks.Position, r.Pucks.OffsetX, r.Pucks.OffsetY, k, 0);
 
                     if (goalString.Length > 33) // невероятный костыль
                     {
@@ -346,18 +337,18 @@ namespace Aviators
                         splitStr[0] += ",";
                         splitStr[1] = splitStr[1].Insert(0, " ");
                         DrawStr(g, splitStr[0], r.Pucks);
-                        r.Pucks.Position = BackRectangleAtr(r.Pucks, k, 0);
+                        r.Pucks.Position = BackRectangleAtr(r.Pucks.Position, r.Pucks.OffsetX, r.Pucks.OffsetY, k, 0);
                         ++k;
-                        r.Pucks.Position = UpdateRectangle(r.Pucks, k, 0);
+                        r.Pucks.Position = UpdateRectangle(r.Pucks.Position, r.Pucks.OffsetX, r.Pucks.OffsetY, k, 0);
                         DrawStr(g, splitStr[1], r.Pucks);
-                        r.Pucks.Position = BackRectangleAtr(r.Pucks, k, 0);
+                        r.Pucks.Position = BackRectangleAtr(r.Pucks.Position, r.Pucks.OffsetX, r.Pucks.OffsetY, k, 0);
                         ++k;
                     }
                     else
                     {
 
                         DrawStr(g, goalString, r.Pucks);
-                        r.Pucks.Position = BackRectangleAtr(r.Pucks, k, 0);
+                        r.Pucks.Position = BackRectangleAtr(r.Pucks.Position, r.Pucks.OffsetX, r.Pucks.OffsetY, k, 0);
                         ++k;
                     }
                 }
@@ -371,9 +362,9 @@ namespace Aviators
                 if (bestPlayer == null)
                     bestPlayer = new Player(100, "Алексей", "Данилин");
 
-                //var goalieStat = Math.Abs(1.0 - ((float)game.Score.Item2 / (float)game.Stat2.ShotsIn)).ToString("N3") + "%";
+                var goalieStat = Math.Abs(1.0 - ((float)game.Score.Item2 / (float)game.Stat2.ShotsIn)).ToString("N3") + "%";
 
-                string bestStat = 
+                string bestStat = bestPlayer.Position == PlayerPosition.Вратарь ? goalieStat :
                     $"{game.Goal.Count(go => go.Author.Id == bestPlayer.Id)}+{game.Goal.Count(go => go.Assistant1 != null && go.Assistant1.Id == bestPlayer.Id) + game.Goal.Count(go => go.Assistant2 != null && go.Assistant2.Id == bestPlayer.Id)}";
 
                 var arrOfBestPlayerAttributes = new string[4]
@@ -386,9 +377,9 @@ namespace Aviators
 
                 for (int i = 0; i < arrOfBestPlayerAttributes.Length; i++)
                 {
-                    r.Best.Position = UpdateRectangle(r.Best, i, 0);
+                    r.Best.Position = UpdateRectangle(r.Best.Position, r.Best.OffsetX, r.Best.OffsetY, i, 0);
                     DrawStr(g, arrOfBestPlayerAttributes[i], r.Best);
-                    r.Best.Position = BackRectangleAtr(r.Best, i, 0);
+                    r.Best.Position = BackRectangleAtr(r.Best.Position, r.Best.OffsetX, r.Best.OffsetY, i, 0);
                 }
 
 
@@ -411,66 +402,34 @@ namespace Aviators
             return file;
         }
 
-        private Rectangle BackRectangleAtr(TextInImg stat, int i, int j)
+        private Rectangle BackRectangleAtr(Rectangle rect, int offX, int offY, int i, int j)
         {
-            return new Rectangle(stat.Position.X - j * stat.OffsetX,
-                                  stat.Position.Y - i * stat.OffsetY,
-                                  stat.Position.Width,
-                                  stat.Position.Height);
+            return new Rectangle(rect.X - j * offX,
+                                  rect.Y - i * offY,
+                                  rect.Width,
+                                  rect.Height);
         }
 
-        private Rectangle UpdateRectangle(TextInImg stat, int i, int j)
+        private Rectangle UpdateRectangle(Rectangle rect, int offX, int offY, int i, int j)
         {
-            return new Rectangle(j * stat.OffsetX + stat.Position.X,
-                                  i * stat.OffsetY + stat.Position.Y,
-                                  stat.Position.Width,
-                                  stat.Position.Height);
+            return new Rectangle(rect.X + j * offX,
+                                  rect.Y + i * offY,
+                                  rect.Width,
+                                  rect.Height);
         }
 
 
 
-        private void DrawStr(Graphics g, string s, TextInImg stat)
+        private void DrawStr(Graphics g, string s, TextInImg text)
         {
-            g.DrawString(s, stat.Font, stat.Color, stat.Position, stat.StrFormatting);
+            if (text.IsOutline)
+                DrawOutlineText(g, s, text.Font, text.Position, text.Color, text.OutlineColor);
+            
+            else
+                g.DrawString(s, text.Font, text.Color, text.Position, text.StrFormatting);
+
             //g.DrawRectangle(Pens.Red, stat.Position);
         }
-
-        private Point GetPointOfPlayer(int ind)
-        {
-            var point = new Point();
-
-            var startX = 36;
-            var startY = 290;
-
-            var distX = 190;
-            var distY = 196;
-
-            var kekterval = 0;
-
-            if (ind < 2)
-            {
-                var distXGoalie = 180;
-                var startXGoalie = 420;
-                var startYGoalie = 150;
-
-                point.X = startXGoalie + ind * distXGoalie;
-                point.Y = startYGoalie;
-            }
-            else
-            {
-                var column = (ind - 2) % 5;
-                var row = (ind - 2) / 5;
-
-                if (column > 2)
-                    kekterval = 140;
-
-                point.X = startX + distX * column + kekterval;
-                point.Y = startY + distY * row;
-            }
-
-            return point;
-        }
-
 
         private ImageCodecInfo GetEncoder(ImageFormat format)
         {

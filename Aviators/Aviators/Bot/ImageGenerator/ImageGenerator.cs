@@ -38,7 +38,7 @@
 //        void DrawOutlineText(Graphics g, String text, Font font, Rectangle r, Brush b)
 //        {
 //            // set atialiasing
-//            g.SmoothingMode = SmoothingMode.HighQuality;
+//////            g.SmoothingMode = SmoothingMode.HighQuality;
 
 //            // make thick pen for outlining
 //            Pen pen = new Pen(Color.Black, 3);

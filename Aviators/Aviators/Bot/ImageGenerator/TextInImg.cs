@@ -9,6 +9,8 @@ namespace Aviators.Bot.ImageGenerator
     {
         // в дальнейшем может пригодиться ввести флаг отличающий оффсетные тексты от обычных...
         public bool IsOffset { get; set; }
+        public bool IsOutline = false;
+        public Color OutlineColor { get; set; }
         public Rectangle Position { get; set; }
         public Size RectSize { get; set; }
         public int OffsetX { get; set; }
@@ -67,7 +69,7 @@ namespace Aviators.Bot.ImageGenerator
                         tmpFontSize = Convert.ToInt32(lines[i]);
                 }
 
-                if (lines[i] == "Font Style")
+                if (lines[i] == "Font style")
                 {
                     if (!CheckForNothing(lines[++i]))
                     {
@@ -116,6 +118,37 @@ namespace Aviators.Bot.ImageGenerator
 
                         if (lines[i].ToLower() == "right")
                             StrFormatting = format.rightFormat;
+                    }
+                }
+
+                if (lines[i] == "Outline")
+                {
+                    if (!CheckForNothing(lines[++i]))
+                    {
+                        IsOutline = true;
+
+                        if (lines[i].Contains(","))
+                        {
+                            var spl = lines[i].Split(',');
+
+                            OutlineColor = System.Drawing.Color.FromArgb(Convert.ToInt32(spl[0]),
+                                    Convert.ToInt32(spl[1]),
+                                    Convert.ToInt32(spl[2])); 
+                        }
+                        else
+                        {
+                            if (lines[i].ToLower() == "white")
+                                OutlineColor = System.Drawing.Color.White;
+
+                            if (lines[i].ToLower() == "black")
+                                OutlineColor = System.Drawing.Color.Black;
+
+                            if (lines[i].ToLower() == "blue")
+                                OutlineColor = System.Drawing.Color.Blue;
+
+                            if (lines[i].ToLower() == "red")
+                                OutlineColor = System.Drawing.Color.Red;
+                        }
                     }
                 }
 

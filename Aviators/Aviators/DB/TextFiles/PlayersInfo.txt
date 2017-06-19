@@ -9,7 +9,6 @@
 91;Зубарев;Алексей;Нападающий;vk.com/id27839520;-;
 44;Кабанов;Владислав;Вратарь;vk.com/kabanchik44;instagram.com/kabanov_44;
 59;Калинин;Андрей;Нападающий;vk.com/nikolas5997;instagram.com/nk59nk;
-81;Капустин;Игорь;Нападающий;vk.com/id57568820;-;
 10;Корнеев;Дмитрий;Нападающий;vk.com/id53260917;-;
 53;Кузьмичев;Максим;Защитник;vk.com/maks.kuzmi4ev;instagram.com/_kuzmi4_53_;
 17;Липецкий;Павел;Нападающий;vk.com/p.lipetsky;instagram.com/pavell17;
@@ -17,11 +16,10 @@
 20;Миронов;Максим;Вратарь;vk.com/id271727830;-;
 12;Мусинский;Виктор;Нападающий;vk.com/id266553061;instagram.com/musanskiy12;
 14;Наконечный;Филипп;Нападающий;vk.com/id28522431;instagram.com/pasantre956;
-73;Перцевый;Дмитрий;Нападающий;vk.com/id39118063;-;
 9;Савенков;Алексей;Нападающий;vk.com/savenkov4;instagram.com/savenkov_9;
-15;Семенов;Максим;Защитник;vk.com/id20530012;instagram.com/devil_fox25;
-55;Сидоров;Артём;Защитник;vk.com/id236938249;-;
-88;Сорокин;Денис;Нападающий;vk.com/desoo;instagram.com/desoo;
+15;Семёнов;Максим;Защитник;vk.com/id20530012;instagram.com/devil_fox25;
+55;Сидоров;Артем;Защитник;vk.com/id236938249;-;
+88;Сорокин;Денис;Нападающий;vk.com/desoo;instagram.com/desoo88;
 5;Трофимов;Николай;Защитник;vk.com/improvisator5;instagram.com/trofim_nv;
 28;Флотский;Артём;Нападающий;vk.com/id128000542;-;
 1;Черненков;Николай;Вратарь;vk.com/gofcsmgo;instagram.com/kolka20;;
@@ -29,3 +27,9 @@
 100;Данилин;Алексей;Тренер;vk.com/id345386;instagram.com/alexdanni;
 71;Ружицкий;Илья;Нападающий;vk.com/ruzhik99;instagram.com/mr.ilya_1771;
 4;Морозов;Евгений;Защитник;vk.com/pekin29;-;
+71;Зайцев;Кирилл;Нападающий;vk.com/zaytsev__kirill;instagram.com/zaytsev7;
+44;Максимович;Алексей;Нападающий;vk.com/id157205760;instagram.com/alex_maksimovich;
+73;Ярцев;Илья;Защитник;vk.com/za_420;instagram.com/iyrtsv;
+55;Мокроусов;Владимир;Защитник;-;-;
+81;Вовченко;Владислав;Нападающий;-;-;
+55;Ложкин;Денис;Нападающий;-;-;

@@ -86,7 +86,7 @@ Fonts/seguisb.ttf
 Font size
 42
 Font style
-Bold
+regular
 Color
 Black
 Formatting
@@ -118,7 +118,7 @@ Segoe UI
 Font size
 25
 Font style
-Bold
+regular
 Color
 White
 Formatting
@@ -134,7 +134,7 @@ Fonts/MyriadPro-Cond.otf
 Font size
 45
 Font style
-Bold
+regular
 Color
 White
 Formatting

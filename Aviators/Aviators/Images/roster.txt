@@ -1,33 +1,8 @@
 Images
 Tournament
-Position
 355, 28, 115, 115
-Repeatability
--
-*
 EnemyLogo
-Position
 970, 40, 120, 120
-Repeatability
--
-*
-Forwards
-Position
-36, 290, 132, 132
-Repeatability
-190, 196
-*
-Defenders
-Position
-556, 290, 132, 132
-Repeatability
-190, 196
-*
-Goalies
-Position
-420, 150, 132, 132
-Repeatability
-180 0
 +
 Texts
 Description
@@ -36,7 +11,7 @@ Position
 Repeatability
 -
 Font
-Fonts/segoeui.ttf
+Fonts/tahoma.ttf
 Font size
 25
 Font style
@@ -61,13 +36,21 @@ Color
 White
 Formatting
 center
+*
 +
-OffsetTexts
+Players
+Forwards
+Position
+36, 290, 132, 132
+Repeatability
+190 196
 Name
 Size
 200 100
 Offset
-0 128
+3 128
+Outline
+black
 Font
 Fonts/tahoma.ttf
 Font size
@@ -79,11 +62,13 @@ white
 Formatting
 -
 *
-IsKorA
+AorK
 Size
-70 50
+80 80
 Offset
-100 50
+105 80
+Outline
+white
 Font
 Fonts/tahoma.ttf
 Font size
@@ -99,12 +84,139 @@ Number
 Size
 70 50
 Offset
-50 5
+123 5
+Outline
+black
 Font
 Fonts/tahoma.ttf
 Font size
+30
 Font style
+bold
 Color
 9, 55, 143
 Formatting
 -
+*
+#
+Defenders
+Position
+746, 290, 132, 132
+Repeatability
+190 196
+Name
+Size
+200 100
+Offset
+3 128
+Outline
+black
+Font
+Fonts/tahoma.ttf
+Font size
+26
+Font style
+bold
+Color
+white
+Formatting
+-
+*
+AorK
+Size
+80 80
+Offset
+105 80
+Outline
+white
+Font
+Fonts/tahoma.ttf
+Font size
+50
+Font style
+bold
+Color
+Red
+Formatting
+left
+*
+Number
+Size
+70 50
+Offset
+123 5
+Outline
+black
+Font
+Fonts/tahoma.ttf
+Font size
+30
+Font style
+bold
+Color
+9, 55, 143
+Formatting
+-
+*
+#
+Goalies
+Position
+350, 150, 132, 132
+Repeatability
+300 0
+*
+Name
+Size
+200 100
+Offset
+133 66
+Outline
+black
+Font
+Fonts/tahoma.ttf
+Font size
+26
+Font style
+bold
+Color
+white
+Formatting
+-
+*
+AorK
+Size
+80 80
+Offset
+105 80
+Outline
+white
+Font
+Fonts/tahoma.ttf
+Font size
+50
+Font style
+bold
+Color
+Red
+Formatting
+left
+*
+Number
+Size
+70 50
+Offset
+123 5
+Outline
+black
+Font
+Fonts/tahoma.ttf
+Font size
+26
+Font style
+bold
+Color
+9, 55, 143
+Formatting
+-
+*
+#
