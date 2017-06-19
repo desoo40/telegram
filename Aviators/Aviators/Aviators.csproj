@@ -78,12 +78,11 @@
     <Compile Include="Bot\AviaBot.cs" />
     <Compile Include="Bot\Chat.cs" />
     <Compile Include="Bot\CommandProcessor.cs" />
-    <Compile Include="Bot\ImageGenerator\Format.cs" />
-    <Compile Include="Bot\ImageGenerator\GameStat.cs" />
-    <Compile Include="Bot\ImageGenerator\ImageGenerator2.cs" />
+    <Compile Include="Bot\ImageGenerator\Layout\Format.cs" />
+    <Compile Include="Bot\ImageGenerator\Layout\GameStat.cs" />
     <Compile Include="Bot\ImageGenerator\ImageGenerator.cs" />
-    <Compile Include="Bot\ImageGenerator\RosterImg.cs" />
-    <Compile Include="Bot\ImageGenerator\TextInImg.cs" />
+    <Compile Include="Bot\ImageGenerator\Layout\RosterImg.cs" />
+    <Compile Include="Bot\ImageGenerator\Layout\TextInImg.cs" />
     <Compile Include="Bot\TextHelper.cs" />
     <Compile Include="Configs\Config.cs" />
     <Compile Include="Data\ParseFiles.cs" />

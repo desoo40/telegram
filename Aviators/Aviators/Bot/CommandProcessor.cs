@@ -26,7 +26,7 @@ namespace Aviators
     {
         private TelegramBotClient Bot;
         private readonly Randomiser Gen;
-        private ImageGenerator2 ImageGen;
+        private ImageGenerator ImageGen;
         //private DBCore DB;
         Regex rxNums = new Regex(@"^\d+$"); // проверка на число
 
@@ -35,7 +35,7 @@ namespace Aviators
         {
             Bot = bot;
             Gen = new Randomiser();
-            ImageGen = new ImageGenerator2();
+            ImageGen = new ImageGenerator();
             //DB = new DBCore();
         }
 
