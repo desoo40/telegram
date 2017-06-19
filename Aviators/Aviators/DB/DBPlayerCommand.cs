@@ -83,22 +83,28 @@ namespace Aviators
             }
             while (reader.Read())
             {
-                var player = new Player(Convert.ToInt32(reader["number"].ToString()),
-                    reader["name"].ToString(),
-                    reader["lastname"].ToString());
-                player.Id = Convert.ToInt32(reader["id"].ToString());
-
-                var value = reader["positionid"].ToString();
-                if (value != "")
-                    player.Position =(PlayerPosition) Convert.ToInt32(value);
-                //player.VK = reader["vk_href"].ToString();
-                //player.INSTA = reader["insta_href"].ToString();
-
-                GetPlayerInfo(player);
-
+                var player = PlayerSql(reader);
                 return player;
             }
             return null;
+        }
+
+        private Player PlayerSql(SqliteDataReader reader)
+        {
+            var player = new Player(Convert.ToInt32(reader["number"].ToString()),
+                reader["name"].ToString(),
+                reader["lastname"].ToString());
+            player.Id = Convert.ToInt32(reader["id"].ToString());
+
+            var value = reader["positionid"].ToString();
+            if (value != "")
+                player.Position = (PlayerPosition) Convert.ToInt32(value);
+            //player.VK = reader["vk_href"].ToString();
+            //player.INSTA = reader["insta_href"].ToString();
+
+            GetPlayerInfo(player);
+
+            return player;
         }
 
         private void GetPlayerInfo(Player player)
@@ -321,42 +327,6 @@ namespace Aviators
             return players;
         }
 
- 
-
-        public void AddPlayer(Player player)
-        {
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
-                player.Number, player.Name, player.Surname);
-
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
-        public void RemovePlayerByNumber(int number)
-        {
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            var player = GetPlayerByNumber(number);
-            if (player == null) return;
-
-            cmd.CommandText = string.Format("DELETE from player where number={0}", number);
-
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
-
         public Player GetPlayerOrInsert(Player player)
         {
             //TODO сделать, что бы первую большую букву делал
@@ -464,6 +434,42 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             return player;
         }
 
+        #region не используется
 
+        public void AddPlayer(Player player)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
+                player.Number, player.Name, player.Surname);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void RemovePlayerByNumber(int number)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            var player = GetPlayerByNumber(number);
+            if (player == null) return;
+
+            cmd.CommandText = string.Format("DELETE from player where number={0}", number);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        #endregion
     }
 }
