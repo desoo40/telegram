@@ -42,27 +42,32 @@ namespace Aviators
             return players;
         }
 
-        internal void UpdatePlayersInfo(List<Player> players)
+        public Player GetPlayerById(int id)
         {
-            foreach (var player in players)
-            {
-                var p = GetPlayerOrInsert(player);
+            return GetPlayerSQL("SELECT * FROM player WHERE id = " + id);
 
-                SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-                cmd.CommandText = string.Format("UPDATE player SET positionid = {1} WHERE id = {0};" +
-                                                "DELETE FROM player_info WHere player_id = {0}; " +
-                                                "INSERT INTO player_info (player_id, vk, insta) VALUES({0}, '{2}', '{3}')",
-                    p.Id, (int)player.Position, player.VK, player.INSTA);
 
-                try
-                {
-                    cmd.ExecuteNonQuery();
-                }
-                catch (SqliteException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                }
-            }
+            //SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            //cmd.CommandText = "SELECT * FROM player WHERE id = " + id;
+
+            //SqliteDataReader reader = null;
+            //try
+            //{
+            //    reader = cmd.ExecuteReader();
+            //}
+            //catch (SqliteException ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
+            //while (reader.Read())
+            //{
+            //    var player = new Player(Convert.ToInt32(reader["number"].ToString()),
+            //        reader["name"].ToString(),
+            //        reader["lastname"].ToString());
+            //    player.Id = Convert.ToInt32(reader["id"].ToString());
+            //    return player;
+            //}
+            //return null;
         }
 
         /// <summary>
@@ -81,15 +86,16 @@ namespace Aviators
             {
                 Console.WriteLine(ex.Message);
             }
+
             while (reader.Read())
             {
-                var player = PlayerSql(reader);
+                var player = ReaderToPlayer(reader);
                 return player;
             }
             return null;
         }
 
-        private Player PlayerSql(SqliteDataReader reader)
+        private Player ReaderToPlayer(SqliteDataReader reader)
         {
             var player = new Player(Convert.ToInt32(reader["number"].ToString()),
                 reader["name"].ToString(),
@@ -99,8 +105,6 @@ namespace Aviators
             var value = reader["positionid"].ToString();
             if (value != "")
                 player.Position = (PlayerPosition) Convert.ToInt32(value);
-            //player.VK = reader["vk_href"].ToString();
-            //player.INSTA = reader["insta_href"].ToString();
 
             GetPlayerInfo(player);
 
@@ -157,33 +161,7 @@ namespace Aviators
             //return null;
         }
 
-        public Player GetPlayerById(int id)
-        {
-            return GetPlayerSQL("SELECT * FROM player WHERE id = " + id);
-
-
-            //SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            //cmd.CommandText = "SELECT * FROM player WHERE id = " + id;
-
-            //SqliteDataReader reader = null;
-            //try
-            //{
-            //    reader = cmd.ExecuteReader();
-            //}
-            //catch (SqliteException ex)
-            //{
-            //    Console.WriteLine(ex.Message);
-            //}
-            //while (reader.Read())
-            //{
-            //    var player = new Player(Convert.ToInt32(reader["number"].ToString()),
-            //        reader["name"].ToString(),
-            //        reader["lastname"].ToString());
-            //    player.Id = Convert.ToInt32(reader["id"].ToString());
-            //    return player;
-            //}
-            //return null;
-        }
+       
 
         private Player GetPlayerByNameOrSurname(string nameOrSurname)
         {
@@ -318,52 +296,16 @@ namespace Aviators
             {
                 var player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
 
-                if (type == Top.Assist) player.StatAssist = Convert.ToInt32(reader["num"].ToString());
-                if (type == Top.Goals) player.StatGoal = Convert.ToInt32(reader["num"].ToString());
-                if (type == Top.Points) player.StatBomb = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Assist) player.AllStatAssist = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Goals) player.AllStatGoal = Convert.ToInt32(reader["num"].ToString());
+                if (type == Top.Points) player.AllStatBomb = Convert.ToInt32(reader["num"].ToString());
 
                 players.Add(player);
             }
             return players;
         }
 
-        public Player GetPlayerOrInsert(Player player)
-        {
-            //TODO сделать, что бы первую большую букву делал
-            //player.Name = player.Name.ToLowerInvariant()[0].
-
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("select ID from player where name = '{0}' AND " +
-                                            "lastname = '{1}' AND number = {2}",
-                 player.Name, player.Surname, player.Number);
-
-            try
-            {
-                object obj = cmd.ExecuteScalar();
-                if (obj == null)
-                {
-                    cmd.CommandText = String.Format(
-                        "INSERT INTO player(name, lastname, number) VALUES ('{0}', '{1}', {2})",
-                        player.Name, player.Surname, player.Number);
-                    cmd.ExecuteNonQuery();
-
-                    cmd.CommandText = @"select last_insert_rowid()";
-                    player.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
-                }
-                else
-                {
-                    player.Id = Convert.ToInt32(obj);
-                }
-
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-
-            }
-            return player;
-        }
-
+       
         public Player GetPlayerTopForTeam(Team team)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -400,7 +342,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             while (reader != null && reader.Read())
             {
                 player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
-                player.StatAssist = Convert.ToInt32(reader["num"].ToString());
+                player.AllStatAssist = Convert.ToInt32(reader["num"].ToString());
 
             }
             reader.Close();
@@ -428,11 +370,76 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
             while (reader != null && reader.Read())
             {
-                player.StatGoal = Convert.ToInt32(reader["num"].ToString());
+                player.AllStatGoal = Convert.ToInt32(reader["num"].ToString());
 
             }
             return player;
         }
+
+
+        #region Добавление, обновление игрока
+
+        public Player GetPlayerOrInsert(Player player)
+        {
+            //TODO сделать, что бы первую большую букву делал
+            //player.Name = player.Name.ToLowerInvariant()[0].
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select ID from player where name = '{0}' AND " +
+                                            "lastname = '{1}' AND number = {2}",
+                player.Name, player.Surname, player.Number);
+
+            try
+            {
+                object obj = cmd.ExecuteScalar();
+                if (obj == null)
+                {
+                    cmd.CommandText = String.Format(
+                        "INSERT INTO player(name, lastname, number) VALUES ('{0}', '{1}', {2})",
+                        player.Name, player.Surname, player.Number);
+                    cmd.ExecuteNonQuery();
+
+                    cmd.CommandText = @"select last_insert_rowid()";
+                    player.Id = Convert.ToInt32((long) cmd.ExecuteScalar());
+                }
+                else
+                {
+                    player.Id = Convert.ToInt32(obj);
+                }
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+
+            }
+            return player;
+        }
+
+        internal void UpdatePlayersInfo(List<Player> players)
+        {
+            foreach (var player in players)
+            {
+                var p = GetPlayerOrInsert(player);
+
+                SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+                cmd.CommandText = string.Format("UPDATE player SET positionid = {1} WHERE id = {0};" +
+                                                "DELETE FROM player_info WHere player_id = {0}; " +
+                                                "INSERT INTO player_info (player_id, vk, insta) VALUES({0}, '{2}', '{3}')",
+                    p.Id, (int) player.Position, player.VK, player.INSTA);
+
+                try
+                {
+                    cmd.ExecuteNonQuery();
+                }
+                catch (SqliteException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                }
+            }
+        }
+
+        #endregion
 
         #region не используется
 

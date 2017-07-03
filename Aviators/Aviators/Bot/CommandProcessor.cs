@@ -664,7 +664,7 @@ namespace Aviators
 
             Player player = DB.DBCommands.DBPlayer.GetPlayerTopForTeam(team);
             if (player != null)
-                result.Add($"`{"Любимчик",otstup}` {player.Surname +" (" + player.StatGoal+"+" + player.StatAssist + ")"}");
+                result.Add($"`{"Любимчик",otstup}` {player.Surname +" (" + player.AllStatGoal+"+" + player.AllStatAssist + ")"}");
 
             var keyboard = MakeKeyboardGames(games);
 
@@ -737,13 +737,13 @@ namespace Aviators
                     return topPlayer.StatAverragePerGame.ToString("F");
 
                 case Aviators.Top.Goals:
-                    return topPlayer.StatGoal.ToString();
+                    return topPlayer.AllStatGoal.ToString();
 
                 case Aviators.Top.Assist:
-                    return topPlayer.StatAssist.ToString();
+                    return topPlayer.AllStatAssist.ToString();
 
                 case Aviators.Top.Points:
-                    return topPlayer.StatBomb.ToString();
+                    return topPlayer.AllStatBomb.ToString();
 
                 case Aviators.Top.Penalty:
                     return topPlayer.Shtraf.ToString();
