@@ -73,6 +73,7 @@ create table game_action (
    game_id              INT4                 null,
    player_id            INT4                 null,
    action               INT4                 null,   
+   param               INT4                 null,   
    constraint FK_GAME_ACT_REFERENCE_PLAYER foreign key (player_id)
       references player (id)
       on delete restrict on update restrict,

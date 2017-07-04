@@ -544,9 +544,9 @@ namespace Aviators
             foreach (var topPlayer in topPlayers)
             {
                 result += "\n";
-                result += string.Format("`#{0,-3}{1,-20}`*{2}*", topPlayer.Number,
+                result += string.Format("`#{0,-3}{1,-20}`*{2}({3})*", topPlayer.Number,
                     topPlayer.Name + " " + topPlayer.Surname,
-                    GetTypeParametr(type, topPlayer));
+                    GetTypeParametr(type, topPlayer), topPlayer.Games);
 
             }
 

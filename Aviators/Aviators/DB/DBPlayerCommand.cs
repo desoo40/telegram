@@ -222,8 +222,13 @@ namespace Aviators
                 var game_id = reader["game_id"].ToString();
                 var action = (Action)Convert.ToInt32(reader["action"].ToString());
                 var gameaction = new GameAction(player, game_id, action);
-
+                var par = reader["param"].ToString();
+                if (par != "")
+                {
+                    gameaction.Param = Convert.ToInt32(par);
+                }
                 player.Actions.Add(gameaction);
+
             }
             reader.Close();
             cmd.CommandText = "SELECT goal_player.asist, goal.game_id  FROM goal_player  LEFT JOIN goal ON goal_player.goal_id = goal.id WHERE player_id = " + player.Id;
@@ -267,9 +272,23 @@ namespace Aviators
             return players.OrderByDescending(p => p.StatAverragePerGame).ToList().GetRange(0, input);
         }
 
+        private List<Player> GetTopPlayersPenalty(int count)
+        {
+            List<Player> players = GetAllPlayerWitoutStatistic();
+            foreach (var player in players)
+            {
+                GetPlayerStatistic(player);
+            }
+
+            var players15 = players.Where(p => p.Games > 15).ToList();
+
+            return players15.OrderBy(p => p.Shtraf).ToList().GetRange(0, count);
+        }
+
         internal List<Player> GetTopPlayers(Top type, int count)
         {
             if (type == Top.APG) return GetTopPlayersAPG(count);
+            if (type == Top.Penalty) return GetTopPlayersPenalty(count);
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
 
@@ -305,7 +324,6 @@ namespace Aviators
             return players;
         }
 
-       
         public Player GetPlayerTopForTeam(Team team)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();

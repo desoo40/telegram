@@ -362,18 +362,24 @@ namespace Aviators
 
             #endregion
 
-            //Добавляем игроков в игру(пока сделаем через Action)
-            foreach (var player in game.Roster)
-            {
-                //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
-                DBGame.AddAction(game.Id, player.Id, Action.Игра);
-                if(player.isA)
-                    DBGame.AddAction(game.Id, player.Id, Action.Ассистент);
-                if (player.isK)
-                    DBGame.AddAction(game.Id, player.Id, Action.Капитан);
+            if (game.Actions.Count != 0)
+                foreach (var gameAction in game.Actions)
+                {
+                    DB.DBCommands.DBGame.AddAction(game.Id, gameAction.Player.Id, gameAction.Action, gameAction.Param);
+                }
+
+            ////Добавляем игроков в игру(пока сделаем через Action)
+            //foreach (var player in game.Roster)
+            //{
+            //    //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
+            //    DBGame.AddAction(game.Id, player.Id, Action.Игра);
+            //    if(player.isA)
+            //        DBGame.AddAction(game.Id, player.Id, Action.Ассистент);
+            //    if (player.isK)
+            //        DBGame.AddAction(game.Id, player.Id, Action.Капитан);
 
 
-            }
+            //}
 
             foreach (var goal in game.Goal)
             {
@@ -405,12 +411,12 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
 
-            if (findGame.Actions.Count == 0)
+            if (findGame.Actions.Count != 0)
                 foreach (var gameAction in game.Actions)
                 {
-                    DB.DBCommands.DBGame.AddAction(findGame.Id, gameAction.Player.Id, gameAction.Action);
+                    DB.DBCommands.DBGame.AddAction(findGame.Id, gameAction.Player.Id, gameAction.Action, gameAction.Param);
                 }
-            if (findGame.Goal.Count == 0)
+            if (findGame.Goal.Count != 0)
                 foreach (var goal in game.Goal)
                 {
                     DB.DBCommands.DBGame.AddGoal(goal, findGame.Id);

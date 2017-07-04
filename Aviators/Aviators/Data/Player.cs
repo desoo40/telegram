@@ -49,7 +49,7 @@ namespace Aviators
 
         public int Pas => Actions.Count(a => a.Action == Action.Пас);
 
-        public int Shtraf => Actions.Count(a => a.Action == Action.Штраф);
+        public int Shtraf => Actions.Where(a => a.Action == Action.Штраф).Sum(a => a.Param);
 
         public int Games => Actions.Count(a => a.Action == Action.Игра);
 

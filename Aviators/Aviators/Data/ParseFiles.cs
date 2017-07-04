@@ -54,7 +54,7 @@ namespace Aviators
                 if (!Directory.Exists("Complete"))
                     Directory.CreateDirectory("Complete");
 
-                File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
+                 File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
                 Console.WriteLine("OK");
             }
         }
@@ -113,6 +113,16 @@ namespace Aviators
                     var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[2], playerInfo[1]);
                     newplayer.isA = isA;
                     newplayer.isK = isK;
+
+                    //Добавим действие, что он играл
+                    var action = new GameAction(newplayer, "0", Action.Игра);
+                    newplayer.Actions.Add(action);
+
+                    if (isA)
+                        newplayer.Actions.Add(new GameAction(newplayer, "0", Action.Ассистент));
+                    if (isK)
+                        newplayer.Actions.Add(new GameAction(newplayer, "0", Action.Капитан));
+
                     Roster.Add(newplayer);
                 }
 
@@ -251,12 +261,32 @@ namespace Aviators
                     Game.Stat1.Penalty = Convert.ToInt32(pen[0]);
                     Game.Stat2.Penalty = Convert.ToInt32(pen[1]);
 
+                    while (lines[i + 1] != "Вратарь")
+                    {
+                        var var = lines[++i].Split(' ');
+
+                        if (var[0].ToLower() == "к") continue;
+
+                        var player = Roster.Find(p => p.Number == Convert.ToInt32(var[0]));
+
+                        var action   = new GameAction(player, "0", Action.Штраф);
+                        action.Param = Convert.ToInt32(var[1]);
+                        player.Actions.Add(action);
+                    }
+
                 }
 
                 if (lines[i] == "Вратарь" && lines[i + 1].Contains("-")) // что делать?
                 {
-                    var var = lines[++i].Split('-');
+                    while (lines[i+1] != "Лучший")
+                    {
+                        var var = lines[++i].Split('-');
+                        var vara = Roster.Find(p => p.Number == Convert.ToInt32(var[0]));
 
+                        var time = var[1].Split(':');
+                        vara.Actions[0].Param = Convert.ToInt32(time[0]);
+                    }
+                   
                 }
 
                 if (lines[i] == "Лучший") // MVP ++
@@ -287,7 +317,11 @@ namespace Aviators
             foreach (var player in Roster)
             {
                 //var a = new GameAction(player, game.Id.ToString(), Action.Игра);
-                Game.Actions.Add(new GameAction(player, "0", Action.Игра));
+                //Game.Actions.Add(new GameAction(player, "0", Action.Игра));
+                foreach (var playerAction in player.Actions)
+                {
+                    Game.Actions.Add(playerAction);
+                }
             }
 
             return Game;

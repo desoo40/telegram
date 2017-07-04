@@ -392,11 +392,17 @@ namespace Aviators
             }
         }
 
-        public void AddAction(int newgameId, int playerId, Action action)
-        {
+        public void AddAction(int newgameId, int playerId, Action action, int param = 0)
+         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("INSERT INTO game_action (game_id, player_id, action) VALUES({0}, {1}, {2})",
+            if (param == 0)
+                cmd.CommandText = string.Format("INSERT INTO game_action (game_id, player_id, action) VALUES({0}, {1}, {2})",
                 newgameId, playerId, (int)action);
+            else
+            {
+                cmd.CommandText = string.Format("INSERT INTO game_action (game_id, player_id, action, param) VALUES({0}, {1}, {2}, {3})",
+                    newgameId, playerId, (int)action, param);
+            }
 
             try
             {
