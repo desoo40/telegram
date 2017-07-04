@@ -255,7 +255,7 @@ namespace Aviators
 
                 if (lines[i] == "Вратарь" && lines[i + 1].Contains("-")) // что делать?
                 {
-
+                    var var = lines[++i].Split('-');
 
                 }
 
