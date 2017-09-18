@@ -268,11 +268,11 @@ namespace Aviators
                     {
 
                         r.Stat.Position = UpdateRectangle(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j);
-                        if (arrOfStat[i, j] == 0)
-                        {
-                            DrawStr(g, "-", r.Stat);
-                        }
-                        else
+                        //if (arrOfStat[i, j] == 0)
+                        //{
+                        //    DrawStr(g, "-", r.Stat);
+                        //}
+                        //else
                             DrawStr(g, arrOfStat[i, j].ToString(), r.Stat);
                         r.Stat.Position = BackRectangleAtr(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j); // потому что соскакивают все атрибуты
                     }
