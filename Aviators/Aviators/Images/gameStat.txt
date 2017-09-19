@@ -33,7 +33,7 @@ Repeatability
 Font
 Fonts/MyriadPro-Semibold.otf
 Font size
-24
+22
 Font style
 Regular
 Color
