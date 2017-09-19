@@ -74,6 +74,8 @@ namespace Aviators.Bot
                     Console.WriteLine("Не удалось принять файл");
                 }
 
+                await Bot.SendTextMessageAsync(cid, "Файл принят");
+
                 return;
             }
 

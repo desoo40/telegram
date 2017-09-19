@@ -42,7 +42,17 @@ namespace Aviators
                 }
                 else
                 {
-                    var game = ParseTXTFile(fileInfo.FullName);
+                    Game game = null;
+                    try
+                    {
+                        game = ParseTXTFile(fileInfo.FullName);
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
                     if (game == null) continue;
 
                     var findGame = DB.DBCommands.DBGame.FindGame(game);
