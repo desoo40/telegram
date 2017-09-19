@@ -136,52 +136,102 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="DB\PlayersPhoto\101_максимович.jpg" />
-    <Content Include="DB\PlayersPhoto\102_катин.jpg" />
-    <Content Include="DB\PlayersPhoto\11_распоркин.jpg" />
-    <Content Include="DB\PlayersPhoto\15_дорофеев.jpg" />
-    <Content Include="DB\PlayersPhoto\15_сазонов.jpg" />
+    <Content Include="DB\PlayersPhoto\101_максимович.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\102_катин.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\11_распоркин.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\15_дорофеев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\15_сазонов.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\15_семёнов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="DB\PlayersPhoto\16_никитин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\PlayersPhoto\16_румянцев.jpg" />
-    <Content Include="DB\PlayersPhoto\18_мовсесян.jpg" />
-    <Content Include="DB\PlayersPhoto\1_воробьёв.jpg" />
-    <Content Include="DB\PlayersPhoto\20_дмитриев.jpg" />
-    <Content Include="DB\PlayersPhoto\21_кукушкин.jpg" />
-    <Content Include="DB\PlayersPhoto\22_нефёдов.jpg" />
-    <Content Include="DB\PlayersPhoto\44_данаев.jpg" />
+    <Content Include="DB\PlayersPhoto\16_румянцев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\18_мовсесян.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\1_воробьёв.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\20_дмитриев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\21_кукушкин.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\22_нефёдов.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\44_данаев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\44_максимович.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\PlayersPhoto\50_пашинский.jpg" />
-    <Content Include="DB\PlayersPhoto\53_хаймоменко.jpg" />
-    <Content Include="DB\PlayersPhoto\55_капустин.jpg" />
+    <Content Include="DB\PlayersPhoto\50_пашинский.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\53_хаймоменко.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\55_капустин.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\55_мокроусов.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\PlayersPhoto\57_кузнецов.jpg" />
-    <Content Include="DB\PlayersPhoto\59_греков.jpg" />
-    <Content Include="DB\PlayersPhoto\63_канищев.jpg" />
+    <Content Include="DB\PlayersPhoto\57_кузнецов.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\59_греков.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\63_канищев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\71_зайцев.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="DB\PlayersPhoto\73_ярцев.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\PlayersPhoto\7_богатов.jpg" />
+    <Content Include="DB\PlayersPhoto\7_богатов.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\81_вовченко.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\PlayersPhoto\81_могучев.jpg" />
-    <Content Include="DB\PlayersPhoto\86_кучеров.jpg" />
-    <Content Include="DB\PlayersPhoto\92_могучев.jpg" />
-    <Content Include="DB\PlayersPhoto\95_рябов.jpg" />
-    <Content Include="DB\PlayersPhoto\9_иванов.jpg" />
-    <Content Include="DB\PlayersPhoto\DSC_5983.jpg" />
+    <Content Include="DB\PlayersPhoto\81_могучев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\86_кучеров.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\92_могучев.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\95_рябов.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\9_иванов.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="DB\PlayersPhoto\DSC_5983.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\no_photo.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -329,7 +379,9 @@
     <Content Include="Images\roster.txt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Teams\авиаторы.png" />
+    <Content Include="Images\Teams\авиаторы.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Teams\ГУУ.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -345,7 +397,9 @@
     <Content Include="Images\Teams\МИЭТ.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Teams\МСХА.png" />
+    <Content Include="Images\Teams\МСХА.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Teams\МЭИ.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -355,7 +409,9 @@
     <Content Include="Images\Teams\ПГАФКСиТ.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Teams\РАНХИГС.png" />
+    <Content Include="Images\Teams\РАНХИГС.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="Images\Teams\РГУФКСиТ.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -383,7 +439,9 @@
     <Content Include="Images\Teams\ХК Университет Лесгафта.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="Images\Teams\ЮУРГУ.png" />
+    <Content Include="Images\Teams\ЮУРГУ.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <None Include="sqlite3.dll">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </None>
