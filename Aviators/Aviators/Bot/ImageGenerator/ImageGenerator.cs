@@ -206,13 +206,15 @@ namespace Aviators
 
                 #endregion
 
-                #region Соперник
-
+                #region Соперник + мы
+                
                 var enemyName = game.Team2;
+                var homeName = game.Description;
 
                 Image enLogo = getTeamLogo(enemyName);
 
                 enemyName = th.FullNameFinder(game.Team2);
+                DrawStr(g, homeName, r.Team1);
                 DrawStr(g, enemyName, r.Team2);
 
                 if (enLogo != null)

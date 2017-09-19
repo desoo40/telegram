@@ -10,7 +10,20 @@ Best
 *
 Texts
 Team1
+Position
+15, 24, 350, 30
+Repeatability
 -
+Font
+Fonts/MyriadPro-Semibold.otf
+Font size
+22
+Font style
+Regular
+Color
+White
+Formatting
+left
 *
 Team2
 Position
