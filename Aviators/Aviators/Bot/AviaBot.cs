@@ -1,9 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Threading;
 using Telegram.Bot;
 using Aviators.Configs;
+using Telegram.Bot.Types.Enums;
 
 namespace Aviators.Bot
 {
@@ -18,7 +20,7 @@ namespace Aviators.Bot
         public static bool End = true;
         public static void Start()
         {
-            Bot = new TelegramBotClient(Config.BotToken.Aviators);
+            Bot = new TelegramBotClient(Config.BotToken.Boris);
             Commands = new CommandProcessor(Bot);
 
             var me = Bot.GetMeAsync().Result;
@@ -35,9 +37,12 @@ namespace Aviators.Bot
 
             while (End)
             {
+                if (Program.LoadIncome)
+                    Parse.ProcessFiles();
+
                 //Nothing to do, just sleep 1 sec
                 //ctrl+c break cycle
-                Thread.Sleep(1000);
+                Thread.Sleep(10000);
             }
 
             Console.WriteLine("StopReceiving...");
@@ -49,6 +54,30 @@ namespace Aviators.Bot
             var msg = e.Message.Text;
             var cid = e.Message.Chat.Id;
             var fromId = e.Message.From.Id; //для проверки на права доступа(типа добавления и т.д.)
+
+            if (e.Message.Type == MessageType.DocumentMessage)
+            {
+                Console.WriteLine("Принимаем файл: " + e.Message.Document.FileName);
+
+                try
+                {
+                    var file = await Bot.GetFileAsync(e.Message.Document.FileId);
+                    //var filename = file.FileId + "." + file.FilePath.Split('.').Last();
+
+                    using (var saveImageStream = new FileStream("Incoming" + "/" + e.Message.Document.FileName, FileMode.Create))
+                    {
+                        await file.FileStream.CopyToAsync(saveImageStream);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine("Не удалось принять файл");
+                }
+
+                await Bot.SendTextMessageAsync(cid, "Файл принят");
+
+                return;
+            }
 
             Console.WriteLine("Incoming request: " + msg);
             Console.WriteLine("Search known chat: " + e.Message.Chat.FirstName + "; " + cid);

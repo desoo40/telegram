@@ -13,13 +13,17 @@ namespace Aviators
     {
         public static void ProcessFiles()
         {
-            Console.WriteLine("Обрабатываем файлы во входящей папке");
-
             DirectoryInfo di = new DirectoryInfo("Incoming");
             var files = di.GetFiles();
 
             if (files.Length == 0)
-                Console.WriteLine("Входящих файлов не обнаружено");
+            {
+                return;
+                //Console.WriteLine("Входящих файлов не обнаружено");
+            }
+
+
+            Console.WriteLine("Обрабатываем файлы во входящей папке");
 
             string name;
 
@@ -38,7 +42,17 @@ namespace Aviators
                 }
                 else
                 {
-                    var game = ParseTXTFile(fileInfo.FullName);
+                    Game game = null;
+                    try
+                    {
+                        game = ParseTXTFile(fileInfo.FullName);
+
+                    }
+                    catch (Exception e)
+                    {
+                        Console.WriteLine(e);
+                    }
+
                     if (game == null) continue;
 
                     var findGame = DB.DBCommands.DBGame.FindGame(game);

@@ -13,7 +13,7 @@ namespace Aviators
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
         private static bool InitFromCode = false;
-        private static bool LoadIncome = true;
+        public static bool LoadIncome = true;
 
         static void Main(string[] args)
         {
@@ -80,8 +80,8 @@ namespace Aviators
                 }
             }
 
-            if(LoadIncome || args.Length > 0 && args[0] == "load")
-                Parse.ProcessFiles();
+            //if(LoadIncome || args.Length > 0 && args[0] == "load")
+            //    Parse.ProcessFiles();
 
             Console.WriteLine("Starting Bot...");
             try
