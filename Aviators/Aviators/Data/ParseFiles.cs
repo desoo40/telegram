@@ -21,56 +21,58 @@ namespace Aviators
                 return;
                 //Console.WriteLine("Входящих файлов не обнаружено");
             }
-
-
             Console.WriteLine("Обрабатываем файлы во входящей папке");
-
-            string name;
-
 
             foreach (var fileInfo in files)
             {
-                Console.Write("Обрабатываем файл: " + fileInfo.Name + " ... ");
+                ProcessOneFile(fileInfo.FullName);
+            }
+        }
 
-                if (fileInfo.Name.Contains("PlayersInfo"))
+        public static bool ProcessOneFile(string path)
+        {
+            Console.Write("Обрабатываем файл: " + Path.GetFileNameWithoutExtension(path) + " ... ");
+
+            string name;
+
+            if (Path.GetFileNameWithoutExtension(path).Contains("PlayersInfo"))
+            {
+                var players = ParsePlayerInfo(path);
+                DB.DBCommands.DBPlayer.UpdatePlayersInfo(players);
+
+                name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(path), -1);
+            }
+            else
+            {
+                Game game = null;
+                try
                 {
-                    var players = ParsePlayerInfo(fileInfo.FullName);
-                    DB.DBCommands.DBPlayer.UpdatePlayersInfo(players);
-
-                    name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), -1);
-
+                    game = ParseTXTFile(path);
                 }
+                catch (Exception e)
+                {
+                    Console.WriteLine(e);
+                }
+
+                if (game == null) return false;
+
+                var findGame = DB.DBCommands.DBGame.FindGame(game);
+                if (findGame == null)
+                    DB.DBCommands.AddNewGameAndPlayers(game);
                 else
                 {
-                    Game game = null;
-                    try
-                    {
-                        game = ParseTXTFile(fileInfo.FullName);
-
-                    }
-                    catch (Exception e)
-                    {
-                        Console.WriteLine(e);
-                    }
-
-                    if (game == null) continue;
-
-                    var findGame = DB.DBCommands.DBGame.FindGame(game);
-                    if (findGame == null)
-                        DB.DBCommands.AddNewGameAndPlayers(game);
-                    else
-                        DB.DBCommands.UpdateGameAndPlayer(findGame, game);
-
-                    name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(fileInfo.Name), game.Id);
-
+                    if (!DB.DBCommands.UpdateGameAndPlayer(findGame, game)) return false;
                 }
 
-                if (!Directory.Exists("Complete"))
-                    Directory.CreateDirectory("Complete");
-
-                 File.Move(fileInfo.FullName, "Complete\\" + name + ".txt");
-                Console.WriteLine("OK");
+                name = DB.DBCommands.AddParseFile(Path.GetFileNameWithoutExtension(path), game.Id);
             }
+
+            if (!Directory.Exists("Complete"))
+                Directory.CreateDirectory("Complete");
+
+            File.Move(path, "Complete\\" + name + ".txt");
+            Console.WriteLine("OK");
+            return true;
         }
 
         private static Game ParseTXTFile(string file)

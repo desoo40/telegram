@@ -37,8 +37,8 @@ namespace Aviators.Bot
 
             while (End)
             {
-                if (Program.LoadIncome)
-                    Parse.ProcessFiles();
+                //if (Program.LoadIncome)
+                //    Parse.ProcessFiles();
 
                 //Nothing to do, just sleep 1 sec
                 //ctrl+c break cycle
@@ -75,6 +75,11 @@ namespace Aviators.Bot
                 }
 
                 await Bot.SendTextMessageAsync(cid, "Файл принят");
+
+                bool res = Parse.ProcessOneFile("Incoming" + "/" + e.Message.Document.FileName);
+
+                if (res) await Bot.SendTextMessageAsync(cid, "Файл обработан");
+                else await Bot.SendTextMessageAsync(cid, "Файл не удалось обработать");
 
                 return;
             }
