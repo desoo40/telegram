@@ -15,7 +15,7 @@ namespace SportfortCrawler
     {
         private static bool finishedLoading = false;
         private static WebConfig config = new Awesomium.Core.WebConfig();
-        public static readonly string UserAgent = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/27.0.1453.110 Safari/537.36";
+        public static readonly string UserAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36";
         private static WebView view;
 
         internal static void Initializate()
@@ -24,7 +24,18 @@ namespace SportfortCrawler
             {
                 config.UserAgent = UserAgent;
                 Awesomium.Core.WebCore.Initialize(config);
-                view = WebCore.CreateWebView(800, 600);
+                var proxyConfig = String.Format("{0}:{1}", "hqproxy.avp.ru", 3128);
+                var webPreferences = new WebPreferences { ProxyConfig = proxyConfig };
+                var webSession = WebCore.CreateWebSession(webPreferences);
+                view = WebCore.CreateWebView(800, 600, webSession);
+
+                view.LoginRequest += (s, e) =>
+                {
+                    e.Username = @"kl\latokhin";
+                    e.Password = @"password_kl";
+                    e.Handled = EventHandling.Modal;
+                    e.Cancel = false;
+                };
 
                 Console.WriteLine("Start testing ya.ru downloading...");
                 view.SynchronousMessageTimeout = 0;
@@ -57,6 +68,14 @@ namespace SportfortCrawler
             Console.WriteLine("Start downloading...");
             view.SynchronousMessageTimeout = 0;
             view.Source = new Uri(page);
+
+            view.LoginRequest += (s, e) =>
+            {
+                e.Username = @"kl\latokhin";
+                e.Password = @"password_kl";
+                e.Handled = EventHandling.Modal;
+                e.Cancel = false;
+            };
 
             view.LoadingFrameComplete += (s, e) =>
             {
@@ -160,6 +179,14 @@ namespace SportfortCrawler
             Console.WriteLine("Start downloading...");
             view.SynchronousMessageTimeout = 0;
             view.Source = new Uri(sportFortHomePage);
+
+            view.LoginRequest += (s, e) =>
+            {
+                e.Username = @"kl\latokhin";
+                e.Password = @"password_kl";
+                e.Handled = EventHandling.Modal;
+                e.Cancel = false;
+            };
 
             view.LoadingFrameComplete += (s, e) =>
             {
@@ -320,7 +347,15 @@ namespace SportfortCrawler
 
             Console.WriteLine("Start downloading...");
             view.SynchronousMessageTimeout = 0;
-            view.Source = new Uri(sportFortHomePage);                
+            view.Source = new Uri(sportFortHomePage);
+
+            view.LoginRequest += (s, e) =>
+            {
+                e.Username = @"kl\latokhin";
+                e.Password = @"password_kl";
+                e.Handled = EventHandling.Modal;
+                e.Cancel = false;
+            };
 
             view.LoadingFrameComplete += (s, e) =>
             {
@@ -430,6 +465,14 @@ namespace SportfortCrawler
             Console.WriteLine("Start downloading...");
             view.SynchronousMessageTimeout = 0;
             view.Source = new Uri(sportFortStat);
+
+            view.LoginRequest += (s, e) =>
+            {
+                e.Username = @"kl\latokhin";
+                e.Password = @"password_kl";
+                e.Handled = EventHandling.Modal;
+                e.Cancel = false;
+            };
 
             view.LoadingFrameComplete += (s, e) =>
             {

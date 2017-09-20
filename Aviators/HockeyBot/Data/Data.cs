@@ -4,6 +4,20 @@ using System.Linq;
 
 namespace HockeyBot
 {
+    public class Vote
+    {
+        public string Name { get; set; }
+        public string Surname { get; set; }
+        public string Data { get; set; }
+
+        public Vote(string name, string surname, string data)
+        {
+
+            Name = name;
+            Surname = surname;
+            Data = data;
+        }
+    }
     public class Player
     {
         public int Id { get; set; }

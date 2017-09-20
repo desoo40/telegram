@@ -4,6 +4,7 @@ using System.Threading;
 using Telegram.Bot;
 using HockeyBot.Configs;
 using System.Linq;
+using System.Net;
 
 namespace HockeyBot.Bot
 {
@@ -20,6 +21,9 @@ namespace HockeyBot.Bot
         public static void Start()
         {
             Bot = new TelegramBotClient(Config.BotToken);
+            Bot.WebProxy = new WebProxy("hqproxy.avp.ru", 3128);
+            Bot.WebProxy.Credentials = new NetworkCredential(@"kl\latokhin", @"password_kl");
+            
             Commands = new CommandProcessor(Bot);
 
             var me = Bot.GetMeAsync().Result;
@@ -82,6 +86,16 @@ namespace HockeyBot.Bot
             Console.WriteLine("Incoming callback from: " + e.CallbackQuery.From);
 
             int msgid = Convert.ToInt32(e.CallbackQuery.InlineMessageId);
+
+            var chatFindedVote = Chats.FindLast(chat => chat.WaitingVotings.Any(voting => voting.Msg.MessageId == e.CallbackQuery.Message.MessageId));
+            if (chatFindedVote == null)
+            {
+                Console.WriteLine("Cannot find chatFindedVoting for: " + e.CallbackQuery.Message);
+            }
+            else
+            {
+                Commands.ContinueWaitingVoting(chatFindedVote, e.CallbackQuery.Message.MessageId, e.CallbackQuery);
+            }
 
             var chatFindedStatistic = Chats.FindLast(chat => chat.WaitingStatistics.Any(stat => stat.Msg.MessageId == e.CallbackQuery.Message.MessageId));
             if (chatFindedStatistic == null)

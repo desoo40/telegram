@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.RegularExpressions;
 using Telegram.Bot;
 using HockeyBot.Configs;
@@ -38,7 +40,7 @@ namespace HockeyBot
 
             if(chatFinded.CommandsQueue.Count > 20)
             {
-                Console.WriteLine("Too bug queue. Reset it.");
+                Console.WriteLine("Too big queue. Reset it.");
                 chatFinded.CommandsQueue.Clear();
                 return;
             }
@@ -96,6 +98,16 @@ namespace HockeyBot
                     continue;
                 }
 
+                if (command == "vote")
+                {
+                    chatFinded.VoteMode = true;
+                    if (isLastCommand)
+                    {
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Задайте вопрос голосования:'");
+                    }
+                    continue;
+                }
+
                 //check modes
                 if (chatFinded.AddMode)
                 {
@@ -116,6 +128,13 @@ namespace HockeyBot
                         ExceptionOnCmd(chatFinded, ex);
                         continue;
                     }
+                }
+
+                if (chatFinded.VoteMode)
+                {
+                    while (commands.Count != 0) command += " " + commands.Dequeue();
+                    AddVoting(chatFinded, command);
+                    continue;
                 }
 
                 //do command
@@ -176,6 +195,73 @@ namespace HockeyBot
                         continue;
                     }
                 }                
+            }
+        }
+
+        internal async void ContinueWaitingVoting(Chat chatFinded, int msgid, CallbackQuery e)
+        {
+            var voting = chatFinded.WaitingVotings.FindLast(x => x.Msg.MessageId == msgid);
+            if (voting == null) return;
+
+            var detailedResult = "";
+            if (e.Data == "Подробнее")
+            {
+                detailedResult += "\nДа:\n";
+                var votes = voting.V.FindAll(x => x.Data == "Да");
+                foreach (var vote in votes)
+                {
+                    detailedResult += $" {vote.Name} {vote.Surname}\n";
+                }
+                if (votes.Count == 0) detailedResult += " -\n";
+
+                detailedResult += "Нет:\n";
+                votes = voting.V.FindAll(x => x.Data == "Нет");
+                foreach (var vote in voting.V.FindAll(x => x.Data == "Нет"))
+                {
+                    detailedResult += $" {vote.Name} {vote.Surname}\n";
+                }
+                if (votes.Count == 0) detailedResult += " -\n";
+
+                detailedResult += "Хз:\n";
+                votes = voting.V.FindAll(x => x.Data == ":(");
+                foreach (var vote in voting.V.FindAll(x => x.Data == ":("))
+                {
+                    detailedResult += $" {vote.Name} {vote.Surname}\n";
+                }
+                if (votes.Count == 0) detailedResult += " -\n";
+            }
+            else
+            {
+                var vote = new Vote(e.From.FirstName, e.From.LastName, e.Data);
+                var voteDupl = voting.V.FindLast(x => x.Name == vote.Name && x.Surname == vote.Surname);
+                if (voteDupl != null)
+                {
+                    if (voteDupl.Data == vote.Data) return;
+                    voteDupl.Data = vote.Data;
+                }
+                else
+                {
+                    voting.V.Add(vote);
+                }
+                //voting.SaveDb();
+            }
+
+            var short_result = $"Да:{voting.V.Count(x => x.Data == "Да")};Нет:{voting.V.Count(x => x.Data == "Нет")};Хз:{voting.V.Count(x => x.Data == ":(")}";
+
+            var btn_yes = new InlineKeyboardButton("Да");
+            var btn_no = new InlineKeyboardButton("Нет");
+            var btn_unk = new InlineKeyboardButton(":(");
+            var btn_res = new InlineKeyboardButton("Подробнее");
+            var keyboard = new InlineKeyboardMarkup(new[] { new[] { btn_yes, btn_no, btn_unk }, new []{ btn_res } });
+
+            try
+            {
+                var answer = $"{voting.Question}\n{short_result}\n{detailedResult}";
+                await Bot.EditMessageTextAsync(chatFinded.Id, msgid, answer, parseMode: ParseMode.Markdown, replyMarkup: keyboard);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
             }
         }
 
@@ -268,6 +354,20 @@ namespace HockeyBot
             DB.RemovePlayerByNumber(number);
             await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
             ShowPlayerByNubmer(chatFinded, number);
+        }
+
+        private async void AddVoting(Chat chatFinded, string command)
+        {
+            chatFinded.VoteMode = false;
+            var btn_yes = new InlineKeyboardButton("Да");
+            var btn_no = new InlineKeyboardButton("Нет");
+            var btn_unk = new InlineKeyboardButton(":(");
+            var keyboard = new InlineKeyboardMarkup(new[] { new[] { btn_yes, btn_no, btn_unk } });
+
+            var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"{command}", replyMarkup: keyboard);
+            var v = new List<Vote>();
+            
+            chatFinded.WaitingVotings.Add(new WaitingVoting() { Msg = msg, V = v, Question = command});
         }
 
         private async void ShowPlayerByNubmer(Chat chatFinded, int playerNumber)
@@ -462,15 +562,16 @@ namespace HockeyBot
             var name = p[(new Random()).Next(p.Count - 1)].Name;
             var surname = p[(new Random()).Next(p.Count - 1)].Surname;
 
+            //почему-то было условие chatFinded.Id > 0 ? "" : "/" + "трени"
             keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] {
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + surname),
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "новости") };
+                new Telegram.Bot.Types.KeyboardButton("/" + surname),
+                new Telegram.Bot.Types.KeyboardButton("/" + "новости") };
             keys.Keyboard[1] = new Telegram.Bot.Types.KeyboardButton[2] {
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "трени"),
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "игры") };
+                new Telegram.Bot.Types.KeyboardButton("/" + "трени"),
+                new Telegram.Bot.Types.KeyboardButton("/" + "игры") };
             keys.Keyboard[2] = new Telegram.Bot.Types.KeyboardButton[2] {
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "кричалки"),
-                new Telegram.Bot.Types.KeyboardButton(chatFinded.Id > 0 ? "" : "/" + "помощь") };
+                new Telegram.Bot.Types.KeyboardButton("/" + "кричалки"),
+                new Telegram.Bot.Types.KeyboardButton("/" + "помощь") };
 
             var help =
 @"*Бот умеет*:

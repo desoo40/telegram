@@ -18,10 +18,10 @@ namespace SportfortCrawler
             //InitializatePlayersInfo();
 
             Console.WriteLine("InitializateGamesTrainingInfo...");
-            //InitializateGamesTrainingInfo();
+            InitializateGamesTrainingInfo();
 
             Console.WriteLine("InitializateLastGamesInfo...");
-            //InitializateLastGamesInfo();
+            InitializateLastGamesInfo();
 
             Console.WriteLine("InitializateStatsInfo...");
             InitializateStatsInfo();
@@ -196,6 +196,8 @@ namespace SportfortCrawler
                 {
                     try
                     {
+                        web.Proxy = new WebProxy("hqproxy.avp.ru", 3128);
+                        web.Proxy.Credentials = new NetworkCredential(@"kl\latokhin", @"password_kl");
                         web.DownloadFile(photoUrl, Path.Combine(Configs.Config.DBPlayersPhotoDirPath, $"{number}_{surname.ToLower()}.jpg"));
                     }
                     catch (Exception ex)
