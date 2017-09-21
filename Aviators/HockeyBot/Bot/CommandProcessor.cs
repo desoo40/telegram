@@ -103,7 +103,7 @@ namespace HockeyBot
                     chatFinded.VoteMode = true;
                     if (isLastCommand)
                     {
-                        await Bot.SendTextMessageAsync(chatFinded.Id, "Задайте вопрос голосования:'");
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Задайте вопрос голосования:");
                     }
                     continue;
                 }
@@ -200,7 +200,7 @@ namespace HockeyBot
 
         internal async void ContinueWaitingVoting(Chat chatFinded, int msgid, CallbackQuery e)
         {
-            var voting = chatFinded.WaitingVotings.FindLast(x => x.Msg.MessageId == msgid);
+            var voting = chatFinded.WaitingVotings.FindLast(x => x.MessageId == msgid);
             if (voting == null) return;
 
             var detailedResult = "";
@@ -237,13 +237,15 @@ namespace HockeyBot
                 if (voteDupl != null)
                 {
                     if (voteDupl.Data == vote.Data) return;
+
                     voteDupl.Data = vote.Data;
+                    DB.UpdateVoteData(msgid, vote.Name, vote.Surname, vote.Data);
                 }
                 else
                 {
                     voting.V.Add(vote);
+                    DB.AddVote(msgid, vote.Name, vote.Surname, vote.Data);
                 }
-                //voting.SaveDb();
             }
 
             var short_result = $"Да:{voting.V.Count(x => x.Data == "Да")};Нет:{voting.V.Count(x => x.Data == "Нет")};Хз:{voting.V.Count(x => x.Data == ":(")}";
@@ -252,7 +254,15 @@ namespace HockeyBot
             var btn_no = new InlineKeyboardButton("Нет");
             var btn_unk = new InlineKeyboardButton(":(");
             var btn_res = new InlineKeyboardButton("Подробнее");
-            var keyboard = new InlineKeyboardMarkup(new[] { new[] { btn_yes, btn_no, btn_unk }, new []{ btn_res } });
+            InlineKeyboardMarkup keyboard;
+            if (e.Data == "Подробнее")
+            {
+                keyboard = new InlineKeyboardMarkup(new[] { new[] { btn_yes, btn_no, btn_unk } });
+            }
+            else
+            {
+                keyboard = new InlineKeyboardMarkup(new[] { new[] { btn_yes, btn_no, btn_unk }, new[] { btn_res } });
+            }
 
             try
             {
@@ -366,8 +376,10 @@ namespace HockeyBot
 
             var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"{command}", replyMarkup: keyboard);
             var v = new List<Vote>();
-            
-            chatFinded.WaitingVotings.Add(new WaitingVoting() { Msg = msg, V = v, Question = command});
+            var voting = new WaitingVoting() {MessageId = msg.MessageId, V = v, Question = command};
+
+            DB.AddVoting(voting);
+            chatFinded.WaitingVotings.Add(voting);
         }
 
         private async void ShowPlayerByNubmer(Chat chatFinded, int playerNumber)
@@ -595,6 +607,17 @@ namespace HockeyBot
             help = help.Replace("'%фамилия%'", $"{surname}");
 
             await Bot.SendTextMessageAsync(chatFinded.Id, help, false, false, 0, keys, ParseMode.Markdown);
+        }
+
+        public void TryToRestoreVotingFromDb(int messageId, Chat chat)
+        {
+            var voting = DB.GetVotingById(messageId);
+            if (voting == null) return;
+
+            chat.WaitingVotings.Add(voting);
+
+            voting.V = DB.GetVotesByMessageId(messageId);
+            Console.WriteLine("Voting restored from DB: " + voting.Question);
         }
     }
 }

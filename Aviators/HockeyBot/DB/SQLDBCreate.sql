@@ -1,5 +1,7 @@
 ﻿DROP TABLE IF EXISTS player;
 DROP TABLE IF EXISTS event;
+DROP TABLE IF EXISTS voting;
+DROP TABLE IF EXISTS vote;
 
 CREATE TABLE player(
     id INTEGER PRIMARY KEY,
@@ -20,4 +22,18 @@ CREATE TABLE event(
     address TEXT NULL,
     details TEXT NULL,
     members TEXT NULL
+);
+
+CREATE TABLE voting(
+    id INTEGER PRIMARY KEY,
+    messageid INTEGER NULL,
+    question TEXT NOT NULL
+);
+
+CREATE TABLE vote(
+    id INTEGER PRIMARY KEY,
+    messageid INTEGER NULL,
+    name TEXT NOT NULL,
+    surname TEXT NOT NULL,
+    data TEXT NOT NULL
 );

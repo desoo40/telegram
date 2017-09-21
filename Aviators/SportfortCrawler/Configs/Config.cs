@@ -16,5 +16,7 @@ namespace SportfortCrawler.Configs
         public static readonly string SportFortHomePage = ConfigurationManager.AppSettings["HomePage"];
         public static readonly string SportFortTournamentsStatsPage = ConfigurationManager.AppSettings["TournamentsStatsPage"];
         public static readonly string SportFortTournamentsTablesPage = ConfigurationManager.AppSettings["TournamentsTablesPage"];
+
+        public static readonly string PWD = ConfigurationManager.AppSettings["PWD"];
     }
 }

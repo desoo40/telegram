@@ -43,7 +43,7 @@ namespace HockeyBot
     public class WaitingVoting
     {
         public string Question { get; set; }
-        public Message Msg { get; set; }
+        public int MessageId { get; set; }
         public List<Vote> V { get; set; }
 
         public void SaveDb()

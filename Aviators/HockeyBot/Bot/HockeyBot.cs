@@ -22,7 +22,7 @@ namespace HockeyBot.Bot
         {
             Bot = new TelegramBotClient(Config.BotToken);
             Bot.WebProxy = new WebProxy("hqproxy.avp.ru", 3128);
-            Bot.WebProxy.Credentials = new NetworkCredential(@"kl\latokhin", @"password_kl");
+            Bot.WebProxy.Credentials = new NetworkCredential(@"kl\latokhin", Config.PWD);
             
             Commands = new CommandProcessor(Bot);
 
@@ -38,11 +38,20 @@ namespace HockeyBot.Bot
             Console.WriteLine("StartReceiving...");
             Bot.StartReceiving();
 
+            var tick = 0;
             while (End)
             {
                 //Nothing to do, just sleep 1 sec
                 //ctrl+c break cycle
                 Thread.Sleep(1000);
+
+                //one per X second update db events
+                ++tick;
+                if (tick == 600)
+                {
+                    tick = 0;
+                    DBCore.InitializationOnlyEvents();
+                }
             }
 
             Console.WriteLine("StopReceiving...");
@@ -83,14 +92,27 @@ namespace HockeyBot.Bot
 
         private static void Bot_OnCallbackQuery(object sender, Telegram.Bot.Args.CallbackQueryEventArgs e)
         {
-            Console.WriteLine("Incoming callback from: " + e.CallbackQuery.From);
+            Console.WriteLine("Incoming callback from: " + e.CallbackQuery.From.Username);
 
             int msgid = Convert.ToInt32(e.CallbackQuery.InlineMessageId);
 
-            var chatFindedVote = Chats.FindLast(chat => chat.WaitingVotings.Any(voting => voting.Msg.MessageId == e.CallbackQuery.Message.MessageId));
+            var chatFindedVote = Chats.FindLast(chat => chat.WaitingVotings.Any(voting => voting.MessageId == e.CallbackQuery.Message.MessageId));
             if (chatFindedVote == null)
             {
-                Console.WriteLine("Cannot find chatFindedVoting for: " + e.CallbackQuery.Message);
+                var restoredChat = Chats.FindLast(chat => chat.Id == e.CallbackQuery.Message.Chat.Id);
+                if (restoredChat == null)
+                {
+                    restoredChat = new Chat(e.CallbackQuery.Message.Chat.Id);
+                    Chats.Add(restoredChat);
+                }
+                //try to restore from db
+                Commands.TryToRestoreVotingFromDb(e.CallbackQuery.Message.MessageId, restoredChat);
+                chatFindedVote = Chats.FindLast(chat => chat.WaitingVotings.Any(voting => voting.MessageId == e.CallbackQuery.Message.MessageId));
+            }
+
+            if (chatFindedVote == null)
+            {
+                Console.WriteLine("Cannot find chatFindedVoting for: " + e.CallbackQuery.Message.MessageId);
             }
             else
             {
@@ -100,7 +122,7 @@ namespace HockeyBot.Bot
             var chatFindedStatistic = Chats.FindLast(chat => chat.WaitingStatistics.Any(stat => stat.Msg.MessageId == e.CallbackQuery.Message.MessageId));
             if (chatFindedStatistic == null)
             {
-                Console.WriteLine("Cannot find chatFindedStatistic for: " + e.CallbackQuery.Message);
+                Console.WriteLine("Cannot find chatFindedStatistic for: " + e.CallbackQuery.Message.MessageId);
             }
             else
             {
@@ -110,7 +132,7 @@ namespace HockeyBot.Bot
             var chatFindedEventMore = Chats.FindLast(chat => chat.WaitingEvents.Any(ev => ev.Msg.MessageId == e.CallbackQuery.Message.MessageId));
             if (chatFindedEventMore == null)
             {
-                Console.WriteLine("Cannot find chatFindedEventMore for: " + e.CallbackQuery.Message);
+                Console.WriteLine("Cannot find chatFindedEventMore for: " + e.CallbackQuery.Message.MessageId);
             }
             else
             {

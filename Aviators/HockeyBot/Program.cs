@@ -9,7 +9,7 @@ namespace HockeyBot
         /// Флаг для создания базы и табличек, что бы из кода.
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
-        private static bool InitFromCode = true;
+        private static bool InitFromCode = false;
 
         static void Main(string[] args)
         {
@@ -17,6 +17,7 @@ namespace HockeyBot
             ServicePointManager.ServerCertificateValidationCallback = Network.SSL.Validator;
 
             Console.CancelKeyPress += Console_CancelKeyPress;
+            DBCore.InitializationOnlyEvents();
 
             if (InitFromCode || args.Length > 0 && args[0] == "init")
             {

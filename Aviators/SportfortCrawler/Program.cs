@@ -17,8 +17,11 @@ namespace SportfortCrawler
             {
                 Directory.CreateDirectory(Configs.Config.DBPlayersPhotoDirPath);
             }
-            
-            Synchronizer.InitializateSources();
+
+            var players = false;
+            if (args.Length > 0 && args[0] == "players") players = true;
+
+            Synchronizer.InitializateSources(players);
         }
     }
 }

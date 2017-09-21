@@ -4,27 +4,28 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using SportfortCrawler.Configs;
 
 namespace SportfortCrawler
 {
     public class Synchronizer
     {
-        public static void InitializateSources()
+        public static void InitializateSources(bool players=false)
         {
             Console.WriteLine("PageParsers.Initializate...");
             PageParsers.Initializate();
 
             Console.WriteLine("InitializatePlayersInfo...");
-            //InitializatePlayersInfo();
+            if(players)InitializatePlayersInfo();
 
             Console.WriteLine("InitializateGamesTrainingInfo...");
             InitializateGamesTrainingInfo();
 
-            Console.WriteLine("InitializateLastGamesInfo...");
-            InitializateLastGamesInfo();
+            //Console.WriteLine("InitializateLastGamesInfo...");
+            //InitializateLastGamesInfo();
 
-            Console.WriteLine("InitializateStatsInfo...");
-            InitializateStatsInfo();
+            //Console.WriteLine("InitializateStatsInfo...");
+            //InitializateStatsInfo();
         }
 
         public static void InitializateStatsInfo()
@@ -197,7 +198,7 @@ namespace SportfortCrawler
                     try
                     {
                         web.Proxy = new WebProxy("hqproxy.avp.ru", 3128);
-                        web.Proxy.Credentials = new NetworkCredential(@"kl\latokhin", @"password_kl");
+                        web.Proxy.Credentials = new NetworkCredential(@"kl\latokhin", Config.PWD);
                         web.DownloadFile(photoUrl, Path.Combine(Configs.Config.DBPlayersPhotoDirPath, $"{number}_{surname.ToLower()}.jpg"));
                     }
                     catch (Exception ex)

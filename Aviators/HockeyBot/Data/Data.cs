@@ -12,7 +12,6 @@ namespace HockeyBot
 
         public Vote(string name, string surname, string data)
         {
-
             Name = name;
             Surname = surname;
             Data = data;

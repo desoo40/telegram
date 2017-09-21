@@ -64,6 +64,52 @@ namespace HockeyBot
             }
         }
 
+        public WaitingVoting GetVotingById(int messageId)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT * FROM voting WHERE messageid = " + messageId;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            while (reader.Read() && reader.HasRows)
+            {
+                var voting = new WaitingVoting() { MessageId = messageId, V = null, Question = reader["question"].ToString() };
+                return voting;
+            }
+            return null;
+        }
+
+        public List<Vote> GetVotesByMessageId(int messageId)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = "SELECT * FROM vote WHERE messageid = " + messageId;
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            var votes = new List<Vote>();
+            while (reader.Read() && reader.HasRows)
+            {
+                var vote = new Vote(reader["name"].ToString(), reader["surname"].ToString(), reader["data"].ToString());
+                votes.Add(vote);
+            }
+            return votes;
+        }
+
         public Player GetPlayerByNumber(int number)
         {
             SqliteCommand cmd = conn.CreateCommand();
@@ -218,6 +264,54 @@ namespace HockeyBot
             return players;
         }
 
+        public void AddVoting(WaitingVoting voting)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = string.Format("INSERT INTO voting (messageid, question) VALUES({0}, '{1}')",
+                voting.MessageId, voting.Question);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void AddVote(int messageId, string name, string surname, string data)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = string.Format("INSERT INTO vote (messageid, name, surname, data) VALUES({0}, '{1}', '{2}', '{3}')",
+                messageId, name, surname, data);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
+        public void UpdateVoteData(int messageId, string name, string surname, string data)
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = string.Format("UPDATE vote SET data='{3}' WHERE messageid={0} AND name='{1}' AND surname='{2}'",
+                messageId, name, surname, data);
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
         public void AddPlayer(Player player)
         {
             SqliteCommand cmd = conn.CreateCommand();
@@ -269,6 +363,65 @@ namespace HockeyBot
                         
             db.Disconnect();
             Console.WriteLine("Finish Initialization");
+        }
+
+        public static void InitializationOnlyEvents()
+        {
+            Console.WriteLine("Start Initialization for Events");
+            DBCore db = new DBCore();
+
+            Console.WriteLine("Clear events");
+            db.ClearEvents();
+
+            Console.WriteLine("FillEventsFromFile");
+            db.LoadEventsFromFile();
+
+            db.Disconnect();
+            Console.WriteLine("Finish Initialization");
+        }
+
+        public static void InitializationOnlyPlayers()
+        {
+            Console.WriteLine("Start Initialization for Events");
+            DBCore db = new DBCore();
+
+            Console.WriteLine("Clear players");
+            db.ClearPlayers();
+
+            Console.WriteLine("FillEventsFromFile");
+            db.LoadPlayersFromFile();
+
+            db.Disconnect();
+            Console.WriteLine("Finish Initialization");
+        }
+
+        private void ClearEvents()
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = $"DELETE FROM event";
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        private void ClearPlayers()
+        {
+            SqliteCommand cmd = conn.CreateCommand();
+            cmd.CommandText = $"DELETE FROM player";
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         #region Import

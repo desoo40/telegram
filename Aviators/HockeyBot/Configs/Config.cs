@@ -19,6 +19,7 @@ namespace HockeyBot.Configs
         public static readonly string Descr = Directory.GetCurrentDirectory() + ConfigurationManager.AppSettings["Descr"];
 
         public static readonly string SportFortTeamMembersPage = ConfigurationManager.AppSettings["TeamMembersPage"];
+        public static readonly string PWD = ConfigurationManager.AppSettings["PWD"];
 
 
         public static class BotAdmin
