@@ -9,6 +9,7 @@ using Telegram.Bot.Types;
 using File = System.IO.File;
 using Telegram.Bot.Types.ReplyMarkups;
 using Telegram.Bot.Types.Enums;
+using Telegram.Bot.Types.InlineKeyboardButtons;
 
 namespace HockeyBot
 {
@@ -206,7 +207,7 @@ namespace HockeyBot
             var detailedResult = "";
             if (e.Data == "Подробнее")
             {
-                detailedResult += "\nДа:\n";
+                detailedResult += "\n*Да*:\n";
                 var votes = voting.V.FindAll(x => x.Data == "Да");
                 foreach (var vote in votes)
                 {
@@ -214,7 +215,7 @@ namespace HockeyBot
                 }
                 if (votes.Count == 0) detailedResult += " -\n";
 
-                detailedResult += "Нет:\n";
+                detailedResult += "*Нет*:\n";
                 votes = voting.V.FindAll(x => x.Data == "Нет");
                 foreach (var vote in voting.V.FindAll(x => x.Data == "Нет"))
                 {
@@ -222,7 +223,7 @@ namespace HockeyBot
                 }
                 if (votes.Count == 0) detailedResult += " -\n";
 
-                detailedResult += "Хз:\n";
+                detailedResult += "*Хз*:\n";
                 votes = voting.V.FindAll(x => x.Data == ":(");
                 foreach (var vote in voting.V.FindAll(x => x.Data == ":("))
                 {
@@ -250,10 +251,10 @@ namespace HockeyBot
 
             var short_result = $"Да:{voting.V.Count(x => x.Data == "Да")};Нет:{voting.V.Count(x => x.Data == "Нет")};Хз:{voting.V.Count(x => x.Data == ":(")}";
 
-            var btn_yes = new InlineKeyboardButton("Да");
-            var btn_no = new InlineKeyboardButton("Нет");
-            var btn_unk = new InlineKeyboardButton(":(");
-            var btn_res = new InlineKeyboardButton("Подробнее");
+            var btn_yes = new InlineKeyboardCallbackButton("Да", "Да");
+            var btn_no = new InlineKeyboardCallbackButton("Нет", "Нет");
+            var btn_unk = new InlineKeyboardCallbackButton(":(", ":(");
+            var btn_res = new InlineKeyboardCallbackButton("Подробнее", "Подробнее");
             InlineKeyboardMarkup keyboard;
             if (e.Data == "Подробнее")
             {
@@ -266,7 +267,7 @@ namespace HockeyBot
 
             try
             {
-                var answer = $"{voting.Question}\n{short_result}\n{detailedResult}";
+                var answer = $"*{voting.Question}*\n{short_result}\n{detailedResult}";
                 await Bot.EditMessageTextAsync(chatFinded.Id, msgid, answer, parseMode: ParseMode.Markdown, replyMarkup: keyboard);
             }
             catch (Exception ex)
@@ -282,8 +283,11 @@ namespace HockeyBot
 
             var statistic = $"*Статистика по #{stat.Plr.Number}:*\n\nПривет! Я - статистика 💥";
 
+            var button = new InlineKeyboardCallbackButton("Donate for it!", "Soon");
+            var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
             await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, stat.Msg.Caption);
-            await Bot.SendTextMessageAsync(chatFinded.Id, statistic, parseMode: ParseMode.Markdown);
+            await Bot.EditMessageReplyMarkupAsync(chatFinded.Id, msgid, replyMarkup: keyboard);
+            //await Bot.SendTextMessageAsync(chatFinded.Id, statistic, parseMode: ParseMode.Markdown);
             chatFinded.WaitingStatistics.Remove(stat);
         }
 
@@ -311,7 +315,7 @@ namespace HockeyBot
             keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[1] { new Telegram.Bot.Types.KeyboardButton("/помощь") };
             keys.ResizeKeyboard = true;
             keys.OneTimeKeyboard = true;
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный запрос, воспользуйтесь /помощь", false, false, 0, keys);
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный запрос, воспользуйтесь /помощь", ParseMode.Default, false, false, 0, keys);
         }
 
         private async void ExceptionOnCmd(Chat chatFinded, Exception ex)
@@ -369,9 +373,9 @@ namespace HockeyBot
         private async void AddVoting(Chat chatFinded, string command)
         {
             chatFinded.VoteMode = false;
-            var btn_yes = new InlineKeyboardButton("Да");
-            var btn_no = new InlineKeyboardButton("Нет");
-            var btn_unk = new InlineKeyboardButton(":(");
+            var btn_yes = new InlineKeyboardCallbackButton("Да", "Да");
+            var btn_no = new InlineKeyboardCallbackButton("Нет", "Нет");
+            var btn_unk = new InlineKeyboardCallbackButton(":(", ":(");
             var keyboard = new InlineKeyboardMarkup(new[] { new[] { btn_yes, btn_no, btn_unk } });
 
             var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"{command}", replyMarkup: keyboard);
@@ -410,7 +414,7 @@ namespace HockeyBot
                         var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
                             (new StreamReader(photopath)).BaseStream);
 
-                        var button = new InlineKeyboardButton("Cтатистика");
+                        var button = new InlineKeyboardCallbackButton("Cтатистика", "Cтатистика");
                         var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
                         var msg = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup: keyboard);
@@ -461,7 +465,7 @@ namespace HockeyBot
                             var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
                                 (new StreamReader(photopath)).BaseStream);
 
-                            var button = new InlineKeyboardButton("Cтатистика");
+                            var button = new InlineKeyboardCallbackButton("Cтатистика", "Cтатистика");
                             var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
                             var msg = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup: keyboard);
@@ -506,7 +510,7 @@ namespace HockeyBot
 
                     foreach (var game in games)
                     {
-                        var button = new InlineKeyboardButton("Подробнее");
+                        var button = new InlineKeyboardCallbackButton("Подробнее", "Подробнее");
                         var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
                                                 
                         var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"*{game.Date} {game.Time}*\n{game.Place}", replyMarkup: keyboard);
@@ -535,7 +539,7 @@ namespace HockeyBot
                 {                   
                     foreach (var game in games)
                     {
-                        var button = new InlineKeyboardButton("Подробнее");
+                        var button = new InlineKeyboardCallbackButton("Подробнее", "Подробнее");
                         var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
 
                         var msg = await Bot.SendTextMessageAsync(chatFinded.Id, $"*{game.Date} {game.Time}*\n{game.Place}", parseMode: ParseMode.Markdown, replyMarkup: keyboard);
@@ -606,7 +610,7 @@ namespace HockeyBot
             help = help.Replace("'%имя%'", $"{name}");
             help = help.Replace("'%фамилия%'", $"{surname}");
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, help, false, false, 0, keys, ParseMode.Markdown);
+            await Bot.SendTextMessageAsync(chatFinded.Id, help, ParseMode.Markdown, false, false, 0, keys);
         }
 
         public void TryToRestoreVotingFromDb(int messageId, Chat chat)

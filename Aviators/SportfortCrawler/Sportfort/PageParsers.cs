@@ -14,192 +14,195 @@ namespace SportfortCrawler
 {
     class PageParsers
     {
-        private static bool finishedLoading = false;
-        private static bool documentReady = false;
         private static WebConfig config = new Awesomium.Core.WebConfig();
         public static readonly string UserAgent = "Mozilla/5.0 (Windows NT 6.3; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36";
-        private static WebView view;
+        public static WebView view;
+        public static bool isLoaded;
+        public static string page;
+        public static DocumentReadyEventHandler onDocumentReady;
+
+        public static void WaitingLastLoading()
+        {
+            while (!isLoaded)
+            {
+                Thread.Sleep(1000);
+            }
+            return;
+        }
 
         internal static void Initializate()
         {
-            try
+            new Thread(() =>
             {
-                config.UserAgent = UserAgent;
-                Awesomium.Core.WebCore.Initialize(config);
-                var proxyConfig = String.Format("{0}:{1}", "hqproxy.avp.ru", 3128);
-                var webPreferences = new WebPreferences { ProxyConfig = proxyConfig };
-                var webSession = WebCore.CreateWebSession(webPreferences);
-                view = WebCore.CreateWebView(800, 600, webSession);
-
-                view.LoginRequest += (s, e) =>
+                try
                 {
-                    e.Username = @"kl\latokhin";
-                    e.Password = Config.PWD;
-                    e.Handled = EventHandling.Modal;
-                    e.Cancel = false;
-                };
+                    Console.WriteLine("Initializate Web...");
+                    config.UserAgent = UserAgent;
+                    WebCore.Initialize(config, true);
+                    var proxyConfig = String.Format("{0}:{1}", "anon2-disp.kaspersky-labs.com", 3005);
+                    var webPreferences = new WebPreferences { ProxyConfig = proxyConfig };
+                    var webSession = WebCore.CreateWebSession(webPreferences);
+                    view = WebCore.CreateWebView(1920, 1080, webSession, WebViewType.Offscreen);
 
-                Console.WriteLine("Start testing ya.ru downloading...");
-                view.SynchronousMessageTimeout = 0;
-                view.Source = new Uri("https://ya.ru/");
+                    view.LoginRequest += (s, e) =>
+                    {
+                        e.Username = @"latokhin";
+                        e.Password = "Lbvjy198";
+                        e.Handled = EventHandling.Modal;
+                        e.Cancel = false;
+                        Thread.Sleep(1000);
+                    };
 
-                view.LoadingFrameComplete += (s, e) =>
+                    view.LoadingFrameComplete += (s, e) =>
+                    {
+                        Thread.Sleep(1000);
+                    };
+                }
+                catch (Exception ex)
                 {
-                    if (e.IsMainFrame)
-                        finishedLoading = true;
-                };
-
-                while (!finishedLoading)
-                {
-                    Thread.Sleep(1000);
-                    WebCore.Update();
+                    Console.WriteLine(ex.Message);
                 }
 
-                finishedLoading = false;
-                Console.WriteLine("Finished: " + view.HTML.Length + " symbols loaded");
+                WebCore.Run(); 
+            })
+            {
+                Name = "Awesomium control thread",
+                IsBackground = true,
+            }.Start();
+        }
+        internal static void DonwloadPageForParse()
+        {
+            try
+            {
+                view.DocumentReady += onDocumentReady;
+
+                Console.WriteLine("Start downloading: " + page);
+                view.SynchronousMessageTimeout = 0;
+                view.Source = new Uri(page);
+                view.Reload(false);
             }
             catch (Exception ex)
             {
                 Console.WriteLine(ex.Message);
             }
         }
-        internal static List<string> ParseTeamMembersPage(string page)
+        public static List<string> members;
+        internal static List<string> ParseTeamMembersPage(string pageToDownload)
         {
-            var members = new List<string>();
+            members = new List<string>();
 
             Console.WriteLine("Start downloading...");
-            view.SynchronousMessageTimeout = 0;
-            view.Source = new Uri(page);
-
-            view.LoginRequest += (s, e) =>
+            isLoaded = false;
+            page = pageToDownload;
+            PageParsers.onDocumentReady = new DocumentReadyEventHandler((s, e) =>
             {
-                e.Username = @"kl\latokhin";
-                e.Password = Config.PWD;
-                e.Handled = EventHandling.Modal;
-                e.Cancel = false;
-            };
-
-            view.LoadingFrameComplete += (s, e) =>
-            {
-                if (e.IsMainFrame)
-                    finishedLoading = true;
-            };
-
-            while (!finishedLoading)
-            {
-                Thread.Sleep(1000);
-                WebCore.Update();
-            }
-
-            finishedLoading = false;
-            Console.WriteLine("Finished");
-            //</ div >< div class="sf_roster_wrapper" data-groups="[&quot;all&quot;]">
-            //<a href = "javascript:void(0)" onclick="showProfileCard(66110, event);" class="sf_roster_item" id="tm_roster_66110">
-            //<div class="sf_img_cont">
-            //<img class="sf_img" src="https://sportfort.blob.core.windows.net/images/edb81fbe9236454b9d0ed7c382277ba2_Medium.jpg" width="96">
-            //</div>
-            //
-            //<div class="sf_roster_item_title sf_clearfix">
-            //
-            //<strong id = "tm_jersey_66110" > 69 </ strong >
-            //Н
-            //</ div >
-            //
-            //
-            //< div class="sf_roster_item_title_name">
-            //<div class="sf_roster_full_name">
-            //Дмитрий<br>
-            //Латохин
-            //</div>
-            //</div>
-            //</a>
-
-            var doc = new HtmlDocument();
-            doc.LoadHtml(view.HTML);
-            var elem = doc.DocumentNode.SelectNodes("//div[@class='sf_roster_wrapper']");
-            if (elem != null)
-            {
-                var h = new HtmlDocument();
-                foreach (HtmlNode HN in elem)
+                if (e.ReadyState != DocumentReadyState.Loaded)
                 {
-                    h.LoadHtml(HN.InnerHtml);
+                    return;
+                }
+                Console.WriteLine("Finished: " + view.HTML.Length + " symbols loaded");
 
-                    var member = "";
-                    var nameSurname = h.DocumentNode.Descendants("div").Select(x => x.Attributes["class"].Value == "sf_roster_full_name" ? x.InnerText.Trim('\n').Trim() : null)?.ToArray().First(x => x != null).Split('\n');
-                    member += $"name={nameSurname[0].Trim()};surname={nameSurname[1].Trim()};";
+                //</ div >< div class="sf_roster_wrapper" data-groups="[&quot;all&quot;]">
+                //<a href = "javascript:void(0)" onclick="showProfileCard(66110, event);" class="sf_roster_item" id="tm_roster_66110">
+                //<div class="sf_img_cont">
+                //<img class="sf_img" src="https://sportfort.blob.core.windows.net/images/edb81fbe9236454b9d0ed7c382277ba2_Medium.jpg" width="96">
+                //</div>
+                //
+                //<div class="sf_roster_item_title sf_clearfix">
+                //
+                //<strong id = "tm_jersey_66110" > 69 </ strong >
+                //Н
+                //</ div >
+                //
+                //
+                //< div class="sf_roster_item_title_name">
+                //<div class="sf_roster_full_name">
+                //Дмитрий<br>
+                //Латохин
+                //</div>
+                //</div>
+                //</a>
 
-                    var nodes = h.DocumentNode.Descendants("div").Select(x => x.Attributes["class"].Value == "sf_roster_item_title sf_clearfix" ? x.InnerText.Trim('\n').Trim() : null);
-                    if (nodes != null && nodes.Count() != 0)
+                var doc = new HtmlDocument();
+                doc.LoadHtml(view.HTML);
+                var elem = doc.DocumentNode.SelectNodes("//div[@class='sf_roster_wrapper']");
+                if (elem != null)
+                {
+                    var h = new HtmlDocument();
+                    foreach (HtmlNode HN in elem)
                     {
-                        var numbers = nodes.ToArray();
-                        foreach(var number in numbers)
+                        h.LoadHtml(HN.InnerHtml);
+
+                        var member = "";
+                        var nameSurname = h.DocumentNode.Descendants("div").Select(x => x.Attributes["class"].Value == "sf_roster_full_name" ? x.InnerText.Trim('\n').Trim() : null)?.ToArray().First(x => x != null).Split('\n');
+                        member += $"name={nameSurname[0].Trim()};surname={nameSurname[1].Trim()};";
+
+                        var nodes = h.DocumentNode.Descendants("div").Select(x => x.Attributes["class"].Value == "sf_roster_item_title sf_clearfix" ? x.InnerText.Trim('\n').Trim() : null);
+                        if (nodes != null && nodes.Count() != 0)
                         {
-                            if (number != null)
+                            var numbers = nodes.ToArray();
+                            foreach (var number in numbers)
                             {
-                                var temp = number.Replace('\n', ' ').Trim().Split(' ').Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                                if (temp.Count() == 1)
+                                if (number != null)
                                 {
-                                    member += $"amplua={temp[0]};";
+                                    var temp = number.Replace('\n', ' ').Trim().Split(' ').Where(x => !string.IsNullOrEmpty(x)).ToArray();
+                                    if (temp.Count() == 1)
+                                    {
+                                        member += $"amplua={temp[0]};";
+                                    }
+                                    if (temp.Count() == 2)
+                                    {
+                                        member += $"number={temp[0]};amplua={temp[1]};";
+                                    }
+                                    if (temp.Count() == 3)
+                                    {
+                                        member += $"work={temp[0]};number={temp[1]};amplua={temp[2]};";
+                                    }
+                                    break;
                                 }
-                                if (temp.Count() == 2)
-                                {
-                                    member += $"number={temp[0]};amplua={temp[1]};";
-                                }
-                                if (temp.Count() == 3)
-                                {
-                                    member += $"work={temp[0]};number={temp[1]};amplua={temp[2]};";
-                                }
-                                break;
                             }
                         }
+
+                        var foto = h.DocumentNode.Descendants("img").Select(x => x.Attributes["src"].Value)?.ToArray().First(x => x != null) + "";
+                        member += $"photo={foto};";
+                        members.Add(member);
                     }
-
-                    var foto = h.DocumentNode.Descendants("img").Select(x => x.Attributes["src"].Value)?.ToArray().First(x => x != null) + "";
-                    member += $"photo={foto};";
-                    members.Add(member);
                 }
-            }
 
-            view.Stop();
-
-            using (var stream = new StreamWriter("members"))
-            {
-                var result = "";
-                foreach (var member in members)
+                using (var stream = new StreamWriter("members"))
                 {
-                    result += member + "\n";
+                    var result = "";
+                    foreach (var member in members)
+                    {
+                        result += member + "\n";
+                    }
+                    stream.Write(result + "\n");
                 }
-                stream.Write(result + "\n");
-            }
+
+                view.Stop();
+                view.DocumentReady -= onDocumentReady;
+                isLoaded = true; ;
+            });
+            WebCore.QueueWork(DonwloadPageForParse);
+            WaitingLastLoading();
 
             return members;
         }
+        public static List<Event> events;
         internal static List<Event> ParseHomePage(string sportFortHomePage)
         {
-            var events = new List<Event>();
-
             Console.WriteLine("Start downloading...");
-            view.SynchronousMessageTimeout = 0;
-            view.Source = new Uri(sportFortHomePage);
-
-            view.LoginRequest += (s, e) =>
+            isLoaded = false;
+            page = sportFortHomePage;
+            PageParsers.onDocumentReady = new DocumentReadyEventHandler((s, e) =>
             {
-                e.Username = @"kl\latokhin";
-                e.Password = Config.PWD;
-                e.Handled = EventHandling.Modal;
-                e.Cancel = false;
-            };
+                if (e.ReadyState != DocumentReadyState.Loaded)
+                {
+                    return;
+                }
+                Console.WriteLine("Finished: " + view.HTML.Length + " symbols loaded");
 
-            view.LoadingFrameComplete += (s, e) =>
-            {
-                if (e.IsMainFrame)
-                    finishedLoading = true;
-            };
-
-            view.DocumentReady += (s, e) =>
-            {
-                Console.WriteLine("Finished");
-
+                events = new List<Event>();
                 using (var stream = new StreamWriter("events"))
                 {
                     stream.Write(view.HTML);
@@ -315,7 +318,6 @@ namespace SportfortCrawler
                         }
                     }
                 }
-                view.Stop();
 
                 using (var stream = new StreamWriter("parsedEvents"))
                 {
@@ -336,201 +338,171 @@ namespace SportfortCrawler
                     stream.Write(result);
                 }
 
-
-                documentReady = true;
-            };
-
-            while (!finishedLoading||!documentReady)
-            {
-                Thread.Sleep(1000);
-                WebCore.Update();
-            }
-
-            finishedLoading = false;
-            documentReady = false;
+                view.Stop();
+                view.DocumentReady -= onDocumentReady;
+                isLoaded = true;
+            });
+            WebCore.QueueWork(DonwloadPageForParse);
+            WaitingLastLoading();
 
             return events;
-
         }
+        public static List<string> lastEvents;
         internal static List<string> ParseLastGamesHomePage(string sportFortHomePage)
         {
-            var events = new List<string>();
+            lastEvents = new List<string>();
 
             Console.WriteLine("Start downloading...");
-            view.SynchronousMessageTimeout = 0;
-            view.Source = new Uri(sportFortHomePage);
-
-            view.LoginRequest += (s, e) =>
+            isLoaded = false;
+            page = sportFortHomePage;
+            PageParsers.onDocumentReady = new DocumentReadyEventHandler((s, e) =>
             {
-                e.Username = @"kl\latokhin";
-                e.Password = Config.PWD;
-                e.Handled = EventHandling.Modal;
-                e.Cancel = false;
-            };
-
-            view.LoadingFrameComplete += (s, e) =>
-            {
-                if (e.IsMainFrame)
-                    finishedLoading = true;
-            };
-
-            while (!finishedLoading)
-            {
-                Console.WriteLine("Currectly Document Ready is " + view.IsDocumentReady);
-                Thread.Sleep(1000);
-                WebCore.Update();
-            }
-
-            finishedLoading = false;
-            Console.WriteLine("Finished");
-            Console.WriteLine("Check view Error: " + view.GetLastError().ToString());
-
-            using (var stream = new StreamWriter("games"))
-            {
-                stream.Write(view.HTML);
-            }
-
-            var doc = new HtmlDocument();
-            doc.LoadHtml(view.HTML);
-
-            var games = doc.DocumentNode.SelectNodes("//*[@id='floatColumn']/section[3]/div")?.First();
-                
-            if (games != null)
-            {
-                var hgames = new HtmlDocument();
-                hgames.LoadHtml(games.InnerHtml);
-
-                var nodes = hgames.DocumentNode.ChildNodes;
-                for (int i=0; i< nodes.Count; ++i)
+                if (e.ReadyState != DocumentReadyState.Loaded)
                 {
-                    if (nodes[i].Name != "div") continue;
+                    return;
+                }
+                Console.WriteLine("Finished: " + view.HTML.Length + " symbols loaded");
 
-                    var attr = nodes[i].Attributes["class"];
-                    if (attr != null && attr.Value == "sf_game sf_text_center")
+                using (var stream = new StreamWriter("games"))
+                {
+                    stream.Write(view.HTML);
+                }
+
+                var doc = new HtmlDocument();
+                doc.LoadHtml(view.HTML);
+
+                var games = doc.DocumentNode.SelectNodes("//*[@id='floatColumn']/section[3]/div")?.First();
+
+                if (games != null)
+                {
+                    var hgames = new HtmlDocument();
+                    hgames.LoadHtml(games.InnerHtml);
+
+                    var nodes = hgames.DocumentNode.ChildNodes;
+                    for (int i = 0; i < nodes.Count; ++i)
                     {
+                        if (nodes[i].Name != "div") continue;
 
-                        var gameData = "";
-                        var gameDataSource = (nodes[i].InnerText).Split('\n');
-                        foreach (var data in gameDataSource)
+                        var attr = nodes[i].Attributes["class"];
+                        if (attr != null && attr.Value == "sf_game sf_text_center")
                         {
-                            if (data == null || data == "" || data == " " || data == "&nbsp;" || data.Contains("Распечатать") || data.Contains("Протокол") || data.Contains("протокола") || data.Contains("Сводная"))
-                            {
-                                continue;
-                            }
-                            gameData += data + "\n";
-                        }
 
-                        var result1 = "";
-                        var result2 = "";
-                        var fields = gameData.Split('\n').Where(x => x != "").ToList();
-                        if (fields.Count == 8)
-                        {
-                            for (int y = 0; y < fields.Count; ++y)
+                            var gameData = "";
+                            var gameDataSource = (nodes[i].InnerText).Split('\n');
+                            foreach (var data in gameDataSource)
                             {
-                                if (y < 2)
+                                if (data == null || data == "" || data == " " || data == "&nbsp;" || data.Contains("Распечатать") || data.Contains("Протокол") || data.Contains("протокола") || data.Contains("Сводная"))
                                 {
-                                    result2 += $"{fields[1].Trim()}, {fields[0].Trim()}";
-                                    y += 2;
-                                }
-
-                                if (y > 3)
-                                {
-                                    result1 += $"{fields[y].Trim()} ";
                                     continue;
                                 }
-
-                                //result += $"{fields[y]}\n";
+                                gameData += data + "\n";
                             }
-                        }
-                        else
-                        {
-                            result1 = gameData;
-                        }
 
-                        events.Add($"*{result1}*%{result2}");
-                        continue;
+                            var result1 = "";
+                            var result2 = "";
+                            var fields = gameData.Split('\n').Where(x => x != "").ToList();
+                            if (fields.Count == 8)
+                            {
+                                for (int y = 0; y < fields.Count; ++y)
+                                {
+                                    if (y < 2)
+                                    {
+                                        result2 += $"{fields[1].Trim()}, {fields[0].Trim()}";
+                                        y += 2;
+                                    }
+
+                                    if (y > 3)
+                                    {
+                                        result1 += $"{fields[y].Trim()} ";
+                                        continue;
+                                    }
+
+                                    //result += $"{fields[y]}\n";
+                                }
+                            }
+                            else
+                            {
+                                result1 = gameData;
+                            }
+
+                            lastEvents.Add($"*{result1}*%{result2}");
+                            continue;
+                        }
                     }
                 }
-            }
 
-            view.Stop();
-
-            using (var stream = new StreamWriter("parsedGames"))
-            {
-                var result = "";
-                foreach (var even in events)
+                using (var stream = new StreamWriter("parsedGames"))
                 {
-                    result += even + "\n";
+                    var result = "";
+                    foreach (var even in lastEvents)
+                    {
+                        result += even + "\n";
+                    }
+
+                    stream.Write(result);
                 }
 
-                stream.Write(result);
-            }
+                view.Stop();
+                view.DocumentReady -= onDocumentReady;
+                isLoaded = true;
+            });
+            WebCore.QueueWork(DonwloadPageForParse);
+            WaitingLastLoading();
 
-            return events;
+            return lastEvents;
         }
-
+        public static List<string> stats;
         internal static  List<string> ParseStats(string sportFortStat)
         {
-            var stats = new List<string>();
+            stats = new List<string>();
 
             Console.WriteLine("Start downloading...");
-            view.SynchronousMessageTimeout = 0;
-            view.Source = new Uri(sportFortStat);
-
-            view.LoginRequest += (s, e) =>
+            isLoaded = false;
+            page = sportFortStat;
+            PageParsers.onDocumentReady = new DocumentReadyEventHandler((s, e) =>
             {
-                e.Username = @"kl\latokhin";
-                e.Password = Config.PWD;
-                e.Handled = EventHandling.Modal;
-                e.Cancel = false;
-            };
-
-            view.LoadingFrameComplete += (s, e) =>
-            {
-                if (e.IsMainFrame)
-                    finishedLoading = true;
-            };
-
-            while (!finishedLoading)
-            {
-                Console.WriteLine("Currectly Document Ready is " + view.IsDocumentReady);
-                Thread.Sleep(1000);
-                WebCore.Update();
-            }
-
-            finishedLoading = false;
-            Console.WriteLine("Finished");
-            Console.WriteLine("Check view Error: " + view.GetLastError().ToString());
-
-            using (var stream = new StreamWriter("stats"))
-            {
-                stream.Write(view.HTML);
-            }
-
-            var doc = new HtmlDocument();
-            doc.LoadHtml(view.HTML);
-
-            var statTable = doc.DocumentNode.SelectNodes("//*[@id='tournamentContent']/div/table")?.First();
-
-            if (statTable != null)
-            {
-                var hstat = new HtmlDocument();
-                hstat.LoadHtml(statTable.InnerHtml);
-
-                var nodes = hstat.DocumentNode.ChildNodes;
-                for (int i = 0; i < nodes.Count; ++i)
+                if (e.ReadyState != DocumentReadyState.Loaded)
                 {
-                    foreach(var ch in nodes[i].ChildNodes)
+                    return;
+                }
+                Console.WriteLine("Finished: " + view.HTML.Length + " symbols loaded");
+
+                using (var stream = new StreamWriter("stats"))
+                {
+                    stream.Write(view.HTML);
+                }
+
+                var doc = new HtmlDocument();
+                doc.LoadHtml(view.HTML);
+
+                var statTable = doc.DocumentNode.SelectNodes("//*[@id='tournamentContent']/div/table")?.First();
+
+                if (statTable != null)
+                {
+                    var hstat = new HtmlDocument();
+                    hstat.LoadHtml(statTable.InnerHtml);
+
+                    var nodes = hstat.DocumentNode.ChildNodes;
+                    for (int i = 0; i < nodes.Count; ++i)
                     {
-                        if(ch.Name == "tr")
+                        foreach (var ch in nodes[i].ChildNodes)
                         {
-                            var txt = ch.InnerText;
-                            if (txt.Contains("Wild Woodpeckers"))
-                                stats.Add(txt);
+                            if (ch.Name == "tr")
+                            {
+                                var txt = ch.InnerText;
+                                if (txt.Contains("Wild Woodpeckers"))
+                                    stats.Add(txt);
+                            }
                         }
                     }
                 }
-            }
+
+                view.Stop();
+                view.DocumentReady -= onDocumentReady;
+                isLoaded = true;
+            });
+            WebCore.QueueWork(DonwloadPageForParse);
+            WaitingLastLoading();
 
             return stats;
         }

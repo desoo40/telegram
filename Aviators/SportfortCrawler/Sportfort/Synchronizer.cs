@@ -4,7 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Threading.Tasks;
+using Awesomium.Core;
 using SportfortCrawler.Configs;
+using System.Threading;
 
 namespace SportfortCrawler
 {
@@ -15,17 +18,40 @@ namespace SportfortCrawler
             Console.WriteLine("PageParsers.Initializate...");
             PageParsers.Initializate();
 
+            //Console.WriteLine("Check Awesome downloading...");
+            //CheckDownloading();
+
             Console.WriteLine("InitializatePlayersInfo...");
             if(players)InitializatePlayersInfo();
 
             Console.WriteLine("InitializateGamesTrainingInfo...");
             InitializateGamesTrainingInfo();
 
-            //Console.WriteLine("InitializateLastGamesInfo...");
-            //InitializateLastGamesInfo();
+            Console.WriteLine("InitializateLastGamesInfo...");
+            InitializateLastGamesInfo();
 
-            //Console.WriteLine("InitializateStatsInfo...");
-            //InitializateStatsInfo();
+            Console.WriteLine("InitializateStatsInfo...");
+            InitializateStatsInfo();
+
+            Console.ReadLine();
+            WebCore.Shutdown();
+        }
+
+        public static void CheckDownloading()
+        {
+            PageParsers.isLoaded = false;
+            PageParsers.page = "https://ya.ru/";
+            PageParsers.onDocumentReady = new DocumentReadyEventHandler((s, e) =>
+            {
+                if(e.ReadyState != DocumentReadyState.Loaded)
+                    return;
+                Console.WriteLine("Finished: " + PageParsers.view.HTML.Length + " symbols loaded");
+                PageParsers.view.DocumentReady -= PageParsers.onDocumentReady;
+                PageParsers.view.Stop();
+                PageParsers.isLoaded = true;
+            });
+            WebCore.QueueWork(PageParsers.DonwloadPageForParse);
+            PageParsers.WaitingLastLoading();
         }
 
         public static void InitializateStatsInfo()
@@ -165,7 +191,7 @@ namespace SportfortCrawler
             }
         }
 
-    public static void InitializatePlayersInfo()
+        public static void InitializatePlayersInfo()
         {
             Console.WriteLine("ParseTeamMembersPage...");
             var members = PageParsers.ParseTeamMembersPage(Configs.Config.SportFortTeamMembersPage);
@@ -216,9 +242,5 @@ namespace SportfortCrawler
             }
         }
 
-        public static void UpdateSources()
-        {
-
-        }
     }
 }

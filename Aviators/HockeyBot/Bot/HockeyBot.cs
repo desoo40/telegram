@@ -20,10 +20,12 @@ namespace HockeyBot.Bot
         public static bool End = true;
         public static void Start()
         {
+            //var webProxy = new WebProxy("hqproxy.avp.ru", 3128);
+            //webProxy.Credentials = new NetworkCredential(@"kl\latokhin", @"XXX");
+            //Bot = new TelegramBotClient(Config.BotToken, webProxy);
+
             Bot = new TelegramBotClient(Config.BotToken);
-            Bot.WebProxy = new WebProxy("hqproxy.avp.ru", 3128);
-            Bot.WebProxy.Credentials = new NetworkCredential(@"kl\latokhin", Config.PWD);
-            
+
             Commands = new CommandProcessor(Bot);
 
             var me = Bot.GetMeAsync().Result;
