@@ -39,19 +39,20 @@ namespace SportfortCrawler
                     Console.WriteLine("Initializate Web...");
                     config.UserAgent = UserAgent;
                     WebCore.Initialize(config, true);
-                    var proxyConfig = String.Format("{0}:{1}", "anon2-disp.kaspersky-labs.com", 3005);
-                    var webPreferences = new WebPreferences { ProxyConfig = proxyConfig };
-                    var webSession = WebCore.CreateWebSession(webPreferences);
-                    view = WebCore.CreateWebView(1920, 1080, webSession, WebViewType.Offscreen);
+                    //var proxyConfig = String.Format("{0}:{1}", "anon2-disp.kaspersky-labs.com", 3005);
+                    //var webPreferences = new WebPreferences { ProxyConfig = proxyConfig };
+                    //var webSession = WebCore.CreateWebSession(webPreferences);
+                    //view = WebCore.CreateWebView(1920, 1080, webSession, WebViewType.Offscreen);
+                    view = WebCore.CreateWebView(1920, 1080, WebViewType.Offscreen);
 
-                    view.LoginRequest += (s, e) =>
-                    {
-                        e.Username = @"latokhin";
-                        e.Password = "Lbvjy198";
-                        e.Handled = EventHandling.Modal;
-                        e.Cancel = false;
-                        Thread.Sleep(1000);
-                    };
+                    //view.LoginRequest += (s, e) =>
+                    //{
+                    //    e.Username = @"latokhin";
+                    //    e.Password = "Lbvjy198";
+                    //    e.Handled = EventHandling.Modal;
+                    //    e.Cancel = false;
+                    //    Thread.Sleep(1000);
+                    //};
 
                     view.LoadingFrameComplete += (s, e) =>
                     {

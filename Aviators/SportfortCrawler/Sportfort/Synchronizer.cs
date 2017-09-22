@@ -33,7 +33,7 @@ namespace SportfortCrawler
             Console.WriteLine("InitializateStatsInfo...");
             InitializateStatsInfo();
 
-            Console.ReadLine();
+            //Console.ReadLine();
             WebCore.Shutdown();
         }
 

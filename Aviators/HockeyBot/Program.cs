@@ -27,7 +27,7 @@ namespace HockeyBot
                 }
                     catch(Exception e)
                 {
-                        Console.WriteLine("Unknown DBCore exception: " + e.Message);
+                        Console.WriteLine("Unknown DBCore exception: " + e.Message + "\n" + e.InnerException);
                 }
             }
 
@@ -38,7 +38,7 @@ namespace HockeyBot
             }
             catch (Exception e)
             {
-                Console.WriteLine("Unknown AviaBot exception: " + e.Message);
+                Console.WriteLine("Unknown KLHockey Bot exception: " + e.Message + "\n" + e.InnerException);
                 Console.WriteLine("Bot will be terminated.");
             }
         }
