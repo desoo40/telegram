@@ -386,7 +386,7 @@ namespace Aviators
                 DBGame.AddGoal(goal, game.Id);
             }
         }
-        internal void UpdateGameAndPlayer(Game findGame, Game game)
+        internal bool UpdateGameAndPlayer(Game findGame, Game game)
         {
             game.Id = findGame.Id;
             //Добавляем игроков
@@ -397,9 +397,12 @@ namespace Aviators
 
             game.Place = GetPlaceOrInsert(game.Place.Name);
 
+            string bestPlayerId = "";
+            if (game.BestPlayer != null) bestPlayerId =" , best_player_id = "+ game.BestPlayer.Id;
+
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = $"UPDATE game SET " +
-                              $"place_id ={game.Place.Id}, score = {game.Score.Item1}, op_score = {game.Score.Item2}, viewers_count = {game.Viewers}, best_player_id = {game.BestPlayer.Id} " +
+                              $"place_id ={game.Place.Id}, score = {game.Score.Item1}, op_score = {game.Score.Item2}, viewers_count = {game.Viewers} {bestPlayerId} " +
                               $"Where id = {findGame.Id}";
             try
             {
@@ -409,14 +412,15 @@ namespace Aviators
             catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
+                return false;
             }
 
-            if (findGame.Actions.Count != 0)
+            if (findGame.Actions.Count == 0)
                 foreach (var gameAction in game.Actions)
                 {
                     DB.DBCommands.DBGame.AddAction(findGame.Id, gameAction.Player.Id, gameAction.Action, gameAction.Param);
                 }
-            if (findGame.Goal.Count != 0)
+            if (findGame.Goal.Count == 0)
                 foreach (var goal in game.Goal)
                 {
                     DB.DBCommands.DBGame.AddGoal(goal, findGame.Id);
@@ -432,12 +436,15 @@ namespace Aviators
             catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
+                return false;
             }
 
             var team = DB.DBCommands.GetTeam(game.Team2);
 
             DBGame.AddGameStat(findGame.Id, game.Stat1, 1);
             DBGame.AddGameStat(findGame.Id, game.Stat2, team.Id);
+
+            return true;
 
         }
 

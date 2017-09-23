@@ -206,13 +206,15 @@ namespace Aviators
 
                 #endregion
 
-                #region Соперник
-
+                #region Соперник + мы
+                
                 var enemyName = game.Team2;
+                var homeName = game.Description;
 
                 Image enLogo = getTeamLogo(enemyName);
 
                 enemyName = th.FullNameFinder(game.Team2);
+                DrawStr(g, homeName, r.Team1);
                 DrawStr(g, enemyName, r.Team2);
 
                 if (enLogo != null)
@@ -268,11 +270,11 @@ namespace Aviators
                     {
 
                         r.Stat.Position = UpdateRectangle(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j);
-                        if (arrOfStat[i, j] == 0)
-                        {
-                            DrawStr(g, "-", r.Stat);
-                        }
-                        else
+                        //if (arrOfStat[i, j] == 0)
+                        //{
+                        //    DrawStr(g, "-", r.Stat);
+                        //}
+                        //else
                             DrawStr(g, arrOfStat[i, j].ToString(), r.Stat);
                         r.Stat.Position = BackRectangleAtr(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j); // потому что соскакивают все атрибуты
                     }
