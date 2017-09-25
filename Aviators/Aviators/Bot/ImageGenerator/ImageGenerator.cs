@@ -56,6 +56,7 @@ namespace Aviators
             {
 
                 #region Лого турнира
+
                 Image logo;
 
                 if (game.Tournament != null)
@@ -70,17 +71,21 @@ namespace Aviators
                         g.DrawImage(logo, resRect);
                     }
                 }
+
                 #endregion
 
                 #region Дата + описание
 
                 var description = game.Description;
-                int fontSize = (r.Description.Position.Width + 100) / description.Length;
+                if (description.Length != 0)
+                {    int fontSize = (r.Description.Position.Width + 100)/description.Length;
                 r.Description.Font = new Font(r.Description.Font.FontFamily, fontSize, r.Description.Font.Style);
 
                 DrawStr(g, description, r.Description);
                 DrawStr(g, game.Date.ToString(), r.Date);
-                #endregion
+                }
+
+            #endregion
                 #region Лого противника
 
                 Image enLogo;
