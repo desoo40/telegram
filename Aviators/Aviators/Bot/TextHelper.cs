@@ -54,6 +54,9 @@
             if (inStr == "ранхигс")
                 return "ХК \"Сенатор\" РАНХиГС";
 
+            if (inStr == "umb")
+                return "UMB (Словакия)";
+
             return s;
         }
     }

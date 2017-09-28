@@ -360,6 +360,9 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             while (reader != null && reader.Read())
             {
                 player = GetPlayerById(Convert.ToInt32(reader["player_id"].ToString()));
+
+                if (player == null) return null;
+
                 player.AllStatAssist = Convert.ToInt32(reader["num"].ToString());
 
             }
@@ -388,8 +391,8 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
             while (reader != null && reader.Read())
             {
-                player.AllStatGoal = Convert.ToInt32(reader["num"].ToString());
-
+                if (player != null)
+                    player.AllStatGoal = Convert.ToInt32(reader["num"].ToString());
             }
             return player;
         }
