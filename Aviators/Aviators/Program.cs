@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Net;
 using Aviators.Bot;
 using Aviators.Bot.ImageGenerator;
@@ -19,6 +20,10 @@ namespace Aviators
         {
             //to ignore untrusted SSL certificates, linux and mono love it ;)
             ServicePointManager.ServerCertificateValidationCallback = Network.SSL.Validator;
+
+            Stopwatch sw = new Stopwatch();
+
+            if (InitFromCode) sw.Start();
 
             Console.CancelKeyPress += Console_CancelKeyPress;
 
@@ -82,6 +87,12 @@ namespace Aviators
 
             if (LoadIncome || args.Length > 0 && args[0] == "load")
                 Parse.ProcessFiles();
+
+            if (InitFromCode)
+            {
+                sw.Stop();
+                Console.WriteLine($"Инициализация и обработка файлов заняла {sw.Elapsed.ToString("g")}");
+            }
 
             Console.WriteLine("Starting Bot...");
             try

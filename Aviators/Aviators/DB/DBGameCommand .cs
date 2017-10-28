@@ -9,10 +9,16 @@ namespace Aviators
 {
     public class DBGameCommand
     {
-        public Game GetLastGame(int backId = 0)
+        public Game GetLastGame(Chat chat, int backId = 0)
         {
+            var tourid = "";
+            var sesid ="";
+
+            if (chat.Tournament != null) tourid = $"AND tournament_id = {chat.Tournament.Id}";
+            if (chat.Season != null) sesid = $"AND season_id = {chat.Season.Id}";
+
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM game WHERE id =(SELECT MAX(id) FROM game) -" + backId;
+            cmd.CommandText = $"SELECT * FROM game WHERE 1 {tourid} {sesid} ORDER BY id DESC LIMIT 1";
 
             SqliteDataReader reader = null;
             try
@@ -24,7 +30,7 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
 
-            Game game = new Game();
+            Game game = null;
 
             while (reader.Read())
             {
@@ -33,6 +39,7 @@ namespace Aviators
 
             return game;
         }
+
         public Game GetGame(int Id)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -57,12 +64,18 @@ namespace Aviators
 
             return game;
         }
-        public List<Game> GetAllGames()
+        public List<Game> GetAllGames(Chat chat)
         {
             List<Game> games = new List<Game>();
 
+            var tourid = "";
+            var sesid = "";
+
+            if (chat.Tournament != null) tourid = $"AND tournament_id = {chat.Tournament.Id}";
+            if (chat.Season != null) sesid = $"AND season_id = {chat.Season.Id}";
+
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM game";
+            cmd.CommandText = $"SELECT * FROM game WHERE 1 {tourid} {sesid}";
 
             SqliteDataReader reader = null;
             try
@@ -83,6 +96,7 @@ namespace Aviators
             return games;
 
         }
+
         public List<Game> GetGamesTeam(Team team)
         {
             List<Game> games = new List<Game>();
@@ -324,10 +338,10 @@ namespace Aviators
 
             cmd.CommandText = string.Format(
                 "INSERT INTO game " +
-                "(date, op_team_id, score, op_score,tournament_id, viewers_count, place_id, description, penaltygame" + bp1 +
-                "VALUES('{0}',{1}, {2}, {3}, {4},{5},{6},'{7}', '{9}' " + bp,
+                "(date, op_team_id, score, op_score,tournament_id, viewers_count, place_id, description, penaltygame, season_id" + bp1 +
+                "VALUES('{0}',{1}, {2}, {3}, {4},{5},{6},'{7}', '{9}', {10} " + bp,
                 game.Date, opteam_id, game.Score.Item1, game.Score.Item2, game.Tournament.Id, game.Viewers,
-                game.Place.Id, game.Description, game.BestPlayer?.Id ?? null, game.PenaltyGame);
+                game.Place.Id, game.Description, game.BestPlayer?.Id ?? null, game.PenaltyGame, game.Season.Id);
 
             try
             {

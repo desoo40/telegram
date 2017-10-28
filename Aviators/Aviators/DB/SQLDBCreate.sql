@@ -50,7 +50,11 @@ create table game (
       on delete restrict on update restrict,
    constraint FK_GAME_REFERENCE_TOURNAME foreign key (tournament_id)
       references tournament (id)
+      on delete restrict on update restrict,
+	  constraint FK_GAME_REFERENCE_TOURNAME foreign key (season_id)
+      references season (id)
       on delete restrict on update restrict
+
 
 );
 
@@ -221,7 +225,9 @@ create table chat (
    lastname            TEXT                 null,
    isAdmin               TEXT                 null,
    isTextOInly               TEXT                 null,
-   tournament_id               int4                 null
+   tournament_id               int4                 null,
+   season_id               int4                 null
+
 );
 
 /*==============================================================*/

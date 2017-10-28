@@ -9,7 +9,7 @@ namespace Aviators
 {
     public class DBPlayerCommand
     {
-        public List<Player> GetAllPlayerWitoutStatistic()
+        public List<Player> GetAllPlayerWithoutStatistic()
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = "SELECT * FROM player";
@@ -45,29 +45,16 @@ namespace Aviators
         public Player GetPlayerById(int id)
         {
             return GetPlayerSQL("SELECT * FROM player WHERE id = " + id);
+        }
 
+        public Player GetPlayerByNumber(int number)
+        {
+            return GetPlayerSQL("SELECT * FROM player WHERE number = " + number + " ORDER BY id DESC");
+        }
 
-            //SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            //cmd.CommandText = "SELECT * FROM player WHERE id = " + id;
-
-            //SqliteDataReader reader = null;
-            //try
-            //{
-            //    reader = cmd.ExecuteReader();
-            //}
-            //catch (SqliteException ex)
-            //{
-            //    Console.WriteLine(ex.Message);
-            //}
-            //while (reader.Read())
-            //{
-            //    var player = new Player(Convert.ToInt32(reader["number"].ToString()),
-            //        reader["name"].ToString(),
-            //        reader["lastname"].ToString());
-            //    player.Id = Convert.ToInt32(reader["id"].ToString());
-            //    return player;
-            //}
-            //return null;
+        private Player GetPlayerByNameOrSurname(string nameOrSurname)
+        {
+            return GetPlayerSQL($"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'");
         }
 
         /// <summary>
@@ -129,65 +116,6 @@ namespace Aviators
                 player.VK = reader["vk"].ToString();
                 player.INSTA = reader["insta"].ToString();
             }
-        }
-
-        public Player GetPlayerByNumber(int number)
-        {
-            return GetPlayerSQL("SELECT * FROM player WHERE number = " + number + " ORDER BY id DESC");
-            //SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            //cmd.CommandText = "SELECT * FROM player WHERE number = " + number + " ORDER BY id DESC";
-
-            //SqliteDataReader reader = null;
-            //try
-            //{
-            //    reader = cmd.ExecuteReader();
-            //}
-            //catch (SqliteException ex)
-            //{
-            //    Console.WriteLine(ex.Message);
-            //}
-            //while (reader.Read())
-            //{
-            //    var player = new Player(Convert.ToInt32(reader["number"].ToString()),
-            //        reader["name"].ToString(),
-            //        reader["lastname"].ToString());
-            //    player.Id = Convert.ToInt32(reader["id"].ToString());
-            //    //player.Position = reader["pos"].ToString();
-            //    //player.VK = reader["vk_href"].ToString();
-            //    //player.INSTA = reader["insta_href"].ToString();
-
-            //    return player;
-            //}
-            //return null;
-        }
-
-       
-
-        private Player GetPlayerByNameOrSurname(string nameOrSurname)
-        {
-            return GetPlayerSQL($"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'");
-
-            //SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            ////TODO тут надо переделать, что бы у нас все что касается имен делалось с большой буквы, потом маленькими
-            //cmd.CommandText = $"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'";
-
-            //SqliteDataReader reader = null;
-            //try
-            //{
-            //    reader = cmd.ExecuteReader();
-            //}
-            //catch (SqliteException ex)
-            //{
-            //    Console.WriteLine(ex.Message);
-            //}
-            //while (reader != null && reader.Read())
-            //{
-            //    var player = new Player(Convert.ToInt32(reader["number"].ToString()), reader["name"].ToString(),
-            //        reader["lastname"].ToString());
-            //    player.Id = Convert.ToInt32(reader["id"].ToString());
-            //    return player;
-            //}
-            //return null;
         }
 
         public Player GetPlayerStatisticByNameOrSurname(string nameOrSurname)
@@ -263,7 +191,7 @@ namespace Aviators
 
         private List<Player> GetTopPlayersAPG(int input)
         {
-            List<Player> players = GetAllPlayerWitoutStatistic();
+            List<Player> players = GetAllPlayerWithoutStatistic();
             foreach (var player in players)
             {
                 GetPlayerStatistic(player);
@@ -274,7 +202,7 @@ namespace Aviators
 
         private List<Player> GetTopPlayersPenalty(int count)
         {
-            List<Player> players = GetAllPlayerWitoutStatistic();
+            List<Player> players = GetAllPlayerWithoutStatistic();
             foreach (var player in players)
             {
                 GetPlayerStatistic(player);

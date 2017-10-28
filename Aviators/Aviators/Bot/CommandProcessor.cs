@@ -88,6 +88,13 @@ namespace Aviators
                     GetAllGames(chatFinded);
                     return;
 
+                case "турнир":
+                    TournametList(chatFinded, command);
+                    return;
+                case "сезон":
+                    SeasonList(chatFinded, command);
+                    return;
+
                 case "соперник":
                     if (string.IsNullOrEmpty(command.Argument)) TeamList(chatFinded, command);
                     else EnemyTeam(chatFinded, command);
@@ -191,197 +198,219 @@ namespace Aviators
                 chatFinded.WaitingCommands.Add(newCom);
             }
 
+            if (command.Name == "турнир")
+            {
+
+                var id = Convert.ToInt32(cQuery.Data);
+                if (id == 0)
+                {
+                    chatFinded.Tournament = null;
+                    await Bot.SendTextMessageAsync(chatFinded.Id, "Вы выбрали все турниры");
+                }
+                else
+                {
+                    chatFinded.Tournament = DB.DBCommands.GetTournament(Convert.ToInt32(cQuery.Data));
+
+                    if (chatFinded.Tournament == null)
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Не удалось установить турнир");
+                    else
+                        await Bot.SendTextMessageAsync(chatFinded.Id,
+                            $"Для вас установлен турнир *{chatFinded.Tournament.Name}*. Вся статистика будет для этого турнира. Для сброса наберите /сброс",
+                            parseMode: ParseMode.Markdown);
+                }
+            }
+
             chatFinded.WaitingCommands.Remove(command);
         }
 
         #region неиспользумое
 
-        private async void ProcessCommands(Chat chatFinded, int fromId)
-        {
-            //var commands = chatFinded.CommandsQueue;
+        //private async void ProcessCommands(Chat chatFinded, int fromId)
+        //{
+        //    //var commands = chatFinded.CommandsQueue;
 
-            //while (commands.Count > 0)
-            //{
-            //    var command = commands.Dequeue();
-            //    var isLastCommand = (commands.Count == 0);                
+        //    //while (commands.Count > 0)
+        //    //{
+        //    //    var command = commands.Dequeue();
+        //    //    var isLastCommand = (commands.Count == 0);                
 
-            //    //set modes
-            //    if (command == "add")
-            //    {
-            //        if (!Config.BotAdmin.isAdmin(fromId))
-            //        {
-            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой add. Запрос отменён.");
-            //            chatFinded.ResetMode();
-            //            continue;
-            //        }
+        //    //    //set modes
+        //    //    if (command == "add")
+        //    //    {
+        //    //        if (!Config.BotAdmin.isAdmin(fromId))
+        //    //        {
+        //    //            await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой add. Запрос отменён.");
+        //    //            chatFinded.ResetMode();
+        //    //            continue;
+        //    //        }
 
-            //        chatFinded.AddMode = true;
-            //        if (isLastCommand)
-            //        {
-            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Добавьте игрока в формате '99;Имя;Фамилия'");
-            //        }
-            //        continue;
-            //    }
+        //    //        chatFinded.AddMode = true;
+        //    //        if (isLastCommand)
+        //    //        {
+        //    //            await Bot.SendTextMessageAsync(chatFinded.Id, "Добавьте игрока в формате '99;Имя;Фамилия'");
+        //    //        }
+        //    //        continue;
+        //    //    }
 
-            //    if (command == "remove")
-            //    {
-            //        if (!Config.BotAdmin.isAdmin(fromId))
-            //        {
-            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой remove. Запрос отменён.");
-            //            chatFinded.ResetMode();
-            //            continue;
-            //        }
+        //    //    if (command == "remove")
+        //    //    {
+        //    //        if (!Config.BotAdmin.isAdmin(fromId))
+        //    //        {
+        //    //            await Bot.SendTextMessageAsync(chatFinded.Id, "Вам не разрешено пользоваться командой remove. Запрос отменён.");
+        //    //            chatFinded.ResetMode();
+        //    //            continue;
+        //    //        }
 
-            //        chatFinded.RemoveMode = true;
-            //        if (isLastCommand)
-            //        {
-            //            await Bot.SendTextMessageAsync(chatFinded.Id, "Удалите игрока по 'номеру'");
-            //        }
-            //        continue;
-            //    }
-
-
+        //    //        chatFinded.RemoveMode = true;
+        //    //        if (isLastCommand)
+        //    //        {
+        //    //            await Bot.SendTextMessageAsync(chatFinded.Id, "Удалите игрока по 'номеру'");
+        //    //        }
+        //    //        continue;
+        //    //    }
 
 
 
 
-            //    //check modes
-            //    if (chatFinded.AddMode)
-            //    {
-            //        AddPlayer(chatFinded, command);
-            //        continue;
-            //    }
-
-            //    if (chatFinded.RemoveMode)
-            //    {
-            //        try
-            //        {
-            //            var number = int.Parse(command);
-            //            RemovePlayer(chatFinded, number);
-            //            continue;
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            ExceptionOnCmd(chatFinded, ex);
-            //            continue;
-            //        }
-            //    }
-
-            //    if (chatFinded.PersonalStatMode)
-            //    {
-
-            //    }
-
-            //    //do command
 
 
+        //    //    //check modes
+        //    //    if (chatFinded.AddMode)
+        //    //    {
+        //    //        AddPlayer(chatFinded, command);
+        //    //        continue;
+        //    //    }
 
-            //    //если не в режиме, не установили режим, не выполнили команду сразу, может пользователь ввёл число для поиска игрока
-            //    if (rxNums.IsMatch(command))
-            //    {
-            //        //в случае числа показываем игрока
-            //        try
-            //        {
-            //            var number = int.Parse(command);
-            //            ShowPlayerByNubmer(chatFinded, number);
-            //            continue;
-            //        }
-            //        catch (Exception ex)
-            //        {
-            //            ExceptionOnCmd(chatFinded, ex);
-            //            continue;
-            //        }
-            //    }
+        //    //    if (chatFinded.RemoveMode)
+        //    //    {
+        //    //        try
+        //    //        {
+        //    //            var number = int.Parse(command);
+        //    //            RemovePlayer(chatFinded, number);
+        //    //            continue;
+        //    //        }
+        //    //        catch (Exception ex)
+        //    //        {
+        //    //            ExceptionOnCmd(chatFinded, ex);
+        //    //            continue;
+        //    //        }
+        //    //    }
 
-            //    //иначе пользователь ввёл хуйню
-            //    WrongCmd(chatFinded);
-            //}
-        }
+        //    //    if (chatFinded.PersonalStatMode)
+        //    //    {
 
-        private async void TourAnswer(Chat chatFinded)
-        {
-            var tours = DB.DBCommands.GetTournaments();
+        //    //    }
 
-            var rowCount = tours.Count%2 == 0 ? tours.Count/2 : tours.Count/2 + 1;
-            ++rowCount; // ибо "официальные" и "все"
-
-            var keys2 = new InlineKeyboardMarkup();
-            keys2.InlineKeyboard = new InlineKeyboardButton[1][];
-            keys2.InlineKeyboard[0] = new InlineKeyboardButton[1];
-            keys2.InlineKeyboard[0][0] = new InlineKeyboardButton("ГОГОУ!");
+        //    //    //do command
 
 
-            //var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
-            //    {
-            //        Keyboard = new Telegram.Bot.Types.KeyboardButton[rowCount][],
-            //        OneTimeKeyboard = true
-            //    };
+
+        //    //    //если не в режиме, не установили режим, не выполнили команду сразу, может пользователь ввёл число для поиска игрока
+        //    //    if (rxNums.IsMatch(command))
+        //    //    {
+        //    //        //в случае числа показываем игрока
+        //    //        try
+        //    //        {
+        //    //            var number = int.Parse(command);
+        //    //            ShowPlayerByNubmer(chatFinded, number);
+        //    //            continue;
+        //    //        }
+        //    //        catch (Exception ex)
+        //    //        {
+        //    //            ExceptionOnCmd(chatFinded, ex);
+        //    //            continue;
+        //    //        }
+        //    //    }
+
+        //    //    //иначе пользователь ввёл хуйню
+        //    //    WrongCmd(chatFinded);
+        //    //}
+        //}
+
+        //private async void TourAnswer(Chat chatFinded)
+        //{
+        //    var tours = DB.DBCommands.GetTournaments();
+
+        //    var rowCount = tours.Count%2 == 0 ? tours.Count/2 : tours.Count/2 + 1;
+        //    ++rowCount; // ибо "официальные" и "все"
+
+        //    var keys2 = new InlineKeyboardMarkup();
+        //    keys2.InlineKeyboard = new InlineKeyboardButton[1][];
+        //    keys2.InlineKeyboard[0] = new InlineKeyboardButton[1];
+        //    keys2.InlineKeyboard[0][0] = new InlineKeyboardButton("ГОГОУ!");
 
 
-            //    keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Все"),
-            //                                                                  new Telegram.Bot.Types.KeyboardButton("Официальные") }; // помнить о слешах
-            //    for (var i = 0; i < tours.Count; ++i)
-            //    {
-            //        var row = i/2 + 1;
-            //        var column = i % 2;
+        //    //var keys = new Telegram.Bot.Types.ReplyMarkups.ReplyKeyboardMarkup
+        //    //    {
+        //    //        Keyboard = new Telegram.Bot.Types.KeyboardButton[rowCount][],
+        //    //        OneTimeKeyboard = true
+        //    //    };
 
-            //        if (keys.Keyboard[row] == null)
-            //        {
-            //            var isLast = (tours.Count - i - 1 == 0);
-            //            var c = isLast ? 1 : 2;
 
-            //            keys.Keyboard[row] = new KeyboardButton[c]; 
-            //        }
-            //        keys.Keyboard[row][column] = new KeyboardButton(chatFinded.Id > 0 ? tours[i].Name : "/" + tours[i].Name);
-            //    }
+        //    //    keys.Keyboard[0] = new Telegram.Bot.Types.KeyboardButton[2] { new Telegram.Bot.Types.KeyboardButton("Все"),
+        //    //                                                                  new Telegram.Bot.Types.KeyboardButton("Официальные") }; // помнить о слешах
+        //    //    for (var i = 0; i < tours.Count; ++i)
+        //    //    {
+        //    //        var row = i/2 + 1;
+        //    //        var column = i % 2;
 
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Выберете турнир:", false, false, 0, keys2);
-        }
+        //    //        if (keys.Keyboard[row] == null)
+        //    //        {
+        //    //            var isLast = (tours.Count - i - 1 == 0);
+        //    //            var c = isLast ? 1 : 2;
 
-        private async void WrongCmd(Chat chatFinded)
-        {
-            chatFinded.ResetMode();
-            var keys = new ReplyKeyboardMarkup();
-            keys.Keyboard = new KeyboardButton[1][];
-            keys.Keyboard[0] = new KeyboardButton[1]
-            {new KeyboardButton("/помощь")};
-            keys.ResizeKeyboard = true;
-            keys.OneTimeKeyboard = true;
-            await
-                Bot.SendTextMessageAsync(chatFinded.Id, "Неверный запрос, воспользуйтесь /помощь", false, false, 0, keys);
-        }
+        //    //            keys.Keyboard[row] = new KeyboardButton[c]; 
+        //    //        }
+        //    //        keys.Keyboard[row][column] = new KeyboardButton(chatFinded.Id > 0 ? tours[i].Name : "/" + tours[i].Name);
+        //    //    }
 
-        private async void ExceptionOnCmd(Chat chatFinded, Exception ex)
-        {
-            chatFinded.ResetMode();
-            Console.WriteLine(ex.Message);
-            await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать. Запрос отменён.");
-        }
+        //    await Bot.SendTextMessageAsync(chatFinded.Id, "Выберете турнир:", false, false, 0, keys2);
+        //}
 
-        private async void AddPlayer(Chat chatFinded, string argv)
-        {
-            //argv format is number;name;surname
-            chatFinded.AddMode = false;
-            var playerinfo = argv.Split(';');
-            if (playerinfo.Length == 3)
-            {
-                var player = new Player(int.Parse(playerinfo[0]), playerinfo[1].Trim(), playerinfo[2].Trim());
-                DB.DBCommands.DBPlayer.AddPlayer(player);
-                await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали добавить {player.Number}.");
-            }
-            else
-            {
-                await Bot.SendTextMessageAsync(chatFinded.Id, $"Неверный формат запроса: {argv}");
-            }
-        }
+        //private async void WrongCmd(Chat chatFinded)
+        //{
+        //    chatFinded.ResetMode();
+        //    var keys = new ReplyKeyboardMarkup();
+        //    keys.Keyboard = new KeyboardButton[1][];
+        //    keys.Keyboard[0] = new KeyboardButton[1]
+        //    {new KeyboardButton("/помощь")};
+        //    keys.ResizeKeyboard = true;
+        //    keys.OneTimeKeyboard = true;
+        //    await
+        //        Bot.SendTextMessageAsync(chatFinded.Id, "Неверный запрос, воспользуйтесь /помощь", false, false, 0, keys);
+        //}
 
-        private async void RemovePlayer(Chat chatFinded, int number)
-        {
-            chatFinded.RemoveMode = false;
-            DB.DBCommands.DBPlayer.RemovePlayerByNumber(number);
-            await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
-            //ShowPlayerByNubmer(chatFinded, number);
-        }
+        //private async void ExceptionOnCmd(Chat chatFinded, Exception ex)
+        //{
+        //    chatFinded.ResetMode();
+        //    Console.WriteLine(ex.Message);
+        //    await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать. Запрос отменён.");
+        //}
+
+        //private async void AddPlayer(Chat chatFinded, string argv)
+        //{
+        //    //argv format is number;name;surname
+        //    chatFinded.AddMode = false;
+        //    var playerinfo = argv.Split(';');
+        //    if (playerinfo.Length == 3)
+        //    {
+        //        var player = new Player(int.Parse(playerinfo[0]), playerinfo[1].Trim(), playerinfo[2].Trim());
+        //        DB.DBCommands.DBPlayer.AddPlayer(player);
+        //        await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали добавить {player.Number}.");
+        //    }
+        //    else
+        //    {
+        //        await Bot.SendTextMessageAsync(chatFinded.Id, $"Неверный формат запроса: {argv}");
+        //    }
+        //}
+
+        //private async void RemovePlayer(Chat chatFinded, int number)
+        //{
+        //    chatFinded.RemoveMode = false;
+        //    DB.DBCommands.DBPlayer.RemovePlayerByNumber(number);
+        //    await Bot.SendTextMessageAsync(chatFinded.Id, $"Попробовали удалить {number}, проверим успешность поиском.");
+        //    //ShowPlayerByNubmer(chatFinded, number);
+        //}
 
         #endregion
 
@@ -393,7 +422,7 @@ namespace Aviators
         private async void Help(Chat chatFinded)
         {
             var n = 0;
-            var p = DB.DBCommands.DBPlayer.GetAllPlayerWitoutStatistic();
+            var p = DB.DBCommands.DBPlayer.GetAllPlayerWithoutStatistic();
             if (p.Count != 0)
                 n = p[(new Random()).Next(p.Count - 1)].Number;
 
@@ -559,9 +588,38 @@ namespace Aviators
         }
         private async void LastGame(Chat chatFinded)
         {
-            var game = DB.DBCommands.DBGame.GetLastGame();
-            SendGameStat(chatFinded, game);
+            var game = DB.DBCommands.DBGame.GetLastGame(chatFinded);
+
+            if (game == null)
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Не удалось найти игру");
+            else
+                SendGameStat(chatFinded, game);
         }
+
+        private async void TournametList(Chat chatFinded, Command command)
+        {
+            var tours = DB.DBCommands.GetTournaments();
+
+
+            var keyboard = MakeKeyboardTournaments(tours);
+            Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите турнир", replyMarkup: keyboard);
+            command.Message = mes;
+            chatFinded.WaitingCommands.Add(command);
+
+        }
+
+        private async void SeasonList(Chat chatFinded, Command command)
+        {
+            List<Season> seasons = DB.DBCommands.GetSeasons();
+
+            var keyboard = MakeKeyboardSeason(seasons);
+            Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите сезон", replyMarkup: keyboard);
+            command.Message = mes;
+            chatFinded.WaitingCommands.Add(command);
+
+        }
+
+
 
         private async void TeamList(Chat chatFinded, Command command)
         {
@@ -580,7 +638,7 @@ namespace Aviators
         {
             var result = new List<string>();
 
-            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames();
+            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames(chatFinded);
 
             const int otstup = -20;
 
@@ -613,6 +671,12 @@ namespace Aviators
         }
         private async void SendGameStat(Chat chatFinded, Game game)
         {
+            if (game == null)
+            {
+                await Bot.SendTextMessageAsync(chatFinded.Id, "Не удалось найти игру");
+                return;
+            }
+
             //var game = DB.DBCommands.DBGame.GetGame(gameId);
             var file = ImageGen.GameStatistic(game);
 
@@ -678,7 +742,7 @@ namespace Aviators
         }
         private async void NextGame(Chat chatFinded)
         {
-            var file = ImageGen.Roster(DB.DBCommands.DBGame.GetLastGame());
+            var file = ImageGen.Roster(DB.DBCommands.DBGame.GetLastGame(chatFinded));
 
             var photo = new Telegram.Bot.Types.FileToSend("gamestat",
                 (new StreamReader(file)).BaseStream);
@@ -694,8 +758,10 @@ namespace Aviators
 
         private void GetAllGames(Chat chatFinded)
         {
-            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames();
+            List<Game> allGames = DB.DBCommands.DBGame.GetAllGames(chatFinded);
 
+
+            //TODO Переделать на кнопки с играми
             foreach (var allGame in allGames)
             {
                 SendGameStat(chatFinded, allGame);
@@ -776,6 +842,32 @@ namespace Aviators
             return keyboard;
         }
 
+        private InlineKeyboardMarkup MakeKeyboardTournaments(List<Tournament> tour)
+        {
+            var massiv = new List<InlineKeyboardButton[]>();
+
+            //надо как то выбирать все , для этого сделаем сверху кнопу
+            massiv.Add(new[] { new InlineKeyboardButton("Все", 0.ToString()) });
+
+            for (int i = 0; i < tour.Count; i++)
+            {
+                if (i == tour.Count - 1)
+                    massiv.Add(new[] { new InlineKeyboardButton(tour[i].Name, tour[i].Id.ToString()) });
+                else 
+                    if (tour[i].Name.Length > 20) massiv.Add(new[] { new InlineKeyboardButton(tour[i].Name, tour[i].Id.ToString()) });
+                    else
+                    {
+                        massiv.Add(new[] { new InlineKeyboardButton(tour[i].Name, tour[i].Id.ToString()), new InlineKeyboardButton(tour[i + 1].Name, tour[i+1].Id.ToString()) });
+                        i++;
+                    }
+            }
+
+
+            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
+            return keyboard;
+        }
+
+
         private InlineKeyboardMarkup MakeKeyboardGames(List<Game> games)
         {
             var massiv = new List<InlineKeyboardButton[]>();
@@ -783,6 +875,22 @@ namespace Aviators
             {
                 var str = $"{g.Date.ToShortDateString()} {g.Tournament.Name} {g.Team1} {g.Score.Item1}:{g.Score.Item2} {g.Team2}";
                 massiv.Add(new[] { new InlineKeyboardButton(str, g.Id.ToString())});
+            }
+
+            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
+            return keyboard;
+        }
+
+        private InlineKeyboardMarkup MakeKeyboardSeason(List<Season> seasons)
+        {
+            var massiv = new List<InlineKeyboardButton[]>();
+
+            //надо как то выбирать все , для этого сделаем сверху кнопу
+            massiv.Add(new[] { new InlineKeyboardButton("Все", 0.ToString()) });
+
+            foreach (Season s in seasons)
+            {
+                massiv.Add(new[] { new InlineKeyboardButton(s.Name, s.Id.ToString())});
             }
 
             var keyboard = new InlineKeyboardMarkup(massiv.ToArray());

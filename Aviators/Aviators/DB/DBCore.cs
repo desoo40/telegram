@@ -7,6 +7,7 @@ using Aviators.Configs;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.InteropServices;
+using System.Windows.Forms;
 
 namespace Aviators
 {
@@ -265,27 +266,26 @@ namespace Aviators
 
                 var tournament = new Tournament(name);
                 tournament.Id = Convert.ToInt32(reader["id"].ToString());
-                //tournament.Season = reader["season_id"].ToString();
                 tournaments.Add(tournament);
             }
             return tournaments;
         }
 
-        public Tournament GetTournament(int tournamentId)
+        public Tournament GetTournament(int Id)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("select name from tournament where id = {0}", tournamentId);
+            cmd.CommandText = string.Format("select name from tournament where id = {0}", Id);
 
             try
             {
-                return new Tournament(cmd.ExecuteScalar().ToString());
+                var tournament = new Tournament(cmd.ExecuteScalar().ToString());
+                tournament.Id = Id;
 
-
+                return tournament;
             }
             catch (SqliteException ex)
             {
                 Console.WriteLine(ex.Message);
-
             }
             return null;
         }
@@ -346,8 +346,8 @@ namespace Aviators
             {
                 DBPlayer.GetPlayerOrInsert(player);
             }
-            //получаем ид турнира //TODO как то тупо, видимо надо просто по ссылке
-            game.Tournament = GetTournamentByNameOrInsert(game.Tournament.Name, 0);
+            game.Tournament = GetTournamentByNameOrInsert(game.Tournament.Name);
+            game.Season = GetSeasonByDateOrInsert(game.Date);
             game.Place = GetPlaceOrInsert(game.Place.Name);
 
             var opteam_id = GetTeamIdOrInsert(game.Team2);
@@ -386,6 +386,9 @@ namespace Aviators
                 DBGame.AddGoal(goal, game.Id);
             }
         }
+
+       
+
         internal bool UpdateGameAndPlayer(Game findGame, Game game)
         {
             game.Id = findGame.Id;
@@ -509,13 +512,13 @@ namespace Aviators
             return 0;
         }
 
-        private Tournament GetTournamentByNameOrInsert(string s, int season_id)
+        private Tournament GetTournamentByNameOrInsert(string s)
         {
             Tournament tournament = new Tournament(s);
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = string.Format("select ID from tournament where name_lower = '{0}'",
-                 tournament.Name.ToLower(), season_id);
+                 tournament.Name.ToLower());
 
             try
             {
@@ -540,6 +543,16 @@ namespace Aviators
 
             }
             return tournament;
+        }
+
+        private Season GetSeasonByDateOrInsert(DateTime date)
+        {
+            var seasonName = "";
+
+            if (date.Month < 8) seasonName = (date.Year - 1) + "/" + date.Year;
+            else seasonName = date.Year + "/" + (date.Year + 1);
+
+            return GetSeasonByNameOrInsert(seasonName);
         }
 
         private Season GetSeasonByNameOrInsert(string s)
@@ -671,6 +684,11 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
             return fileName;
+        }
+
+        internal List<Season> GetSeasons()
+        {
+            throw new NotImplementedException();
         }
 
         #region Chat

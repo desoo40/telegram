@@ -34,7 +34,7 @@ namespace Aviators
 
         public Place Place { get; set; }
         public Tournament Tournament { get; set; }
-        public string Season { get; set; }
+        public Season Season { get; set; }
 
         public List<GameAction> Actions { get; set; }
         public List<Goal> Goal { get; set; }

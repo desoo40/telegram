@@ -124,7 +124,7 @@ namespace Aviators.Bot
             var chatFinded = Chats.FindLast(chat => chat.WaitingCommands.Any(c=>c.Message.MessageId == e.CallbackQuery.Message.MessageId));
             if (chatFinded == null)
             {
-                Console.WriteLine("Cannot find chst for this command: " + e.CallbackQuery.Message);
+                Console.WriteLine("Cannot find chat for this command: " + e.CallbackQuery.Message);
 
             }
             else

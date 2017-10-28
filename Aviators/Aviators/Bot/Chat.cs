@@ -14,14 +14,11 @@ namespace Aviators
 
         public bool IsAdmin { get; set; } = false;
 
-        public bool WhoMode { get; set; }  = false;
-        public bool PersonalStatMode { get; set; }  = false;
-
-        public bool AddMode { get; set; }  = false;
-        public bool RemoveMode { get; set; }  = false;
         public List<Command> WaitingCommands { get; set; }
 
         public Tournament Tournament { get; set; }
+
+        public Season Season { get; set; }
 
         public bool isTextOnly { get; set; } = false;
 
@@ -32,13 +29,22 @@ namespace Aviators
             WaitingCommands = new List<Command>();
         }
 
+        #region Старое
 
-        internal void ResetMode()
-        {
-            WhoMode = false;
-            PersonalStatMode = false;
-            AddMode = false;
-            RemoveMode = false;
-        }
+        //public bool WhoMode { get; set; }  = false;
+        //public bool PersonalStatMode { get; set; }  = false;
+
+        //public bool AddMode { get; set; }  = false;
+        //public bool RemoveMode { get; set; }  = false;
+
+        //internal void ResetMode()
+        //{
+        //    WhoMode = false;
+        //    PersonalStatMode = false;
+        //    AddMode = false;
+        //    RemoveMode = false;
+        //}
+
+        #endregion
     }
 }
