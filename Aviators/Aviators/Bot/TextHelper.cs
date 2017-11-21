@@ -57,6 +57,15 @@
             if (inStr == "umb")
                 return "UMB (Словакия)";
 
+            if (inStr == "ukpraha")
+                return "UK PRAHA (Чехия)";
+
+            if (inStr == "миит")
+                return "ХК \"Дизель\" МИИТ";
+
+            if (inStr == "мисис")
+                return "ХК \"Стальные медведи\" МИСиС";
+
             return s;
         }
     }

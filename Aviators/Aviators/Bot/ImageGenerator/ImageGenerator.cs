@@ -375,6 +375,8 @@ namespace Aviators
                     bestPlayer = new Player(100, "Алексей", "Данилин");
 
                 var goalieStat = Math.Abs(1.0 - ((float)game.Score.Item2 / (float)game.Stat2.ShotsIn)).ToString("N3") + "%";
+                //var goalieStat = "1.000%";
+
 
                 string bestStat = bestPlayer.Position == PlayerPosition.Вратарь ? goalieStat :
                     $"{game.Goal.Count(go => go.Author.Id == bestPlayer.Id)}+{game.Goal.Count(go => go.Assistant1 != null && go.Assistant1.Id == bestPlayer.Id) + game.Goal.Count(go => go.Assistant2 != null && go.Assistant2.Id == bestPlayer.Id)}";
