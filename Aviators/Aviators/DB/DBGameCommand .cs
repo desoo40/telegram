@@ -9,37 +9,6 @@ namespace Aviators
 {
     public class DBGameCommand
     {
-        public Game GetLastGame(Chat chat, int backId = 0)
-        {
-            var tourid = "";
-            var sesid ="";
-
-            if (chat.Tournament != null) tourid = $"AND tournament_id = {chat.Tournament.Id}";
-            if (chat.Season != null) sesid = $"AND season_id = {chat.Season.Id}";
-
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = $"SELECT * FROM game WHERE 1 {tourid} {sesid} ORDER BY id DESC LIMIT 1";
-
-            SqliteDataReader reader = null;
-            try
-            {
-                reader = cmd.ExecuteReader();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            Game game = null;
-
-            while (reader.Read())
-            {
-                game = ReaderToGame(reader);
-            }
-
-            return game;
-        }
-
         public Game GetGame(int Id)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -64,18 +33,43 @@ namespace Aviators
 
             return game;
         }
+
+        public Game GetLastGame(Chat chat, int backId = 0)
+        {
+            var stOptions = DB.ChatToGameOptions(chat);
+            
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"SELECT * FROM game WHERE 1 {stOptions} ORDER BY id DESC LIMIT 1";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            Game game = null;
+
+            while (reader.Read())
+            {
+                game = ReaderToGame(reader);
+            }
+
+            return game;
+        }
+      
         public List<Game> GetAllGames(Chat chat)
         {
             List<Game> games = new List<Game>();
 
-            var tourid = "";
-            var sesid = "";
+            var stOptions = DB.ChatToGameOptions(chat);
 
-            if (chat.Tournament != null) tourid = $"AND tournament_id = {chat.Tournament.Id}";
-            if (chat.Season != null) sesid = $"AND season_id = {chat.Season.Id}";
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = $"SELECT * FROM game WHERE 1 {tourid} {sesid}";
+            cmd.CommandText = $"SELECT * FROM game WHERE 1 {stOptions}";
 
             SqliteDataReader reader = null;
             try
@@ -97,12 +91,15 @@ namespace Aviators
 
         }
 
-        public List<Game> GetGamesTeam(Team team)
+        public List<Game> GetGamesTeam(Chat chat, Team team)
         {
+
             List<Game> games = new List<Game>();
 
+            var stOptions = DB.ChatToGameOptions(chat);
+
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM game WHERE op_team_id = " + team.Id;
+            cmd.CommandText = "SELECT * FROM game WHERE op_team_id = " + team.Id +" "+ stOptions;
 
             SqliteDataReader reader = null;
             try
@@ -154,7 +151,7 @@ namespace Aviators
             if (value != "")
             {
                 var bestplayer = DB.DBCommands.DBPlayer.GetPlayerById(Convert.ToInt32(value));
-                DB.DBCommands.DBPlayer.GetPlayerStatistic(bestplayer);
+                //DB.DBCommands.DBPlayer.GetPlayerStatistic(bestplayer);
                 game.BestPlayer = bestplayer;
             }
 

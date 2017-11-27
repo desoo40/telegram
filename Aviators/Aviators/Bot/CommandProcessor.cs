@@ -128,8 +128,6 @@ namespace Aviators
             //ProcessCommands(chatFinded, fromId);            
         }
 
-     
-
         public async void ContinueCommand(Chat chatFinded, CallbackQuery cQuery)
         {
             var msgid = cQuery.Message.MessageId;
@@ -152,7 +150,7 @@ namespace Aviators
 
             if (command.Name == "статистика")
             {
-                var statistic = GetPlayerStatistic(command.Argument).Replace("*", "");
+                var statistic = GetPlayerStatistic(chatFinded, command.Argument).Replace("*", "");
 
                 await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
             }
@@ -166,7 +164,7 @@ namespace Aviators
             {
                 var count = Convert.ToInt32(command.Argument) + 5;
 
-                string result = GetTop((Top)(Convert.ToInt32(cQuery.Data)), count);
+                string result = GetTop(chatFinded, (Top)(Convert.ToInt32(cQuery.Data)), count);
 
                 if (result == "")
                 {
@@ -216,6 +214,28 @@ namespace Aviators
                     else
                         await Bot.SendTextMessageAsync(chatFinded.Id,
                             $"Для вас установлен турнир *{chatFinded.Tournament.Name}*. Вся статистика будет для этого турнира. Для сброса наберите /сброс",
+                            parseMode: ParseMode.Markdown);
+                }
+            }
+
+            if (command.Name == "сезон")
+            {
+
+                var id = Convert.ToInt32(cQuery.Data);
+                if (id == 0)
+                {
+                    chatFinded.Season = null;
+                    await Bot.SendTextMessageAsync(chatFinded.Id, "Вы выбрали все сезоны");
+                }
+                else
+                {
+                    chatFinded.Season = DB.DBCommands.GetSeason(Convert.ToInt32(cQuery.Data));
+
+                    if (chatFinded.Season == null)
+                        await Bot.SendTextMessageAsync(chatFinded.Id, "Не удалось установить сезон");
+                    else
+                        await Bot.SendTextMessageAsync(chatFinded.Id,
+                            $"Для вас установлен сезон *{chatFinded.Season.Name}*. Вся статистика будет для этого сезона. Для сброса наберите /сброс",
                             parseMode: ParseMode.Markdown);
                 }
             }
@@ -507,7 +527,7 @@ namespace Aviators
             }
         }
 
-        private string GetPlayerStatistic(string arg)
+        private string GetPlayerStatistic(Chat chat, string arg)
         {
             string result = "Игрок не найден";
             Player player;
@@ -516,13 +536,13 @@ namespace Aviators
             {
                 //в случае числа показываем стату
                 var number = int.Parse(arg);
-                player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNumber(number);
+                player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNumber(chat, number);
             }
             else
             {
                 return "tut viletaet((((";
                 //в случае букв ищем по имени или фамилии
-                player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNameOrSurname(arg);
+                player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNameOrSurname(chat, arg);
             }
 
             if (player != null)
@@ -542,13 +562,13 @@ namespace Aviators
         }
         private async void PlayerStatistic(Chat chatFinded, string arg)
         {
-            var result = GetPlayerStatistic(arg);
+            var result = GetPlayerStatistic(chatFinded, arg);
             await Bot.SendTextMessageAsync(chatFinded.Id, result, parseMode: ParseMode.Markdown);
         }
 
         private async void Top(Chat chatFinded, Top type, int count = 5) // говнокодище Дениса, update говнокод затерт, Денис молодец
         {
-            string result = GetTop(type, count);
+            string result = GetTop(chatFinded, type, count);
 
             var button = new InlineKeyboardButton("Еще");
             button.CallbackData = ((int)type).ToString();
@@ -562,10 +582,10 @@ namespace Aviators
             chatFinded.WaitingCommands.Add(newCom);
         }
 
-        private string GetTop(Top type, int count)
+        private string GetTop(Chat chatFinded, Top type, int count)
         {
             string result = "";
-            List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(type, count);
+            List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(chatFinded, type, count);
 
             if (topPlayers.Count < count - 5) return "";
             result = $"Топ {topPlayers.Count} *{GetTypeDescription(type)}* ХК \"Авиаторы\":\n";
@@ -616,7 +636,6 @@ namespace Aviators
             Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите сезон", replyMarkup: keyboard);
             command.Message = mes;
             chatFinded.WaitingCommands.Add(command);
-
         }
 
 
@@ -708,7 +727,7 @@ namespace Aviators
             var team = DB.DBCommands.GetTeam(command.Argument);
             if (team.Id < 1) result.Add("Соперник не найден");
 
-            var games = DB.DBCommands.DBGame.GetGamesTeam(team);
+            var games = DB.DBCommands.DBGame.GetGamesTeam(chatFinded, team);
             if (games.Count < 1) result.Add("Игр не найдено");
 
             const int otstup = -15;

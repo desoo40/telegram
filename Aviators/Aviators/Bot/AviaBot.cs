@@ -64,9 +64,9 @@ namespace Aviators.Bot
                     var file = await Bot.GetFileAsync(e.Message.Document.FileId);
                     //var filename = file.FileId + "." + file.FilePath.Split('.').Last();
 
-                    using (var saveImageStream = new FileStream("Incoming" + "/" + e.Message.Document.FileName, FileMode.Create))
+                    using (var saveStream = new FileStream("Incoming" + "/" + e.Message.Document.FileName, FileMode.Create))
                     {
-                        await file.FileStream.CopyToAsync(saveImageStream);
+                        await file.FileStream.CopyToAsync(saveStream);
                     }
                 }
                 catch (Exception ex)

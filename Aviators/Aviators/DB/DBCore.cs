@@ -20,6 +20,19 @@ namespace Aviators
             DBConnection = new DBCore();
             DBCommands = new DBCommands();
         }
+
+
+        public static string ChatToGameOptions(Chat chat)
+        {
+            var tourid = "";
+            var sesid = "";
+
+            if (chat.Tournament != null) tourid = $"AND tournament_id = {chat.Tournament.Id}";
+            if (chat.Season != null) sesid = $"AND season_id = {chat.Season.Id}";
+
+            return tourid + " " + sesid;
+
+        }
     }
 
 
@@ -271,17 +284,36 @@ namespace Aviators
             return tournaments;
         }
 
-        public Tournament GetTournament(int Id)
+        public Tournament GetTournament(int id)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("select name from tournament where id = {0}", Id);
+            cmd.CommandText = string.Format("select name from tournament where id = {0}", id);
 
             try
             {
                 var tournament = new Tournament(cmd.ExecuteScalar().ToString());
-                tournament.Id = Id;
+                tournament.Id = id;
 
                 return tournament;
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            return null;
+        }
+
+        public Season GetSeason(int id)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = string.Format("select name from season where id = {0}", id);
+
+            try
+            {
+                var season = new Season(cmd.ExecuteScalar().ToString());
+                season.Id = id;
+
+                return season;
             }
             catch (SqliteException ex)
             {
@@ -688,7 +720,29 @@ namespace Aviators
 
         internal List<Season> GetSeasons()
         {
-            throw new NotImplementedException();
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = "SELECT * FROM season";
+
+            SqliteDataReader reader = null;
+            try
+            {
+                reader = cmd.ExecuteReader();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
+            var seasons = new List<Season>();
+            while (reader.Read())
+            {
+                string name = reader["name"].ToString();
+
+                var season = new Season(name);
+                season.Id = Convert.ToInt32(reader["id"].ToString());
+                seasons.Add(season);
+            }
+            return seasons;
         }
 
         #region Chat
@@ -748,5 +802,7 @@ namespace Aviators
         }
 
         #endregion
+
+        
     }
 }
