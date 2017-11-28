@@ -209,7 +209,7 @@ namespace Aviators
 
             var stOptions = DB.ChatToGameOptions(chat);
             if (typestring == "")
-                stOptions = "WHERE 1" + stOptions;
+                stOptions = "WHERE 1 " + stOptions;
 
             cmd.CommandText =
                 "SELECT  player_id , count(*) AS num " +

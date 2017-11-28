@@ -773,6 +773,8 @@ namespace Aviators
                         if (value != "") chat.IsAdmin = Convert.ToBoolean(value);
                         value = reader["tournament_id"].ToString();
                         if (value != "") chat.Tournament = GetTournament(Convert.ToInt32(value));
+                        value = reader["season_id"].ToString();
+                        if (value != "") chat.Season = GetSeason(Convert.ToInt32(value));
                     }
                 }
 
@@ -783,6 +785,31 @@ namespace Aviators
 
             }
             return chat;
+        }
+
+        public void UpdateChatParams(Chat chat)
+        {
+            if (chat == null) return;
+
+            string tourStr = "null", seasStr = "null";
+
+            if (chat.Tournament != null) tourStr = chat.Tournament.Id.ToString();
+            if (chat.Season != null) seasStr = chat.Season.Id.ToString();
+
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = $"update chat " +
+                              $"set tournament_id = {tourStr}, season_id = {seasStr}, isAdmin = '{chat.IsAdmin.ToString()}', isTextOnly = '{chat.isTextOnly}' " +
+                              $"where id = '{chat.Id}'";
+
+            try
+            {
+                cmd.ExecuteNonQuery();
+
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         public void AddChatIncomeMsg(Chat chatFinded, string msg)

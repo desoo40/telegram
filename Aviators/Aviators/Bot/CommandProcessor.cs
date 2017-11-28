@@ -198,7 +198,6 @@ namespace Aviators
 
             if (command.Name == "турнир")
             {
-
                 var id = Convert.ToInt32(cQuery.Data);
                 if (id == 0)
                 {
@@ -216,6 +215,8 @@ namespace Aviators
                             $"Для вас установлен турнир *{chatFinded.Tournament.Name}*. Вся статистика будет для этого турнира. Для сброса наберите /сброс",
                             parseMode: ParseMode.Markdown);
                 }
+
+                DB.DBCommands.UpdateChatParams(chatFinded);
             }
 
             if (command.Name == "сезон")
@@ -238,6 +239,8 @@ namespace Aviators
                             $"Для вас установлен сезон *{chatFinded.Season.Name}*. Вся статистика будет для этого сезона. Для сброса наберите /сброс",
                             parseMode: ParseMode.Markdown);
                 }
+
+                DB.DBCommands.UpdateChatParams(chatFinded);
             }
 
             chatFinded.WaitingCommands.Remove(command);
