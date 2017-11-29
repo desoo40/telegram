@@ -22,7 +22,7 @@
 88;Сорокин;Денис;-;Нападающий;vk.com/desoo;instagram.com/desoo88;
 5;Трофимов;Николай;-;Защитник;vk.com/improvisator5;instagram.com/trofim_nv;
 28;Флотский;Артём;-;Нападающий;vk.com/id128000542;-;
-1;Черненков;Николай;Вратарь;vk.com/gofcsmgo;instagram.com/kolka20;;
+1;Черненков;Николай;-;Вратарь;vk.com/gofcsmgo;instagram.com/kolka20;;
 88;Шрейдер;Вадим;-;Нападающий;vk.com/dynamik282;instagram.com/shreyder11;
 100;Данилин;Алексей;Александрович;Тренер;vk.com/id345386;instagram.com/alexdanni;
 71;Ружицкий;Илья;-;Нападающий;vk.com/ruzhik99;instagram.com/mr.ilya_1771;

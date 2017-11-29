@@ -353,14 +353,14 @@ namespace Aviators
             {
                 var spl = s.Split(';');
 
-                var player = new Player(Convert.ToInt32(spl[0]), spl[2], spl[1]);
+                var player = new Player(Convert.ToInt32(spl[0]), spl[2], spl[1], spl[3]);
 
                 PlayerPosition pp;
-                PlayerPosition.TryParse(spl[3],true, out pp);
+                PlayerPosition.TryParse(spl[4],true, out pp);
                 player.Position = pp;
 
-                player.VK = spl[4];
-                player.INSTA = spl[5];
+                player.VK = spl[5];
+                player.INSTA = spl[6];
 
                 //switch (spl[2])
                 //{

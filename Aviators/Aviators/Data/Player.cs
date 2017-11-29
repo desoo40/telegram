@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 
 namespace Aviators
@@ -12,15 +13,64 @@ namespace Aviators
             Number = number;
             Name = name;
             Surname = surname;
-            PhotoFile = string.Format("{0}_{1}.jpg", number, surname.ToLower());
+            PhotoFile = GetPhotoFile();
         }
+
+        public Player(int number, string name, string surname, string patronymic)
+        {
+            Actions = new List<GameAction>();
+
+            Number = number;
+            Name = name;
+            Surname = surname;
+
+            Patronymic = patronymic == "-" ? null : patronymic;
+
+            PhotoFile = GetPhotoFile();
+        }
+
+        private string GetPhotoFile()
+        {
+            var files = Directory.GetFiles("DB\\PlayersPhoto");
+
+            string str = "DB\\PlayersPhoto\\" + Surname.ToLower();
+
+            bool findPhoto = files.Contains(str + ".jpg");
+
+            if (!findPhoto)
+            {
+                str += " " + Name.ToLower();
+                findPhoto = files.Contains(str + ".jpg");
+
+                if (!findPhoto)
+                {
+                    if (Patronymic == null)
+                    {
+                        str = "DB\\PlayersPhoto\\no_photo";
+                        return str;
+                    }
+
+                    str += " " + Patronymic.ToLower();
+                    findPhoto = files.Contains(str + ".jpg");
+
+                    if (!findPhoto)
+                    {
+                        str = "DB\\PlayersPhoto\\no_photo.jpg";
+                        return str;
+                    }
+                }
+            }
+            str += ".jpg";
+            return str;
+        }
+
 
         public int Id { get; set; }
         public int Number { get; set; }
 
         public string Name { get; set; }
         public string Surname { get; set; }
-        public string Lastname { get; set; }
+        public string Patronymic { get; set; }
 
         public string PhotoFile { get; set; }
         public PlayerPosition Position { get; set; }

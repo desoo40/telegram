@@ -158,14 +158,11 @@ namespace Aviators
                 j = param % 2;
             }
 
-            string path = $"DB\\PlayersPhoto\\{player.Number}_{player.Surname}.jpg";
-
-            if (!File.Exists(path))
-                path = $"DB\\PlayersPhoto\\no_photo.jpg";
+            
 
 
             var rect = UpdateRectangle(r.Position, r.OffsetX, r.OffsetY, i, j);
-            DrawImageInCircle(g, new Bitmap(path), rect, 3);
+            DrawImageInCircle(g, new Bitmap(player.PhotoFile), rect, 3);
 
             Point pntName = new Point(rect.X + r.Name.OffsetX, rect.Y + r.Name.OffsetY);
             Point pntNum = new Point(rect.X + r.Number.OffsetX, rect.Y + r.Number.OffsetY);
@@ -400,11 +397,8 @@ namespace Aviators
                 int ramka = 8;
                 //TODO проверить на наличие файла
 
-                var photoFile = $"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg";
-
-                if (!File.Exists(photoFile))
-                    photoFile = $"DB\\PlayersPhoto\\no_photo.jpg";
-                DrawImageInCircle(g, new Bitmap(photoFile), r.BestPlayerImage, ramka);
+                
+                DrawImageInCircle(g, new Bitmap(bestPlayer.PhotoFile), r.BestPlayerImage, ramka);
 
                 #endregion
             }

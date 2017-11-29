@@ -64,8 +64,9 @@ create table game (
 create table player (
    id                   INTEGER PRIMARY KEY,
    name                 TEXT                 null,
-   lastname             TEXT                 null,
-   lastname_lower       TEXT                 null,
+   surname				TEXT                 null,
+   surname_lower		TEXT                 null,
+   patronymic			TEXT                 null,
    number               INT4                 null,
    positionid           INT4                 null
 );

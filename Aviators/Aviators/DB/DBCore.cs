@@ -108,7 +108,7 @@ namespace Aviators
         //        }
 
         //        SqliteCommand cmd = Connection.CreateCommand();
-        //        cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname, lastname_lower,position_id,vk_href,insta_href) " +
+        //        cmd.CommandText = string.Format("INSERT INTO player (number, name, surname, surname_lower,position_id,vk_href,insta_href) " +
         //                                        "VALUES({0}, '{1}', '{2}', '{3}', (select ID from position_dic where name = '{4}'), '{5}','{6}')",
         //            playerinfo[0].Trim(), playerinfo[2].Trim(), playerinfo[1].Trim(), playerinfo[1].Trim().ToLower(), playerinfo[3],playerinfo[4], playerinfo[5]);
 
@@ -761,7 +761,7 @@ namespace Aviators
                 {
                     reader.Close();
                     cmd.CommandText =
-                        $"INSERT INTO chat(id, username, firstname, lastname) VALUES ('{incomeChat.Id}', '{incomeChat.Username}', '{incomeChat.FirstName}', '{incomeChat.LastName}')";
+                        $"INSERT INTO chat(id, username, firstname, surname) VALUES ('{incomeChat.Id}', '{incomeChat.Username}', '{incomeChat.FirstName}', '{incomeChat.LastName}')";
                     cmd.ExecuteNonQuery();
 
                 }

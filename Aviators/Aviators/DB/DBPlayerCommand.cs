@@ -29,7 +29,7 @@ namespace Aviators
             {
                 var player = new Player(Convert.ToInt32(reader["number"].ToString()),
                    reader["name"].ToString(),
-                   reader["lastname"].ToString());
+                   reader["surname"].ToString());
                 player.Id = Convert.ToInt32(reader["id"].ToString());
 
                 var value = reader["positionid"].ToString();
@@ -55,7 +55,7 @@ namespace Aviators
         private Player GetPlayerByNameOrSurname(string nameOrSurname)
         {
             return GetPlayerSQL($"SELECT * FROM player " +
-                                $"WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'");
+                                $"WHERE surname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'");
         }
 
         /// <summary>
@@ -87,7 +87,7 @@ namespace Aviators
         {
             var player = new Player(Convert.ToInt32(reader["number"].ToString()),
                 reader["name"].ToString(),
-                reader["lastname"].ToString());
+                reader["surname"].ToString());
             player.Id = Convert.ToInt32(reader["id"].ToString());
 
             var value = reader["positionid"].ToString();
@@ -354,7 +354,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = string.Format("select ID from player where name = '{0}' AND " +
-                                            "lastname = '{1}' AND number = {2}",
+                                            "surname = '{1}' AND number = {2}",
                 player.Name, player.Surname, player.Number);
 
             try
@@ -363,8 +363,8 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 if (obj == null)
                 {
                     cmd.CommandText = String.Format(
-                        "INSERT INTO player(name, lastname, lastname_lower, number) VALUES ('{0}', '{1}','{3}', {2})",
-                        player.Name, player.Surname, player.Number, player.Surname.ToLower());
+                        "INSERT INTO player(name, surname, surname_lower, patronymic, number) VALUES ('{0}', '{1}','{3}', '{4}', {2})",
+                        player.Name, player.Surname, player.Number, player.Surname.ToLower(), player.Patronymic);
                     cmd.ExecuteNonQuery();
 
                     cmd.CommandText = @"select last_insert_rowid()";
@@ -414,7 +414,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
         public void AddPlayer(Player player)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("INSERT INTO player (number, name, lastname) VALUES({0}, '{1}', '{2}')",
+            cmd.CommandText = string.Format("INSERT INTO player (number, name, surname) VALUES({0}, '{1}', '{2}')",
                 player.Number, player.Name, player.Surname);
 
             try
