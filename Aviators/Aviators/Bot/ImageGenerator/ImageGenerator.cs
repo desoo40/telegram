@@ -399,7 +399,12 @@ namespace Aviators
 
                 int ramka = 8;
                 //TODO проверить на наличие файла
-                DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg"), r.BestPlayerImage, ramka);
+
+                var photoFile = $"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg";
+
+                if (!File.Exists(photoFile))
+                    photoFile = $"DB\\PlayersPhoto\\no_photo.jpg";
+                DrawImageInCircle(g, new Bitmap(photoFile), r.BestPlayerImage, ramka);
 
                 #endregion
             }
