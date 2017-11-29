@@ -543,7 +543,7 @@ namespace Aviators
             }
             else
             {
-                return "tut viletaet((((";
+                //return "tut viletaet((((";
                 //в случае букв ищем по имени или фамилии
                 player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNameOrSurname(chat, arg);
             }

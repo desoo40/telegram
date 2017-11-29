@@ -54,7 +54,8 @@ namespace Aviators
 
         private Player GetPlayerByNameOrSurname(string nameOrSurname)
         {
-            return GetPlayerSQL($"SELECT * FROM player WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'");
+            return GetPlayerSQL($"SELECT * FROM player " +
+                                $"WHERE lastname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'");
         }
 
         /// <summary>
@@ -362,8 +363,8 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 if (obj == null)
                 {
                     cmd.CommandText = String.Format(
-                        "INSERT INTO player(name, lastname, number) VALUES ('{0}', '{1}', {2})",
-                        player.Name, player.Surname, player.Number);
+                        "INSERT INTO player(name, lastname, lastname_lower, number) VALUES ('{0}', '{1}','{3}', {2})",
+                        player.Name, player.Surname, player.Number, player.Surname.ToLower());
                     cmd.ExecuteNonQuery();
 
                     cmd.CommandText = @"select last_insert_rowid()";

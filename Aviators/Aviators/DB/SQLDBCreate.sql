@@ -65,6 +65,7 @@ create table player (
    id                   INTEGER PRIMARY KEY,
    name                 TEXT                 null,
    lastname             TEXT                 null,
+   lastname_lower       TEXT                 null,
    number               INT4                 null,
    positionid           INT4                 null
 );
@@ -224,7 +225,7 @@ create table chat (
    firstname        TEXT                 null,
    lastname            TEXT                 null,
    isAdmin               TEXT                 null,
-   isTextOInly               TEXT                 null,
+   isTextOnly               TEXT                 null,
    tournament_id               int4                 null,
    season_id               int4                 null
 
