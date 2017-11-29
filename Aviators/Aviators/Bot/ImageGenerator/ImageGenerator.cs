@@ -398,6 +398,7 @@ namespace Aviators
 
 
                 int ramka = 8;
+                //TODO проверить на наличие файла
                 DrawImageInCircle(g, new Bitmap($"DB\\PlayersPhoto\\{bestPlayer.Number}_{bestPlayer.Surname}.jpg"), r.BestPlayerImage, ramka);
 
                 #endregion

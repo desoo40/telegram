@@ -118,22 +118,27 @@ namespace Aviators
             }
         }
 
-        public Player GetPlayerStatisticByNameOrSurname(string nameOrSurname)
+        public Player GetPlayerStatisticByNameOrSurname(Chat chat, string nameOrSurname)
         {
             var player = GetPlayerByNameOrSurname(nameOrSurname);
-            return GetPlayerStatistic(player);
+            return GetPlayerStatistic(chat, player);
         }
-        public Player GetPlayerStatisticByNumber(int number)
+        public Player GetPlayerStatisticByNumber(Chat chat, int number)
         {
             var player = GetPlayerByNumber(number);
-            return GetPlayerStatistic(player);
+            return GetPlayerStatistic(chat, player);
         }
-        public Player GetPlayerStatistic(Player player)
+        public Player GetPlayerStatistic(Chat chat, Player player)
         {
             if (player == null) return null;
 
+            var stOptions = DB.ChatToGameOptions(chat);
+
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM game_action  WHERE player_id = " + player.Id;
+            cmd.CommandText =
+                "SELECT game_action.* FROM game_action " +
+                "LEFT JOIN game ON game.id = game_action.game_id " +
+                $"WHERE player_id = {player.Id} {stOptions};";
 
             SqliteDataReader reader = null;
             try
@@ -159,7 +164,10 @@ namespace Aviators
 
             }
             reader.Close();
-            cmd.CommandText = "SELECT goal_player.asist, goal.game_id  FROM goal_player  LEFT JOIN goal ON goal_player.goal_id = goal.id WHERE player_id = " + player.Id;
+            cmd.CommandText = "SELECT goal_player.asist, goal.game_id  FROM goal_player  " +
+                              "LEFT JOIN goal ON goal_player.goal_id = goal.id " +
+                              "LEFT JOIN game ON game.id = goal.game_id " +
+                              $"WHERE player_id = {player.Id} {stOptions};";
 
             try
             {
@@ -188,35 +196,10 @@ namespace Aviators
             return player;
         }
 
-
-        private List<Player> GetTopPlayersAPG(int input)
+        internal List<Player> GetTopPlayers(Chat chat, Top type, int count)
         {
-            List<Player> players = GetAllPlayerWithoutStatistic();
-            foreach (var player in players)
-            {
-                GetPlayerStatistic(player);
-            }
-
-            return players.OrderByDescending(p => p.StatAverragePerGame).ToList().GetRange(0, input);
-        }
-
-        private List<Player> GetTopPlayersPenalty(int count)
-        {
-            List<Player> players = GetAllPlayerWithoutStatistic();
-            foreach (var player in players)
-            {
-                GetPlayerStatistic(player);
-            }
-
-            var players15 = players.Where(p => p.Games > 15).ToList();
-
-            return players15.OrderBy(p => p.Shtraf).ToList().GetRange(0, count);
-        }
-
-        internal List<Player> GetTopPlayers(Top type, int count)
-        {
-            if (type == Top.APG) return GetTopPlayersAPG(count);
-            if (type == Top.Penalty) return GetTopPlayersPenalty(count);
+            if (type == Top.APG) return GetTopPlayersAPG(chat, count);
+            if (type == Top.Penalty) return GetTopPlayersPenalty(chat ,count);
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
 
@@ -224,9 +207,17 @@ namespace Aviators
             if (type == Top.Assist) typestring += " WHERE asist = 'True'";
             if (type == Top.Goals) typestring += " WHERE asist = 'False'";
 
+            var stOptions = DB.ChatToGameOptions(chat);
+            if (typestring == "")
+                stOptions = "WHERE 1 " + stOptions;
+
             cmd.CommandText =
-                "SELECT  player_id , count(*) AS num FROM goal_player " + typestring + " GROUP BY player_id ORDER BY num DESC LIMIT " +
-                count;
+                "SELECT  player_id , count(*) AS num " +
+                $"FROM goal_player " +
+                "LEFT JOIN goal ON goal_player.goal_id = goal.id " +
+                "LEFT JOIN game ON game.id = goal.game_id " +
+                $"{typestring} {stOptions} " +
+                $"GROUP BY player_id ORDER BY num DESC LIMIT {count};"; 
 
             SqliteDataReader reader = null;
             try
@@ -252,6 +243,33 @@ namespace Aviators
             return players;
         }
 
+
+        private List<Player> GetTopPlayersAPG(Chat chat, int input)
+        {
+            List<Player> players = GetAllPlayerWithoutStatistic();
+            foreach (var player in players)
+            {
+                GetPlayerStatistic(chat, player);
+            }
+
+            return players.OrderByDescending(p => p.StatAverragePerGame).ToList().GetRange(0, input);
+        }
+
+        private List<Player> GetTopPlayersPenalty(Chat chat, int count)
+        {
+            List<Player> players = GetAllPlayerWithoutStatistic();
+            foreach (var player in players)
+            {
+                GetPlayerStatistic(chat, player);
+            }
+
+            //переметр, показывающий, что игрок должен сыграть более 15 матчей для попадания в статистику пенальти
+            var players15 = players.Where(p => p.Games > 15).ToList();
+
+            return players15.OrderBy(p => p.Shtraf).ToList().GetRange(0, count);
+        }
+
+     
         public Player GetPlayerTopForTeam(Team team)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
