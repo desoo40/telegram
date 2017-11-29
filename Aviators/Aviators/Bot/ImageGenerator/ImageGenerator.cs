@@ -343,7 +343,7 @@ namespace Aviators
 
                     r.Pucks.Position = UpdateRectangle(r.Pucks.Position, r.Pucks.OffsetX, r.Pucks.OffsetY, k, 0);
 
-                    if (goalString.Length > 33) // невероятный костыль
+                    if (goalString.Length > 30) // невероятный костыль
                     {
                         var splitStr = goalString.Split(',');
                         splitStr[0] += ",";
