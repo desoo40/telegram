@@ -761,7 +761,7 @@ namespace Aviators
                 {
                     reader.Close();
                     cmd.CommandText =
-                        $"INSERT INTO chat(id, username, firstname, surname) VALUES ('{incomeChat.Id}', '{incomeChat.Username}', '{incomeChat.FirstName}', '{incomeChat.LastName}')";
+                        $"INSERT INTO chat(id, username, firstname, lastname) VALUES ('{incomeChat.Id}', '{incomeChat.Username}', '{incomeChat.FirstName}', '{incomeChat.LastName}')";
                     cmd.ExecuteNonQuery();
 
                 }

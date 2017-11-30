@@ -117,16 +117,27 @@ namespace Aviators
                 if (lines[i] != "")
                 {
                     bool isK = false, isA = false;
+                    string s;
                     if (lines[i].Contains("("))
                     {
-                        var p = lines[i].Substring(lines[i].IndexOf("("));
+                        int si = lines[i].IndexOf("(");
+
+                        var p = lines[i].Substring(si);
                         if (p[1] == 'К') isK = true;
                         if (p[1] == 'А') isA = true;
-                    }
 
-                    var s = lines[i].Replace("\t", " ");
+                        s = lines[i].Replace("\t", " ").Substring(0, si);
+                    }
+                    else
+                        s = lines[i].Replace("\t", " ");
+
                     var playerInfo = s.Split();
+
                     var newplayer= new Player(Convert.ToInt32(playerInfo[0]), playerInfo[2], playerInfo[1]);
+
+                    if (playerInfo.Length > 3)
+                        newplayer.Patronymic = playerInfo[3];
+
                     newplayer.isA = isA;
                     newplayer.isK = isK;
 

@@ -11,57 +11,30 @@ namespace Aviators
     {
         public List<Player> GetAllPlayerWithoutStatistic()
         {
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = "SELECT * FROM player";
-
-            SqliteDataReader reader = null;
-            try
-            {
-                reader = cmd.ExecuteReader();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-
-            var players = new List<Player>();
-            while (reader.Read())
-            {
-                var player = new Player(Convert.ToInt32(reader["number"].ToString()),
-                   reader["name"].ToString(),
-                   reader["surname"].ToString());
-                player.Id = Convert.ToInt32(reader["id"].ToString());
-
-                var value = reader["positionid"].ToString();
-                if (value != "")
-                    player.Position = (PlayerPosition)Convert.ToInt32(value);
-                //player.VK = reader["vk_href"].ToString();
-                //player.INSTA = reader["insta_href"].ToString();
-                players.Add(player);
-            }
+            var players = GetPlayersSQL("SELECT * FROM player");
+           
             return players;
         }
 
         public Player GetPlayerById(int id)
         {
-            return GetPlayerSQL("SELECT * FROM player WHERE id = " + id);
+            return GetPlayersSQL("SELECT * FROM player WHERE id = " + id).FirstOrDefault();
         }
 
-        public Player GetPlayerByNumber(int number)
+        public List<Player> GetPlayerByNumber(int number)
         {
-            return GetPlayerSQL("SELECT * FROM player WHERE number = " + number + " ORDER BY id DESC");
+            return GetPlayersSQL("SELECT * FROM player WHERE number = " + number + " ORDER BY id DESC");
         }
 
-        private Player GetPlayerByNameOrSurname(string nameOrSurname)
+        private List<Player> GetPlayersBySurname(string surname)
         {
-            return GetPlayerSQL($"SELECT * FROM player " +
-                                $"WHERE surname_lower = '{nameOrSurname.ToLower()}' OR name = '{nameOrSurname}'");
-        }
+             return GetPlayersSQL($"SELECT * FROM player WHERE surname_lower = '{surname.ToLower()}'");
+        } 
 
         /// <summary>
         /// Метод принимает запрос и возвращает класс игрока (что бы объединить разные запросы по игроку)
         /// </summary>
-        private Player GetPlayerSQL(string sql)
+        private List<Player> GetPlayersSQL(string sql)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = sql;
@@ -75,12 +48,13 @@ namespace Aviators
                 Console.WriteLine(ex.Message);
             }
 
+            var players = new List<Player>();
             while (reader.Read())
             {
                 var player = ReaderToPlayer(reader);
-                return player;
+                players.Add(player);
             }
-            return null;
+            return players;
         }
 
         private Player ReaderToPlayer(SqliteDataReader reader)
@@ -94,7 +68,7 @@ namespace Aviators
             if (value != "")
                 player.Position = (PlayerPosition) Convert.ToInt32(value);
 
-            GetPlayerInfo(player);
+            //GetPlayerInfo(player);
 
             return player;
         }
@@ -119,16 +93,6 @@ namespace Aviators
             }
         }
 
-        public Player GetPlayerStatisticByNameOrSurname(Chat chat, string nameOrSurname)
-        {
-            var player = GetPlayerByNameOrSurname(nameOrSurname);
-            return GetPlayerStatistic(chat, player);
-        }
-        public Player GetPlayerStatisticByNumber(Chat chat, int number)
-        {
-            var player = GetPlayerByNumber(number);
-            return GetPlayerStatistic(chat, player);
-        }
         public Player GetPlayerStatistic(Chat chat, Player player)
         {
             if (player == null) return null;
@@ -154,7 +118,7 @@ namespace Aviators
             while (reader.Read())
             {
                 var game_id = reader["game_id"].ToString();
-                var action = (Action)Convert.ToInt32(reader["action"].ToString());
+                var action = (Action) Convert.ToInt32(reader["action"].ToString());
                 var gameaction = new GameAction(player, game_id, action);
                 var par = reader["param"].ToString();
                 if (par != "")
@@ -189,7 +153,8 @@ namespace Aviators
 
                 //var kek = reader.GetBoolean(1);
                 var action = Action.Гол;
-                if (ass) action = Action.Пас; ;
+                if (ass) action = Action.Пас;
+                ;
                 var gameaction = new GameAction(player, game_id, action);
 
                 player.Actions.Add(gameaction);
@@ -197,10 +162,12 @@ namespace Aviators
             return player;
         }
 
+        #region Топы всякие
+
         internal List<Player> GetTopPlayers(Chat chat, Top type, int count)
         {
             if (type == Top.APG) return GetTopPlayersAPG(chat, count);
-            if (type == Top.Penalty) return GetTopPlayersPenalty(chat ,count);
+            if (type == Top.Penalty) return GetTopPlayersPenalty(chat, count);
 
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
 
@@ -218,7 +185,7 @@ namespace Aviators
                 "LEFT JOIN goal ON goal_player.goal_id = goal.id " +
                 "LEFT JOIN game ON game.id = goal.game_id " +
                 $"{typestring} {stOptions} " +
-                $"GROUP BY player_id ORDER BY num DESC LIMIT {count};"; 
+                $"GROUP BY player_id ORDER BY num DESC LIMIT {count};";
 
             SqliteDataReader reader = null;
             try
@@ -243,7 +210,6 @@ namespace Aviators
             }
             return players;
         }
-
 
         private List<Player> GetTopPlayersAPG(Chat chat, int input)
         {
@@ -270,7 +236,6 @@ namespace Aviators
             return players15.OrderBy(p => p.Shtraf).ToList().GetRange(0, count);
         }
 
-     
         public Player GetPlayerTopForTeam(Team team)
         {
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
@@ -286,7 +251,8 @@ namespace Aviators
                 @"SELECT player_id, count(*) AS num FROM goal_player
 LEFT JOIN goal ON goal_player.goal_id = goal.id
 LEFT JOIN game ON goal.game_id = game.id
-WHERE game.op_team_id = " + team.Id + @" AND goal_player.asist = 'True' AND player_id = (SELECT  player_id FROM goal_player
+WHERE game.op_team_id = " + team.Id +
+                @" AND goal_player.asist = 'True' AND player_id = (SELECT  player_id FROM goal_player
 LEFT JOIN goal ON goal_player.goal_id = goal.id
 LEFT JOIN game ON goal.game_id = game.id
 WHERE game.op_team_id = " + team.Id + @"
@@ -319,7 +285,8 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 @"SELECT player_id, count(*) AS num FROM goal_player
 LEFT JOIN goal ON goal_player.goal_id = goal.id
 LEFT JOIN game ON goal.game_id = game.id
-WHERE game.op_team_id = " + team.Id + @" AND goal_player.asist = 'False' AND player_id = (SELECT  player_id FROM goal_player
+WHERE game.op_team_id = " + team.Id +
+                @" AND goal_player.asist = 'False' AND player_id = (SELECT  player_id FROM goal_player
 LEFT JOIN goal ON goal_player.goal_id = goal.id
 LEFT JOIN game ON goal.game_id = game.id
 WHERE game.op_team_id = " + team.Id + @"
@@ -344,6 +311,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             return player;
         }
 
+        #endregion
 
         #region Добавление, обновление игрока
 
@@ -352,36 +320,47 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             //TODO сделать, что бы первую большую букву делал
             //player.Name = player.Name.ToLowerInvariant()[0].
 
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("select ID from player where name = '{0}' AND " +
-                                            "surname = '{1}' AND number = {2}",
-                player.Name, player.Surname, player.Number);
+            var findPlayers = GetPlayersBySurname(player.Surname);
 
-            try
+            if (findPlayers.Count == 0) InsertPlayer(player);
+            if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
+            if (findPlayers.Count > 1)
             {
-                object obj = cmd.ExecuteScalar();
-                if (obj == null)
+                findPlayers =
+                    findPlayers.FindAll(
+                        f =>
+                            f.Surname.ToLower() == player.Surname.ToLower() 
+                            && f.Name.ToLower() == player.Name.ToLower());
+
+                if (findPlayers.Count == 0) InsertPlayer(player);
+                if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
+
+                if (findPlayers.Count > 1)
                 {
-                    cmd.CommandText = String.Format(
-                        "INSERT INTO player(name, surname, surname_lower, patronymic, number) VALUES ('{0}', '{1}','{3}', '{4}', {2})",
-                        player.Name, player.Surname, player.Number, player.Surname.ToLower(), player.Patronymic);
-                    cmd.ExecuteNonQuery();
+                    findPlayers =
+                        findPlayers.FindAll(
+                            f =>
+                                f.Surname.ToLower() == player.Surname.ToLower()
+                                && f.Name.ToLower() == player.Name.ToLower()
+                                && f.Patronymic.ToLower() == player.Patronymic.ToLower());
 
-                    cmd.CommandText = @"select last_insert_rowid()";
-                    player.Id = Convert.ToInt32((long) cmd.ExecuteScalar());
+                    if (findPlayers.Count == 0) InsertPlayer(player);
+                    if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
                 }
-                else
-                {
-                    player.Id = Convert.ToInt32(obj);
-                }
-
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-
             }
             return player;
+        }
+
+        private void InsertPlayer(Player player)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = String.Format(
+                       "INSERT INTO player(name, surname, surname_lower, patronymic, number) VALUES ('{0}', '{1}','{3}', '{4}', {2})",
+                       player.Name, player.Surname, player.Number, player.Surname.ToLower(), player.Patronymic);
+            cmd.ExecuteNonQuery();
+
+            cmd.CommandText = @"select last_insert_rowid()";
+            player.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
         }
 
         internal void UpdatePlayersInfo(List<Player> players)
@@ -411,39 +390,39 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
         #region не используется
 
-        public void AddPlayer(Player player)
-        {
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            cmd.CommandText = string.Format("INSERT INTO player (number, name, surname) VALUES({0}, '{1}', '{2}')",
-                player.Number, player.Name, player.Surname);
+        //public void AddPlayer(Player player)
+        //{
+        //    SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+        //    cmd.CommandText = string.Format("INSERT INTO player (number, name, surname) VALUES({0}, '{1}', '{2}')",
+        //        player.Number, player.Name, player.Surname);
 
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
+        //    try
+        //    {
+        //        cmd.ExecuteNonQuery();
+        //    }
+        //    catch (SqliteException ex)
+        //    {
+        //        Console.WriteLine(ex.Message);
+        //    }
+        //}
 
-        public void RemovePlayerByNumber(int number)
-        {
-            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
-            var player = GetPlayerByNumber(number);
-            if (player == null) return;
+        //public void RemovePlayerByNumber(int number)
+        //{
+        //    SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+        //    var player = GetPlayerByNumber(number);
+        //    if (player == null) return;
 
-            cmd.CommandText = string.Format("DELETE from player where number={0}", number);
+        //    cmd.CommandText = string.Format("DELETE from player where number={0}", number);
 
-            try
-            {
-                cmd.ExecuteNonQuery();
-            }
-            catch (SqliteException ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-        }
+        //    try
+        //    {
+        //        cmd.ExecuteNonQuery();
+        //    }
+        //    catch (SqliteException ex)
+        //    {
+        //        Console.WriteLine(ex.Message);
+        //    }
+        //}
 
         #endregion
     }
