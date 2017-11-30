@@ -21,12 +21,12 @@ namespace Aviators
             return GetPlayersSQL("SELECT * FROM player WHERE id = " + id).FirstOrDefault();
         }
 
-        public List<Player> GetPlayerByNumber(int number)
+        public List<Player> GetPlayersByNumber(int number)
         {
             return GetPlayersSQL("SELECT * FROM player WHERE number = " + number + " ORDER BY id DESC");
         }
 
-        private List<Player> GetPlayersBySurname(string surname)
+        public List<Player> GetPlayersBySurname(string surname)
         {
              return GetPlayersSQL($"SELECT * FROM player WHERE surname_lower = '{surname.ToLower()}'");
         } 

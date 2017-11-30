@@ -125,7 +125,6 @@ namespace Aviators.Bot
             if (chatFinded == null)
             {
                 Console.WriteLine("Cannot find chat for this command: " + e.CallbackQuery.Message);
-
             }
             else
             {

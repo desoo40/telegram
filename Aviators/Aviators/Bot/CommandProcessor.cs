@@ -155,6 +155,12 @@ namespace Aviators
                 await Bot.EditMessageCaptionAsync(chatFinded.Id, msgid, statistic);
             }
 
+            if (command.Name == "игрок")
+            {
+                var player = DB.DBCommands.DBPlayer.GetPlayerById(Convert.ToInt32(cQuery.Data));
+                SendPlayer(chatFinded, command, player);
+            }
+
             if (command.Name == "состав")
             {
                 SendGameSostav(chatFinded, Convert.ToInt32(command.Argument));
@@ -243,7 +249,7 @@ namespace Aviators
                 DB.DBCommands.UpdateChatParams(chatFinded);
             }
 
-            chatFinded.WaitingCommands.Remove(command);
+            //chatFinded.WaitingCommands.Remove(command);
         }
 
         #region неиспользумое
@@ -474,79 +480,93 @@ namespace Aviators
         {
             var playerNumber = int.Parse(command.Name);
 
-
             if (playerNumber < 0 || playerNumber > 100)
             {
                 await Bot.SendTextMessageAsync(chatFinded.Id, "Неверный формат, введите корректный номер игрока от 0 до 100.");
                 return;
             }
-
-            try
+        
+            var players = DB.DBCommands.DBPlayer.GetPlayersByNumber(playerNumber);
+            if (players == null || players.Count== 0)
             {
-                var player = DB.DBCommands.DBPlayer.GetPlayerByNumber(playerNumber);
-                if (player == null)
-                {
-                    await Bot.SendTextMessageAsync(chatFinded.Id, $"Игрок под номером {playerNumber} не найден.");
-                }
-                else
-                {
-                    var playerDescription = Gen.GetPlayerDescr();
-                    playerDescription += $"#{player.Number} {player.Name} {player.Surname}\n\n" +
-                                         $"{player.Position}\n\n";
-
-                    if (!string.IsNullOrEmpty(player.VK)) playerDescription += $"VK: {player.VK}\n";
-                    if (!string.IsNullOrEmpty(player.INSTA)) playerDescription += $"Inst: {player.INSTA}\n";
-                    //$"Inst: {player.INSTA}";
-
-
-                    var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
-
-                    Console.WriteLine($"Send player:{player.Surname}");
-                    if (File.Exists(photopath))
-                    {
-
-                        var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
-                            (new StreamReader(photopath)).BaseStream);
-
-                        var button = new InlineKeyboardButton("Статистика");
-                        var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
-
-                        Message mes = await Bot.SendPhotoAsync(chatFinded.Id, photo, playerDescription, replyMarkup: keyboard);
-                        var newcom = new Command(new [] {"статистика", command.Name});
-                        newcom.Message = mes;
-                        chatFinded.WaitingCommands.Add(newcom);
-                    }
-                    else
-                    {
-                        Console.WriteLine($"Photo file {photopath} not found.");
-                        await Bot.SendTextMessageAsync(chatFinded.Id, playerDescription);
-                    }
-                }
+                await Bot.SendTextMessageAsync(chatFinded.Id, $"Игрок под номером {playerNumber} не найден.");
+                return;
             }
-            catch (Exception ex)
+
+            if (players.Count==1)
+                SendPlayer(chatFinded, command, players[0]);
+
+            if (players.Count > 1)
             {
-                Console.WriteLine(ex.Message);
-                await Bot.SendTextMessageAsync(chatFinded.Id, "Ваш запрос не удалось обработать.");
+                var keyboard = MakeKeyboardPlayers(players);
+
+                Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Найдено более одного игрока. Выберите:",
+                    parseMode: ParseMode.Markdown, replyMarkup: keyboard);
+                command.Message = mes;
+                command.Name = "игрок";
+                chatFinded.WaitingCommands.Add(command);
+            }
+        }
+
+        private async void SendPlayer(Chat chat, Command command, Player player)
+        {
+            var playerDescription = Gen.GetPlayerDescr();
+            playerDescription += $"#{player.Number} {player.Name} {player.Surname}\n\n" +
+                                 $"{player.Position}\n\n";
+
+            if (!string.IsNullOrEmpty(player.VK)) playerDescription += $"VK: {player.VK}\n";
+            if (!string.IsNullOrEmpty(player.INSTA)) playerDescription += $"Inst: {player.INSTA}\n";
+
+            var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
+
+            var button = new InlineKeyboardButton("Статистика");
+            var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
+
+            Console.WriteLine($"Send player:{player.Surname}");
+            if (File.Exists(photopath))
+            {
+                var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
+                    (new StreamReader(photopath)).BaseStream);
+
+                Message mes = await Bot.SendPhotoAsync(chat.Id, photo, playerDescription, replyMarkup: keyboard);
+                var newcom = new Command(new[] { "статистика", command.Name });
+                newcom.Message = mes;
+                chat.WaitingCommands.Add(newcom);
+            }
+            else
+            {
+                Console.WriteLine($"Photo file {photopath} not found.");
+                await Bot.SendTextMessageAsync(chat.Id, playerDescription);
             }
         }
 
         private string GetPlayerStatistic(Chat chat, string arg)
         {
             string result = "Игрок не найден";
-            Player player;
+            Player player = null;
+            var players = new List<Player>();
 
             if (rxNums.IsMatch(arg))
             {
-                //в случае числа показываем стату
                 var number = int.Parse(arg);
-                player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNumber(chat, number);
+                players = DB.DBCommands.DBPlayer.GetPlayersByNumber(number);
             }
             else
             {
-                //return "tut viletaet((((";
-                //в случае букв ищем по имени или фамилии
-                player = DB.DBCommands.DBPlayer.GetPlayerStatisticByNameOrSurname(chat, arg);
+                players = DB.DBCommands.DBPlayer.GetPlayersBySurname(arg);
             }
+
+            //в случае числа показываем стату
+            if (players.Count == 1)
+            {
+                player = players[0];
+                DB.DBCommands.DBPlayer.GetPlayerStatistic(chat, player);
+            }
+            else
+            {
+                //TODO дописать выбор игрока
+            }
+            
 
             if (player != null)
             {
@@ -889,6 +909,19 @@ namespace Aviators
             return keyboard;
         }
 
+
+        private InlineKeyboardMarkup MakeKeyboardPlayers(List<Player> players)
+        {
+            var massiv = new List<InlineKeyboardButton[]>();
+            foreach (Player p in players)
+            {
+                var str = $"{p.Number} - {p.Surname} {p.Name} {p.Patronymic}";
+                massiv.Add(new[] { new InlineKeyboardButton(str, p.Id.ToString()) });
+            }
+
+            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
+            return keyboard;
+        }
 
         private InlineKeyboardMarkup MakeKeyboardGames(List<Game> games)
         {
