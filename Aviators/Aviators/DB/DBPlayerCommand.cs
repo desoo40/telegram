@@ -61,7 +61,8 @@ namespace Aviators
         {
             var player = new Player(Convert.ToInt32(reader["number"].ToString()),
                 reader["name"].ToString(),
-                reader["surname"].ToString());
+                reader["surname"].ToString(),
+                reader["patronymic"].ToString());
             player.Id = Convert.ToInt32(reader["id"].ToString());
 
             var value = reader["positionid"].ToString();

@@ -46,7 +46,7 @@ namespace Aviators
                 {
                     if (Patronymic == null)
                     {
-                        str = "DB\\PlayersPhoto\\no_photo";
+                        str = "DB\\PlayersPhoto\\no_photo.jpg";
                         return str;
                     }
 

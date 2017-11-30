@@ -517,7 +517,7 @@ namespace Aviators
             if (!string.IsNullOrEmpty(player.VK)) playerDescription += $"VK: {player.VK}\n";
             if (!string.IsNullOrEmpty(player.INSTA)) playerDescription += $"Inst: {player.INSTA}\n";
 
-            var photopath = Path.Combine(Config.DBPlayersPhotoDirPath, player.PhotoFile);
+            var photopath = player.PhotoFile;
 
             var button = new InlineKeyboardButton("Статистика");
             var keyboard = new InlineKeyboardMarkup(new[] { new[] { button } });
