@@ -371,12 +371,13 @@ namespace Aviators
 
       
 
-        public void AddNewGameAndPlayers(Game game)
+        public bool AddNewGameAndPlayers(Game game)
         {
             //Добавляем игроков
             foreach (var player in game.Roster)
             {
-                DBPlayer.GetPlayerOrInsert(player);
+                var p = DBPlayer.GetPlayerOrInsert(player);
+                if (p == null) return false;
             }
             game.Tournament = GetTournamentByNameOrInsert(game.Tournament.Name);
             game.Season = GetSeasonByDateOrInsert(game.Date);
@@ -417,6 +418,8 @@ namespace Aviators
             {
                 DBGame.AddGoal(goal, game.Id);
             }
+
+            return true;
         }
 
        
@@ -427,7 +430,8 @@ namespace Aviators
             //Добавляем игроков
             foreach (var player in game.Roster)
             {
-                DBPlayer.GetPlayerOrInsert(player);
+                var p =  DBPlayer.GetPlayerOrInsert(player);
+                if (p == null) return false;
             }
 
             game.Place = GetPlaceOrInsert(game.Place.Name);

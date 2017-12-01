@@ -25,7 +25,9 @@ namespace Aviators
 
             foreach (var fileInfo in files)
             {
-                ProcessOneFile(fileInfo.FullName);
+                var r = ProcessOneFile(fileInfo.FullName);
+                if (r == false)
+                    Console.WriteLine("Файл не удалось обработать.");
             }
         }
 
@@ -58,7 +60,11 @@ namespace Aviators
 
                 var findGame = DB.DBCommands.DBGame.FindGame(game);
                 if (findGame == null)
-                    DB.DBCommands.AddNewGameAndPlayers(game);
+                {
+                    var r = DB.DBCommands.AddNewGameAndPlayers(game);
+                    if (r == false) return false;
+
+                }
                 else
                 {
                     if (!DB.DBCommands.UpdateGameAndPlayer(findGame, game)) return false;

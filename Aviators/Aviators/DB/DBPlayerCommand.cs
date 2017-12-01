@@ -338,6 +338,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             if (findPlayers.Count > 1)
             {
                 Console.WriteLine("У нас тут ситуация с входящим игроком без отчества: " + player);
+                return null;
             }
 
           
