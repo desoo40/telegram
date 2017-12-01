@@ -323,32 +323,24 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
             var findPlayers = GetPlayersBySurname(player.Surname);
 
+            if (player.Patronymic == null)
+                findPlayers = findPlayers.FindAll(f =>
+                                f.Surname.ToLower() == player.Surname.ToLower()
+                                && f.Name.ToLower() == player.Name.ToLower());
+            else
+                findPlayers = findPlayers.FindAll(f =>
+                                    f.Surname.ToLower() == player.Surname.ToLower()
+                                    && f.Name.ToLower() == player.Name.ToLower()
+                                    && f.Patronymic.ToLower() == player.Patronymic.ToLower());
+
             if (findPlayers.Count == 0) InsertPlayer(player);
             if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
             if (findPlayers.Count > 1)
             {
-                findPlayers =
-                    findPlayers.FindAll(
-                        f =>
-                            f.Surname.ToLower() == player.Surname.ToLower() 
-                            && f.Name.ToLower() == player.Name.ToLower());
-
-                if (findPlayers.Count == 0) InsertPlayer(player);
-                if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
-
-                if (findPlayers.Count > 1)
-                {
-                    findPlayers =
-                        findPlayers.FindAll(
-                            f =>
-                                f.Surname.ToLower() == player.Surname.ToLower()
-                                && f.Name.ToLower() == player.Name.ToLower()
-                                && f.Patronymic.ToLower() == player.Patronymic.ToLower());
-
-                    if (findPlayers.Count == 0) InsertPlayer(player);
-                    if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
-                }
+                Console.WriteLine("У нас тут ситуация с входящим игроком без отчества: " + player);
             }
+
+          
             return player;
         }
 
@@ -369,6 +361,8 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             foreach (var player in players)
             {
                 var p = GetPlayerOrInsert(player);
+
+                if (p == null) continue;
 
                 SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
                 cmd.CommandText = string.Format("UPDATE player SET positionid = {1} WHERE id = {0};" +
