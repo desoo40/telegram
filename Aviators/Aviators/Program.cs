@@ -13,7 +13,7 @@ namespace Aviators
         /// Флаг для создания базы и табличек, что бы из кода.
         /// Можно так же аргумент в свойствах проекта прописывать, но неудобно
         /// </summary>
-        private static bool InitFromCode = true;
+        private static bool InitFromCode = false;
         public static bool LoadIncome = true;
 
         static void Main(string[] args)
