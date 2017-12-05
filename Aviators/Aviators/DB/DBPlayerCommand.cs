@@ -182,7 +182,7 @@ namespace Aviators
 
             cmd.CommandText =
                 "SELECT  player_id , count(*) AS num " +
-                $"FROM goal_player " +
+                "FROM goal_player " +
                 "LEFT JOIN goal ON goal_player.goal_id = goal.id " +
                 "LEFT JOIN game ON game.id = goal.game_id " +
                 $"{typestring} {stOptions} " +
@@ -206,6 +206,8 @@ namespace Aviators
                 if (type == Top.Assist) player.AllStatAssist = Convert.ToInt32(reader["num"].ToString());
                 if (type == Top.Goals) player.AllStatGoal = Convert.ToInt32(reader["num"].ToString());
                 if (type == Top.Points) player.AllStatBomb = Convert.ToInt32(reader["num"].ToString());
+
+                GetPlayerStatistic(chat, player);
 
                 players.Add(player);
             }
