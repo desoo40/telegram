@@ -101,7 +101,11 @@ namespace Aviators
 
         public int Shtraf => Actions.Where(a => a.Action == Action.Штраф).Sum(a => a.Param);
 
-        public int Games => Actions.Count(a => a.Action == Action.Игра);
+        public int Games
+        {
+            get { return Actions.Count(a => a.Action == Action.Игра); }
+            set { throw new System.NotImplementedException(); }
+        }
 
         public int PlusMinus
             => (Actions.Count(a => a.Action == Action.Плюс) - Actions.Count(a => a.Action == Action.Минус));

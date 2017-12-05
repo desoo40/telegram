@@ -611,14 +611,18 @@ namespace Aviators
             List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(chatFinded, type, count);
 
             if (topPlayers.Count < count - 5) return "";
-            result = $"Топ {topPlayers.Count} *{GetTypeDescription(type)}* ХК \"Авиаторы\":\n";
+            
+            result = $"Топ {topPlayers.Count} *{GetTypeDescription(type)}* ХК \"Авиаторы\" в турнире \"{chatFinded.Tournament}\" сезона *{chatFinded.Season}*:\n";
+
+            result += string.Format("*{0,-3}{1,-20}{2} {3}*\n", "№", "Имя Фамилия", "О", "И");
 
             foreach (var topPlayer in topPlayers)
             {
                 result += "\n";
-                result += string.Format("`#{0,-3}{1,-20}`*{2}({3})*", topPlayer.Number,
+
+                result += string.Format("`#{0,-3}{1,-20}`*{2} {3}*", topPlayer.Number,
                     topPlayer.Name + " " + topPlayer.Surname,
-                    GetTypeParametr(type, topPlayer), topPlayer.Games);
+                    GetStringOfStatType(type, topPlayer), topPlayer.Games);
 
             }
 
@@ -837,7 +841,7 @@ namespace Aviators
             return "";
         }
 
-        private string GetTypeParametr(Top type, Player topPlayer)
+        private string GetStringOfStatType(Top type, Player topPlayer)
         {
             switch (type)
             {
@@ -851,7 +855,7 @@ namespace Aviators
                     return topPlayer.AllStatAssist.ToString();
 
                 case Aviators.Top.Points:
-                    return topPlayer.AllStatBomb.ToString();
+                    return $"{topPlayer.AllStatBomb} ({topPlayer.AllStatGoal}+{topPlayer.AllStatAssist})";
 
                 case Aviators.Top.Penalty:
                     return topPlayer.Shtraf.ToString();
