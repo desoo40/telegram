@@ -611,10 +611,22 @@ namespace Aviators
             List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(chatFinded, type, count);
 
             if (topPlayers.Count < count - 5) return "";
-            
-            result = $"Топ {topPlayers.Count} *{GetTypeDescription(type)}* ХК \"Авиаторы\" в турнире \"{chatFinded.Tournament}\" сезона *{chatFinded.Season}*:\n";
 
-            result += string.Format("*{0,-3}{1,-20}{2} {3}*\n", "№", "Имя Фамилия", "О", "И");
+            result += TourSeasonStringUpdate(chatFinded);
+
+            result += $"Топ {topPlayers.Count} *{GetTypeDescription(type)}* ХК \"Авиаторы\"\n\n";
+
+            
+
+            if (type == Aviators.Top.Goals)
+                result += string.Format("`{0,-3} {1,-20}`*{2} {3}*", "№", "Имя Фамилия", "Г", "И");
+
+            if (type == Aviators.Top.Assist)
+                result += string.Format("`{0,-3} {1,-20}`*{2} {3}*", "№", "Имя Фамилия", "А", "И");
+
+            if (type == Aviators.Top.Points)
+                result += string.Format("`{0,-3} {1,-20}`*{2} ({3}+{4}) {5}*", "№", "Имя Фамилия", "О", "Г", "А", "И");
+
 
             foreach (var topPlayer in topPlayers)
             {
@@ -627,6 +639,20 @@ namespace Aviators
             }
 
             return result;
+        }
+
+        private string TourSeasonStringUpdate(Chat chatFinded)
+        {
+            var s = "";
+            if (chatFinded.Tournament != null)
+                s += $"*{chatFinded.Tournament}*";
+
+            if (chatFinded.Season != null)
+                s += $"\n*{chatFinded.Season}*";
+
+            s += "\n";
+
+            return s;
         }
 
         private async void Slogans(Chat chatFinded)
@@ -674,7 +700,7 @@ namespace Aviators
             teams.RemoveAt(0);
 
             var keyboard = MakeKeyboardTeams(teams);
-            Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите соперника", replyMarkup: keyboard);
+            Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, TourSeasonStringUpdate(chatFinded) + "Выберите соперника", replyMarkup: keyboard);
             command.Message = mes;
             chatFinded.WaitingCommands.Add(command);
 
@@ -763,6 +789,7 @@ namespace Aviators
             var shotsIn = games.Sum(g => g.Stat1.ShotsIn);
             var opGoals = games.Sum(g => g.Score.Item2);
 
+            result.Add(TourSeasonStringUpdate(chatFinded));
             result.Add("Статистика встреч с соперником *" + team.Name +"*");
 
             result.Add($"`{"Всего игр",otstup}` {games.Count}");
@@ -855,7 +882,7 @@ namespace Aviators
                     return topPlayer.AllStatAssist.ToString();
 
                 case Aviators.Top.Points:
-                    return $"{topPlayer.AllStatBomb} ({topPlayer.AllStatGoal}+{topPlayer.AllStatAssist})";
+                    return $"{topPlayer.AllStatBomb} ({topPlayer.Goals}+{topPlayer.Pas})";
 
                 case Aviators.Top.Penalty:
                     return topPlayer.Shtraf.ToString();

@@ -585,8 +585,8 @@ namespace Aviators
         {
             var seasonName = "";
 
-            if (date.Month < 8) seasonName = (date.Year - 1) + "/" + date.Year;
-            else seasonName = date.Year + "/" + (date.Year + 1);
+            if (date.Month < 8) seasonName = (date.Year - 1).ToString("yy") + "/" + date.Year.ToString("yy");
+            else seasonName = date.Year.ToString("yy") + "/" + ((date.Year + 1).ToString("yy"));
 
             return GetSeasonByNameOrInsert(seasonName);
         }
