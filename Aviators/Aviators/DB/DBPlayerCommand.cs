@@ -325,27 +325,90 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
             var findPlayers = GetPlayersBySurname(player.Surname);
 
-            if (player.Patronymic == null)
-                findPlayers = findPlayers.FindAll(f =>
-                                f.Surname.ToLower() == player.Surname.ToLower()
-                                && f.Name.ToLower() == player.Name.ToLower());
-            else
-                findPlayers = findPlayers.FindAll(f =>
-                                    f.Surname.ToLower() == player.Surname.ToLower()
-                                    && f.Name.ToLower() == player.Name.ToLower()
-                                    && f.Patronymic.ToLower() == player.Patronymic.ToLower());
-
+            // не нашли с фамилией, записываем игрока
             if (findPlayers.Count == 0) InsertPlayer(player);
-            if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
-            if (findPlayers.Count > 1)
-            {
-                Console.WriteLine("У нас тут ситуация с входящим игроком без отчества: " + player);
-                return null;
-            }
 
-          
+            //если нашли один, проверяем есть ли отчество во входящем и сравниваем
+            if (findPlayers.Count == 1)
+                OnePlayerAnalayze(player, findPlayers[0]);
+            if(findPlayers.Count > 1)
+            {
+                findPlayers = findPlayers.FindAll(f =>f.Name.ToLower() == player.Name.ToLower());
+
+                if (findPlayers.Count == 0) InsertPlayer(player);
+                if (findPlayers.Count == 1)
+                    OnePlayerAnalayze(player, findPlayers[0]);
+
+                if (findPlayers.Count > 1)
+                {
+                    if (player.Patronymic == null)
+                        Console.WriteLine("Нашли более одного игрока в базе, необходимо добавить отчество: " + player);
+                    else
+                    {
+                        findPlayers = findPlayers.FindAll(f => f.Patronymic.ToLower() == player.Patronymic.ToLower());
+
+                        if (findPlayers.Count == 0) InsertPlayer(player);
+                        if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
+                        if(findPlayers.Count>1)
+                            Console.WriteLine("Нашли более одного игрока в базе, ошибка: " + player);
+                    }
+                }
+            }
             return player;
         }
+
+        private void OnePlayerAnalayze(Player player, Player findPlayer)
+        {
+            if (player.Patronymic == null)
+            {
+                if (SameName(player, findPlayer))
+                {
+                    if (findPlayer.Patronymic != null)
+                        Console.WriteLine("В базе отчество есть, а во входящем нету: " + player);
+
+                    player.Id = findPlayer.Id;
+                }
+                else
+                    InsertPlayer(player);
+
+            }
+            else
+            {
+                if (findPlayer.Patronymic != null)
+                {
+                    if (SamePatronymic(player, findPlayer))
+                        player.Id = findPlayer.Id;
+                    else
+                        InsertPlayer(player);
+                }
+                else
+                {
+                    UpdatePatronymicPlayer(player);
+                    player.Id = findPlayer.Id;
+                }
+
+            }
+        }
+
+        private void UpdatePatronymicPlayer(Player player)
+        {
+            
+
+        }
+
+        private bool SameName(Player p1, Player p2)
+        {
+            return p1.Name.ToLower() == p2.Name.ToLower();
+        }
+        private bool SameSurname(Player p1, Player p2)
+        {
+            return p1.Surname.ToLower() == p2.Surname.ToLower();
+        }
+        private bool SamePatronymic(Player p1, Player p2)
+        {
+            return p1.Patronymic.ToLower() == p2.Patronymic.ToLower();
+        }
+
 
         private void InsertPlayer(Player player)
         {
