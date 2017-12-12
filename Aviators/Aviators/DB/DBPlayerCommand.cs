@@ -365,11 +365,11 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
         private void OnePlayerAnalayze(Player player, Player findPlayer)
         {
-            if (player.Patronymic == null)
+            if (string.IsNullOrEmpty(player.Patronymic))
             {
                 if (SameName(player, findPlayer))
                 {
-                    if (findPlayer.Patronymic != null)
+                    if (!string.IsNullOrEmpty(findPlayer.Patronymic))
                     {
                         //Console.WriteLine("В базе отчество есть, а во входящем нету: " + player);
                     }
@@ -382,7 +382,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             }
             else
             {
-                if (findPlayer.Patronymic != null)
+                if (!string.IsNullOrEmpty(findPlayer.Patronymic))
                 {
                     if (SamePatronymic(player, findPlayer))
                         player.Id = findPlayer.Id;
@@ -391,9 +391,10 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 }
                 else
                 {
+                    player.Id = findPlayer.Id;
+
                     Console.WriteLine("Обновляем отчество в базе: " + player);
                     UpdatePatronymicPlayer(player);
-                    player.Id = findPlayer.Id;
                 }
 
             }
@@ -401,23 +402,18 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
         private void UpdatePatronymicPlayer(Player player)
         {
-            
-
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = String.Format(
+                       $"UPDATE player SET patronymic = '{player.Patronymic}' WHERE id = {player.Id}");
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
-
-        private bool SameName(Player p1, Player p2)
-        {
-            return p1.Name.Trim().ToLower() == p2.Name.Trim().ToLower();
-        }
-        private bool SameSurname(Player p1, Player p2)
-        {
-            return p1.Surname.ToLower() == p2.Surname.ToLower();
-        }
-        private bool SamePatronymic(Player p1, Player p2)
-        {
-            return p1.Patronymic.Trim().ToLower() == p2.Patronymic.Trim().ToLower();
-        }
-
 
         private void InsertPlayer(Player player)
         {
@@ -425,7 +421,14 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             cmd.CommandText = String.Format(
                        "INSERT INTO player(name, surname, surname_lower, patronymic, number) VALUES ('{0}', '{1}','{3}', '{4}', {2})",
                        player.Name, player.Surname, player.Number, player.Surname.ToLower(), player.Patronymic);
-            cmd.ExecuteNonQuery();
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             cmd.CommandText = @"select last_insert_rowid()";
             player.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
@@ -454,6 +457,19 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                     Console.WriteLine(ex.Message);
                 }
             }
+        }
+
+        private bool SameName(Player p1, Player p2)
+        {
+            return p1.Name.Trim().ToLower() == p2.Name.Trim().ToLower();
+        }
+        private bool SameSurname(Player p1, Player p2)
+        {
+            return p1.Surname.ToLower() == p2.Surname.ToLower();
+        }
+        private bool SamePatronymic(Player p1, Player p2)
+        {
+            return p1.Patronymic.Trim().ToLower() == p2.Patronymic.Trim().ToLower();
         }
 
         #endregion
