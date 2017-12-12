@@ -24,7 +24,7 @@ namespace Aviators
             Name = name;
             Surname = surname;
 
-            Patronymic = patronymic == "-" ? null : patronymic;
+            Patronymic = patronymic == "-" || patronymic == "" ? null : patronymic;
 
             PhotoFile = GetPhotoFile();
         }

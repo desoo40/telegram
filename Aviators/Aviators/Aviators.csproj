@@ -77,6 +77,7 @@
   <ItemGroup>
     <Compile Include="Bot\AviaBot.cs" />
     <Compile Include="Bot\Chat.cs" />
+    <Compile Include="Bot\Command.cs" />
     <Compile Include="Bot\CommandProcessor.cs" />
     <Compile Include="Bot\ImageGenerator\Layout\Format.cs" />
     <Compile Include="Bot\ImageGenerator\Layout\GameStat.cs" />

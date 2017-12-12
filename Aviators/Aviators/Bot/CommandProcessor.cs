@@ -610,6 +610,8 @@ namespace Aviators
             string result = "";
             List<Player> topPlayers = DB.DBCommands.DBPlayer.GetTopPlayers(chatFinded, type, count);
 
+            topPlayers = SortTopPlayer(type, topPlayers);
+
             if (topPlayers.Count < count - 5) return "";
 
             result += TourSeasonStringUpdate(chatFinded);
@@ -640,6 +642,30 @@ namespace Aviators
 
             return result;
         }
+
+
+        /// <summary>
+        /// Денис захотел сортировку
+        /// </summary>
+        private List<Player> SortTopPlayer(Top type, List<Player> topPlayers)
+        {
+            if (type == Aviators.Top.APG)
+                return topPlayers.OrderByDescending(g => g.StatAverragePerGame).ThenByDescending(g => g.Games).ToList();
+            if (type == Aviators.Top.Goals)
+                return topPlayers.OrderByDescending(g => g.AllStatGoal).ThenByDescending(g => g.Games).ToList();
+            if (type == Aviators.Top.Assist)
+                return topPlayers.OrderByDescending(g => g.AllStatAssist).ThenByDescending(g => g.Games).ToList();
+            if (type == Aviators.Top.Penalty)
+                return topPlayers.OrderByDescending(g => g.AllStatMinute).ThenByDescending(g => g.Games).ToList();
+            if (type == Aviators.Top.PlusMinus)
+                return topPlayers.OrderByDescending(g => g.PlusMinus).ThenByDescending(g => g.Games).ToList();
+            if (type == Aviators.Top.Points)
+                return topPlayers.OrderByDescending(g => g.AllStatBomb).ThenByDescending(g => g.Games).ToList();
+
+
+            return topPlayers;
+        }
+
 
         private string TourSeasonStringUpdate(Chat chatFinded)
         {
@@ -986,30 +1012,6 @@ namespace Aviators
         #endregion
     }
 
-
-    public class Command
-    {
-        public string Name { get; set; }
-        public string Argument => ListArguments.FirstOrDefault();
-        public List<string> ListArguments { get; set; }
-
-        public Message Message { get; set; }
-
-        public Command(string[] input)
-        {
-            ListArguments = new List<string>();
-            if (input.Length > 0)
-            {
-                Name = input[0];
-                if (input.Length > 1)  ListArguments.AddRange(input.Skip(1));
-            }
-            else
-            {
-                Name = ""; //хз
-            }
-        }
-
-    }
 
     public enum Top
     {
