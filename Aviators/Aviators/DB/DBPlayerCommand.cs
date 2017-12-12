@@ -333,7 +333,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 OnePlayerAnalayze(player, findPlayers[0]);
             if(findPlayers.Count > 1)
             {
-                findPlayers = findPlayers.FindAll(f =>f.Name.ToLower() == player.Name.ToLower());
+                findPlayers = findPlayers.FindAll(f => SameName(f, player));
 
                 if (findPlayers.Count == 0) InsertPlayer(player);
                 if (findPlayers.Count == 1)
@@ -342,15 +342,21 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 if (findPlayers.Count > 1)
                 {
                     if (player.Patronymic == null)
+                    {
                         Console.WriteLine("Нашли более одного игрока в базе, необходимо добавить отчество: " + player);
+                        return null;
+                    }
                     else
                     {
-                        findPlayers = findPlayers.FindAll(f => f.Patronymic.ToLower() == player.Patronymic.ToLower());
+                        findPlayers = findPlayers.FindAll(f => SamePatronymic(f, player));
 
                         if (findPlayers.Count == 0) InsertPlayer(player);
                         if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
-                        if(findPlayers.Count>1)
+                        if (findPlayers.Count > 1)
+                        {
                             Console.WriteLine("Нашли более одного игрока в базе, ошибка: " + player);
+                            return null;
+                        }
                     }
                 }
             }
@@ -364,7 +370,9 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 if (SameName(player, findPlayer))
                 {
                     if (findPlayer.Patronymic != null)
-                        Console.WriteLine("В базе отчество есть, а во входящем нету: " + player);
+                    {
+                        //Console.WriteLine("В базе отчество есть, а во входящем нету: " + player);
+                    }
 
                     player.Id = findPlayer.Id;
                 }
@@ -383,6 +391,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                 }
                 else
                 {
+                    Console.WriteLine("Обновляем отчество в базе: " + player);
                     UpdatePatronymicPlayer(player);
                     player.Id = findPlayer.Id;
                 }
@@ -398,7 +407,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
         private bool SameName(Player p1, Player p2)
         {
-            return p1.Name.ToLower() == p2.Name.ToLower();
+            return p1.Name.Trim().ToLower() == p2.Name.Trim().ToLower();
         }
         private bool SameSurname(Player p1, Player p2)
         {
@@ -406,7 +415,7 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
         }
         private bool SamePatronymic(Player p1, Player p2)
         {
-            return p1.Patronymic.ToLower() == p2.Patronymic.ToLower();
+            return p1.Patronymic.Trim().ToLower() == p2.Patronymic.Trim().ToLower();
         }
 
 
