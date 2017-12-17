@@ -39,7 +39,7 @@ namespace Aviators
             //DB = new DBCore();
         }
 
-        public void FindCommands(string msg, Chat chatFinded, int fromId)
+        public async void FindCommands(string msg, Chat chatFinded, int fromId)
         {
             var inputCommands = msg.Split(' ');
 
@@ -170,7 +170,8 @@ namespace Aviators
             {
                 var count = Convert.ToInt32(command.Argument) + 5;
 
-                string result = GetTop(chatFinded, (Top)(Convert.ToInt32(cQuery.Data)), count);
+                string result = 
+                    GetTop(chatFinded, (Top)(Convert.ToInt32(cQuery.Data)), count);
 
                 if (result == "")
                 {
@@ -966,7 +967,6 @@ namespace Aviators
             return keyboard;
         }
 
-
         private InlineKeyboardMarkup MakeKeyboardPlayers(List<Player> players)
         {
             var massiv = new List<InlineKeyboardButton[]>();
@@ -1010,6 +1010,28 @@ namespace Aviators
         }
 
         #endregion
+
+        public async void SendKeyboardButtons(Chat chatFinded)
+        {
+            var keyboard = new ReplyKeyboardMarkup();
+            keyboard.ResizeKeyboard = true;
+
+            var row1 = new KeyboardButton[] // First Row
+            {
+                "Команды",
+                "ОПисание",
+
+            };
+            keyboard.Keyboard = new[]
+            {row1,
+                new KeyboardButton[] // Second Row
+                {
+                    "Туринир",
+                    "Сезон",
+                },
+            };
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Добро пожаловать!", replyMarkup: keyboard);
+        }
     }
 
 
