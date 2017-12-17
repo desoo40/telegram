@@ -661,7 +661,7 @@ namespace Aviators
             if (type == Aviators.Top.PlusMinus)
                 return topPlayers.OrderByDescending(g => g.PlusMinus).ThenByDescending(g => g.Games).ToList();
             if (type == Aviators.Top.Points)
-                return topPlayers.OrderByDescending(g => g.AllStatBomb).ThenByDescending(g => g.Games).ToList();
+                return topPlayers.OrderByDescending(g => g.AllStatBomb).ThenByDescending(g => g.Games).ThenByDescending(g => g.AllStatGoal).ToList();
 
 
             return topPlayers;
@@ -1018,15 +1018,13 @@ namespace Aviators
 
             var row1 = new KeyboardButton[] // First Row
             {
-                "Команды",
-                "ОПисание",
-
+                "Помощь"
             };
             keyboard.Keyboard = new[]
             {row1,
                 new KeyboardButton[] // Second Row
                 {
-                    "Туринир",
+                    "Турнир",
                     "Сезон",
                 },
             };
