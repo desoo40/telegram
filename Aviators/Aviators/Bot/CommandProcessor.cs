@@ -27,7 +27,6 @@ namespace Aviators
         private TelegramBotClient Bot;
         private readonly Randomiser Gen;
         private ImageGenerator ImageGen;
-        //private DBCore DB;
         Regex rxNums = new Regex(@"^\d+$"); // проверка на число
 
 
@@ -36,7 +35,6 @@ namespace Aviators
             Bot = bot;
             Gen = new Randomiser();
             ImageGen = new ImageGenerator();
-            //DB = new DBCore();
         }
 
         public async void FindCommands(string msg, Chat chatFinded, int fromId)
@@ -700,12 +698,10 @@ namespace Aviators
         {
             var tours = DB.DBCommands.GetTournaments();
 
-
             var keyboard = ButtonsGenerator.MakeKeyboardTournaments(tours);
             Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите турнир", replyMarkup: keyboard);
             command.Message = mes;
             chatFinded.WaitingCommands.Add(command);
-
         }
 
         private async void SeasonList(Chat chatFinded, Command command)
@@ -730,7 +726,6 @@ namespace Aviators
             Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, TourSeasonStringUpdate(chatFinded) + "Выберите соперника", replyMarkup: keyboard);
             command.Message = mes;
             chatFinded.WaitingCommands.Add(command);
-
         }
 
         private async void GamesStatistic(Chat chatFinded)
@@ -923,6 +918,9 @@ namespace Aviators
 
        
 
+        /// <summary>
+        /// Отправляет кнопки при подключении к боту, которые всегда будут на месте клавиатуры.
+        /// </summary>
         public async void SendKeyboardButtons(Chat chatFinded)
         {
             var keyboard = new ReplyKeyboardMarkup();
