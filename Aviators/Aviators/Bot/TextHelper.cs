@@ -75,6 +75,16 @@
             if (inStr == "светон")
                 return "ХК \"Светон\"";
 
+            if (inStr == "мчс")
+                return "ХК \"Огненные медведи\" АГПС МЧС";
+
+
+            if (inStr == "финунивер")
+                return "ХК Финансовый Университет";
+
+            if (inStr == "рниму")
+                return "ХК \"White Jackets\" РНИМУ";
+
             return s;
         }
     }
