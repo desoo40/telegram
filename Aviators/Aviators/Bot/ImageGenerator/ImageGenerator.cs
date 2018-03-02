@@ -272,11 +272,11 @@ namespace Aviators
                     {
 
                         r.Stat.Position = UpdateRectangle(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j);
-                        //if (arrOfStat[i, j] == 0)
-                        //{
-                        //    DrawStr(g, "-", r.Stat);
-                        //}
-                        //else
+                        if (arrOfStat[i, j] == 0)
+                        {
+                            DrawStr(g, "-", r.Stat);
+                        }
+                        else
                             DrawStr(g, arrOfStat[i, j].ToString(), r.Stat);
                         r.Stat.Position = BackRectangleAtr(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j); // потому что соскакивают все атрибуты
                     }
@@ -314,7 +314,7 @@ namespace Aviators
 
                 if (game.Goal.Count > extermSizeOfFont)
                 {
-                    var newSize = (int)r.Pucks.Font.Size - 5;
+                    var newSize = (int)r.Pucks.Font.Size - 8;
                     r.Pucks.Font = new Font(r.Pucks.Font.FontFamily, newSize);
                 }
 
@@ -340,7 +340,7 @@ namespace Aviators
 
                     r.Pucks.Position = UpdateRectangle(r.Pucks.Position, r.Pucks.OffsetX, r.Pucks.OffsetY, k, 0);
 
-                    if (goalString.Length > 30) // невероятный костыль
+                    if (goalString.Length > 50) // невероятный костыль
                     {
                         var splitStr = goalString.Split(',');
                         splitStr[0] += ",";
@@ -371,7 +371,10 @@ namespace Aviators
                 if (bestPlayer == null)
                     bestPlayer = new Player(100, "Алексей", "Данилин");
 
-                var goalieStat = Math.Abs(1.0 - ((float)game.Score.Item2 / (float)game.Stat2.ShotsIn)).ToString("N3") + "%";
+                var goalieStat = Math.Abs(1.0 - ((float)game.Score.Item2 / (float)game.Stat2.ShotsIn)).ToString("N3");
+                goalieStat = goalieStat.Replace("0,", ".");
+
+                goalieStat +=  " SV%";
                 //var goalieStat = "1.000%";
 
 
