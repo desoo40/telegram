@@ -76,7 +76,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Bot\AviaBot.cs" />
+    <Compile Include="Bot\ButtonsGenerator.cs" />
     <Compile Include="Bot\Chat.cs" />
+    <Compile Include="Bot\Command.cs" />
     <Compile Include="Bot\CommandProcessor.cs" />
     <Compile Include="Bot\ImageGenerator\Layout\Format.cs" />
     <Compile Include="Bot\ImageGenerator\Layout\GameStat.cs" />
@@ -136,6 +138,7 @@
     <None Include="README.md" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="DB\PlayersPhoto\DSC_6045.jpg" />
     <Content Include="DB\PlayersPhoto\no_photo.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -283,6 +286,9 @@
     <Content Include="DB\PlayersPhoto\никитин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
+    <Content Include="DB\PlayersPhoto\огородников.jpg">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
     <Content Include="DB\PlayersPhoto\оськин.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
@@ -386,6 +392,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Logo\MoscowGames2017_logo.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Images\Logo\ЗХЛ_logo.png">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <Content Include="Images\Logo\МСХЛ_logo.png">

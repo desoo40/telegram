@@ -93,8 +93,7 @@ namespace Aviators.Bot
                 chatFinded = DB.DBCommands.FindOrInsertChat(e.Message.Chat);
                 Chats.Add(chatFinded);
 
-                //chatFinded = new Chat(cid);
-                //Chats.Add(chatFinded);
+                Commands.SendKeyboardButtons(chatFinded);
             }
 
             if (msg == null) return;

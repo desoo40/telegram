@@ -182,7 +182,7 @@ namespace Aviators
 
             cmd.CommandText =
                 "SELECT  player_id , count(*) AS num " +
-                $"FROM goal_player " +
+                "FROM goal_player " +
                 "LEFT JOIN goal ON goal_player.goal_id = goal.id " +
                 "LEFT JOIN game ON game.id = goal.game_id " +
                 $"{typestring} {stOptions} " +
@@ -206,6 +206,8 @@ namespace Aviators
                 if (type == Top.Assist) player.AllStatAssist = Convert.ToInt32(reader["num"].ToString());
                 if (type == Top.Goals) player.AllStatGoal = Convert.ToInt32(reader["num"].ToString());
                 if (type == Top.Points) player.AllStatBomb = Convert.ToInt32(reader["num"].ToString());
+
+                GetPlayerStatistic(chat, player);
 
                 players.Add(player);
             }
@@ -233,6 +235,8 @@ namespace Aviators
 
             //переметр, показывающий, что игрок должен сыграть более 15 матчей для попадания в статистику пенальти
             var players15 = players.Where(p => p.Games > 15).ToList();
+
+            if (count > players15.Count) count = players15.Count;
 
             return players15.OrderBy(p => p.Shtraf).ToList().GetRange(0, count);
         }
@@ -323,26 +327,94 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
 
             var findPlayers = GetPlayersBySurname(player.Surname);
 
-            if (player.Patronymic == null)
-                findPlayers = findPlayers.FindAll(f =>
-                                f.Surname.ToLower() == player.Surname.ToLower()
-                                && f.Name.ToLower() == player.Name.ToLower());
-            else
-                findPlayers = findPlayers.FindAll(f =>
-                                    f.Surname.ToLower() == player.Surname.ToLower()
-                                    && f.Name.ToLower() == player.Name.ToLower()
-                                    && f.Patronymic.ToLower() == player.Patronymic.ToLower());
-
+            // не нашли с фамилией, записываем игрока
             if (findPlayers.Count == 0) InsertPlayer(player);
-            if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
-            if (findPlayers.Count > 1)
-            {
-                Console.WriteLine("У нас тут ситуация с входящим игроком без отчества: " + player);
-                return null;
-            }
 
-          
+            //если нашли один, проверяем есть ли отчество во входящем и сравниваем
+            if (findPlayers.Count == 1)
+                OnePlayerAnalayze(player, findPlayers[0]);
+            if(findPlayers.Count > 1)
+            {
+                findPlayers = findPlayers.FindAll(f => SameName(f, player));
+
+                if (findPlayers.Count == 0) InsertPlayer(player);
+                if (findPlayers.Count == 1)
+                    OnePlayerAnalayze(player, findPlayers[0]);
+
+                if (findPlayers.Count > 1)
+                {
+                    if (player.Patronymic == null)
+                    {
+                        Console.WriteLine("Нашли более одного игрока в базе, необходимо добавить отчество: " + player);
+                        return null;
+                    }
+                    else
+                    {
+                        findPlayers = findPlayers.FindAll(f => SamePatronymic(f, player));
+
+                        if (findPlayers.Count == 0) InsertPlayer(player);
+                        if (findPlayers.Count == 1) player.Id = findPlayers[0].Id;
+                        if (findPlayers.Count > 1)
+                        {
+                            Console.WriteLine("Нашли более одного игрока в базе, ошибка: " + player);
+                            return null;
+                        }
+                    }
+                }
+            }
             return player;
+        }
+
+        private void OnePlayerAnalayze(Player player, Player findPlayer)
+        {
+            if (string.IsNullOrEmpty(player.Patronymic))
+            {
+                if (SameName(player, findPlayer))
+                {
+                    if (!string.IsNullOrEmpty(findPlayer.Patronymic))
+                    {
+                        //Console.WriteLine("В базе отчество есть, а во входящем нету: " + player);
+                    }
+
+                    player.Id = findPlayer.Id;
+                }
+                else
+                    InsertPlayer(player);
+
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(findPlayer.Patronymic))
+                {
+                    if (SamePatronymic(player, findPlayer))
+                        player.Id = findPlayer.Id;
+                    else
+                        InsertPlayer(player);
+                }
+                else
+                {
+                    player.Id = findPlayer.Id;
+
+                    Console.WriteLine("Обновляем отчество в базе: " + player);
+                    UpdatePatronymicPlayer(player);
+                }
+
+            }
+        }
+
+        private void UpdatePatronymicPlayer(Player player)
+        {
+            SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
+            cmd.CommandText = String.Format(
+                       $"UPDATE player SET patronymic = '{player.Patronymic}' WHERE id = {player.Id}");
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
         }
 
         private void InsertPlayer(Player player)
@@ -351,7 +423,14 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
             cmd.CommandText = String.Format(
                        "INSERT INTO player(name, surname, surname_lower, patronymic, number) VALUES ('{0}', '{1}','{3}', '{4}', {2})",
                        player.Name, player.Surname, player.Number, player.Surname.ToLower(), player.Patronymic);
-            cmd.ExecuteNonQuery();
+            try
+            {
+                cmd.ExecuteNonQuery();
+            }
+            catch (SqliteException ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
 
             cmd.CommandText = @"select last_insert_rowid()";
             player.Id = Convert.ToInt32((long)cmd.ExecuteScalar());
@@ -380,6 +459,19 @@ GROUP BY player_id ORDER BY num DESC LIMIT 1";
                     Console.WriteLine(ex.Message);
                 }
             }
+        }
+
+        private bool SameName(Player p1, Player p2)
+        {
+            return p1.Name.Trim().ToLower() == p2.Name.Trim().ToLower();
+        }
+        private bool SameSurname(Player p1, Player p2)
+        {
+            return p1.Surname.ToLower() == p2.Surname.ToLower();
+        }
+        private bool SamePatronymic(Player p1, Player p2)
+        {
+            return p1.Patronymic.Trim().ToLower() == p2.Patronymic.Trim().ToLower();
         }
 
         #endregion
