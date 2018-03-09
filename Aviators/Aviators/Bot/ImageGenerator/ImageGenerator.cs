@@ -151,11 +151,23 @@ namespace Aviators
             {
                 i = param / 3;
                 j = param % 3;
+                
+                if (param == 12)
+                {
+                    i = 3;
+                    j = 3;
+                }
             }
             if (player.Position == PlayerPosition.Защитник || player.Position == PlayerPosition.Вратарь)
             {
                 i = param / 2;
                 j = param % 2;
+
+                //костыль для случая из 13 нап и 7 защей
+                //if (param == 6)
+                //{
+                //    ++j;
+                //}
             }
 
             
@@ -185,7 +197,7 @@ namespace Aviators
 
         public string GameStatistic(Game game, bool isLastGame = false)
         {
-            Image bitmap = Image.FromFile("Images\\Blanks\\gameStat.jpg");
+            Image bitmap = Image.FromFile("Images\\Blanks\\gameStat1.jpg");
 
             if (isLastGame)
                 bitmap = Image.FromFile("Images\\Blanks\\lastStat.jpg");
@@ -250,17 +262,44 @@ namespace Aviators
 
                         DrawStr(g, "Б", r.OverPenalty);
                     }
+
+                    if (game.OvertimeGame)
+                    {
+                        if (game.Score.Item1 < game.Score.Item2)
+                            r.OverPenalty.Position = UpdateRectangle(r.OverPenalty.Position, r.OverPenalty.OffsetX, r.OverPenalty.OffsetY, 0, 1);
+
+                        DrawStr(g, "ОТ", r.OverPenalty);
+                    }
                 }
 
                 #endregion
 
                 #region Статистика
 
+                double faceoofFull = (double) game.Stat1.Faceoff + game.Stat2.Faceoff;
+
+                double faceoff1 = 0;
+                double faceoff2 = 0;
+
+                if (faceoofFull != 0)
+                {
+                    faceoff1 = (game.Stat1.Faceoff / faceoofFull) * 100;
+                    faceoff2 = (game.Stat2.Faceoff / faceoofFull) * 100;
+                }
+
+                int f1 = (int) faceoff1;
+                int f2 = (int)faceoff2;
+
+                if (f1 + f2 != 100)
+                {
+                    ++f1;
+                }
+
                 var arrOfStat = new int[6, 2]
                 {
                     {game.Stat1.Shots, game.Stat2.Shots},
                     {game.Stat1.ShotsIn, game.Stat2.ShotsIn},
-                    {game.Stat1.Faceoff, game.Stat2.Faceoff},
+                    {f1, f2},
                     {game.Stat1.Hits, game.Stat2.Hits},
                     {game.Stat1.Penalty, game.Stat2.Penalty},
                     {game.Stat1.BlockShots, game.Stat2.BlockShots},
@@ -272,11 +311,11 @@ namespace Aviators
                     {
 
                         r.Stat.Position = UpdateRectangle(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j);
-                        if (arrOfStat[i, j] == 0)
-                        {
-                            DrawStr(g, "-", r.Stat);
-                        }
-                        else
+                        //if (arrOfStat[i, j] == 0)
+                        //{
+                        //    DrawStr(g, "-", r.Stat);
+                        //}
+                        //else
                             DrawStr(g, arrOfStat[i, j].ToString(), r.Stat);
                         r.Stat.Position = BackRectangleAtr(r.Stat.Position, r.Stat.OffsetX, r.Stat.OffsetY, i, j); // потому что соскакивают все атрибуты
                     }
