@@ -36,7 +36,10 @@ namespace Aviators
 
         public Game GetLastGame(Chat chat, int backId = 0)
         {
-            var stOptions = DB.ChatToGameOptions(chat);
+            var stOptions = "";
+
+            if (chat != null)
+                stOptions = DB.ChatToGameOptions(chat);
             
             SqliteCommand cmd = DB.DBConnection.Connection.CreateCommand();
             cmd.CommandText = $"SELECT * FROM game WHERE 1 {stOptions} ORDER BY id DESC LIMIT 1";

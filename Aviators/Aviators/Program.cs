@@ -94,6 +94,12 @@ namespace Aviators
                 Console.WriteLine($"Инициализация и обработка файлов заняла {sw.Elapsed.ToString("g")}");
             }
 
+            var kek = DB.DBCommands.DBGame.GetLastGame(null);
+            var ig = new ImageGenerator();
+
+            ig.Roster(kek);
+            return;
+
             Console.WriteLine("Starting Bot...");
             try
             {
