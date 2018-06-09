@@ -236,6 +236,8 @@ namespace Aviators
             //переметр, показывающий, что игрок должен сыграть более 15 матчей для попадания в статистику пенальти
             var players15 = players.Where(p => p.Games > 15).ToList();
 
+            if (count > players15.Count) count = players15.Count;
+
             return players15.OrderBy(p => p.Shtraf).ToList().GetRange(0, count);
         }
 

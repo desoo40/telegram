@@ -175,7 +175,13 @@ namespace Aviators
                         Game.PenaltyGame = true;
                         s = s.Replace("(Б)", "");
                     }
-                    
+
+                    if (s.Contains("ОТ"))
+                    {
+                        Game.OvertimeGame = true;
+                        s = s.Replace("(ОТ)", "");
+                    }
+
                     var score = s.Split('-');
 
                     Game.Score = new Tuple<int, int>(Convert.ToInt32(score[0]), Convert.ToInt32(score[1]));

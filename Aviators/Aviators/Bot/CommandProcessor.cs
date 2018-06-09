@@ -27,7 +27,6 @@ namespace Aviators
         private TelegramBotClient Bot;
         private readonly Randomiser Gen;
         private ImageGenerator ImageGen;
-        //private DBCore DB;
         Regex rxNums = new Regex(@"^\d+$"); // проверка на число
 
 
@@ -36,10 +35,9 @@ namespace Aviators
             Bot = bot;
             Gen = new Randomiser();
             ImageGen = new ImageGenerator();
-            //DB = new DBCore();
         }
 
-        public void FindCommands(string msg, Chat chatFinded, int fromId)
+        public async void FindCommands(string msg, Chat chatFinded, int fromId)
         {
             var inputCommands = msg.Split(' ');
 
@@ -170,7 +168,8 @@ namespace Aviators
             {
                 var count = Convert.ToInt32(command.Argument) + 5;
 
-                string result = GetTop(chatFinded, (Top)(Convert.ToInt32(cQuery.Data)), count);
+                string result = 
+                    GetTop(chatFinded, (Top)(Convert.ToInt32(cQuery.Data)), count);
 
                 if (result == "")
                 {
@@ -498,7 +497,7 @@ namespace Aviators
 
             if (players.Count > 1)
             {
-                var keyboard = MakeKeyboardPlayers(players);
+                var keyboard = ButtonsGenerator.MakeKeyboardPlayers(players);
 
                 Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Найдено более одного игрока. Выберите:",
                     parseMode: ParseMode.Markdown, replyMarkup: keyboard);
@@ -660,7 +659,7 @@ namespace Aviators
             if (type == Aviators.Top.PlusMinus)
                 return topPlayers.OrderByDescending(g => g.PlusMinus).ThenByDescending(g => g.Games).ToList();
             if (type == Aviators.Top.Points)
-                return topPlayers.OrderByDescending(g => g.AllStatBomb).ThenByDescending(g => g.Games).ToList();
+                return topPlayers.OrderByDescending(g => g.AllStatBomb).ThenByDescending(g => g.Games).ThenByDescending(g => g.AllStatGoal).ToList();
 
 
             return topPlayers;
@@ -699,19 +698,17 @@ namespace Aviators
         {
             var tours = DB.DBCommands.GetTournaments();
 
-
-            var keyboard = MakeKeyboardTournaments(tours);
+            var keyboard = ButtonsGenerator.MakeKeyboardTournaments(tours);
             Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите турнир", replyMarkup: keyboard);
             command.Message = mes;
             chatFinded.WaitingCommands.Add(command);
-
         }
 
         private async void SeasonList(Chat chatFinded, Command command)
         {
             List<Season> seasons = DB.DBCommands.GetSeasons();
 
-            var keyboard = MakeKeyboardSeason(seasons);
+            var keyboard = ButtonsGenerator.MakeKeyboardSeason(seasons);
             Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, "Выберите сезон", replyMarkup: keyboard);
             command.Message = mes;
             chatFinded.WaitingCommands.Add(command);
@@ -725,11 +722,10 @@ namespace Aviators
 
             teams.RemoveAt(0);
 
-            var keyboard = MakeKeyboardTeams(teams);
+            var keyboard = ButtonsGenerator.MakeKeyboardTeams(teams);
             Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, TourSeasonStringUpdate(chatFinded) + "Выберите соперника", replyMarkup: keyboard);
             command.Message = mes;
             chatFinded.WaitingCommands.Add(command);
-
         }
 
         private async void GamesStatistic(Chat chatFinded)
@@ -829,7 +825,7 @@ namespace Aviators
             if (player != null)
                 result.Add($"`{"Любимчик",otstup}` {player.Surname +" (" + player.AllStatGoal+"+" + player.AllStatAssist + ")"}");
 
-            var keyboard = MakeKeyboardGames(games);
+            var keyboard = ButtonsGenerator.MakeKeyboardGames(games);
 
             Message mes = await Bot.SendTextMessageAsync(chatFinded.Id, string.Join("\n", result),
                 parseMode: ParseMode.Markdown, replyMarkup: keyboard);
@@ -920,96 +916,30 @@ namespace Aviators
             return "";
         }
 
-        #region Создание кнопок
+       
 
-        private InlineKeyboardMarkup MakeKeyboardTeams(List<Team> teams)
+        /// <summary>
+        /// Отправляет кнопки при подключении к боту, которые всегда будут на месте клавиатуры.
+        /// </summary>
+        public async void SendKeyboardButtons(Chat chatFinded)
         {
-            var massiv = new List<InlineKeyboardButton[]>();
-            for (int i = 0; i < teams.Count; i++)
+            var keyboard = new ReplyKeyboardMarkup();
+            keyboard.ResizeKeyboard = true;
+
+            var row1 = new KeyboardButton[] // First Row
             {
-                if (i == teams.Count - 1) massiv.Add(new[] { new InlineKeyboardButton(teams[i].Name) });
-                else if (teams[i].Name.Length > 20) massiv.Add(new[] { new InlineKeyboardButton(teams[i].Name) });
-                else
+                "Помощь"
+            };
+            keyboard.Keyboard = new[]
+            {row1,
+                new KeyboardButton[] // Second Row
                 {
-                    massiv.Add(new[] { new InlineKeyboardButton(teams[i].Name), new InlineKeyboardButton(teams[i + 1].Name) });
-                    i++;
-                }
-            }
-
-
-            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
-            return keyboard;
+                    "Турнир",
+                    "Сезон",
+                },
+            };
+            await Bot.SendTextMessageAsync(chatFinded.Id, "Добро пожаловать!", replyMarkup: keyboard);
         }
-
-        private InlineKeyboardMarkup MakeKeyboardTournaments(List<Tournament> tour)
-        {
-            var massiv = new List<InlineKeyboardButton[]>();
-
-            //надо как то выбирать все , для этого сделаем сверху кнопу
-            massiv.Add(new[] { new InlineKeyboardButton("Все", 0.ToString()) });
-
-            for (int i = 0; i < tour.Count; i++)
-            {
-                if (i == tour.Count - 1)
-                    massiv.Add(new[] { new InlineKeyboardButton(tour[i].Name, tour[i].Id.ToString()) });
-                else 
-                    if (tour[i].Name.Length > 20) massiv.Add(new[] { new InlineKeyboardButton(tour[i].Name, tour[i].Id.ToString()) });
-                    else
-                    {
-                        massiv.Add(new[] { new InlineKeyboardButton(tour[i].Name, tour[i].Id.ToString()), new InlineKeyboardButton(tour[i + 1].Name, tour[i+1].Id.ToString()) });
-                        i++;
-                    }
-            }
-
-
-            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
-            return keyboard;
-        }
-
-
-        private InlineKeyboardMarkup MakeKeyboardPlayers(List<Player> players)
-        {
-            var massiv = new List<InlineKeyboardButton[]>();
-            foreach (Player p in players)
-            {
-                var str = $"{p.Number} - {p.Surname} {p.Name} {p.Patronymic}";
-                massiv.Add(new[] { new InlineKeyboardButton(str, p.Id.ToString()) });
-            }
-
-            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
-            return keyboard;
-        }
-
-        private InlineKeyboardMarkup MakeKeyboardGames(List<Game> games)
-        {
-            var massiv = new List<InlineKeyboardButton[]>();
-            foreach (Game g in games)
-            {
-                var str = $"{g.Date.ToShortDateString()} {g.Tournament.Name} {g.Team1} {g.Score.Item1}:{g.Score.Item2} {g.Team2}";
-                massiv.Add(new[] { new InlineKeyboardButton(str, g.Id.ToString())});
-            }
-
-            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
-            return keyboard;
-        }
-
-        private InlineKeyboardMarkup MakeKeyboardSeason(List<Season> seasons)
-        {
-            var massiv = new List<InlineKeyboardButton[]>();
-
-            //надо как то выбирать все , для этого сделаем сверху кнопу
-            massiv.Add(new[] { new InlineKeyboardButton("Все", 0.ToString()) });
-
-            foreach (Season s in seasons)
-            {
-                massiv.Add(new[] { new InlineKeyboardButton(s.Name, s.Id.ToString())});
-            }
-
-            var keyboard = new InlineKeyboardMarkup(massiv.ToArray());
-            return keyboard;
-        }
-
-        #endregion
     }
 
 
