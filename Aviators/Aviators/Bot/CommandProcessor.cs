@@ -527,6 +527,7 @@ namespace Aviators
                 var photo = new Telegram.Bot.Types.FileToSend(player.Number + ".jpg",
                     (new StreamReader(photopath)).BaseStream);
 
+
                 Message mes = await Bot.SendPhotoAsync(chat.Id, photo, playerDescription, replyMarkup: keyboard);
                 var newcom = new Command(new[] { "статистика", command.Name });
                 newcom.Message = mes;

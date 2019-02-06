@@ -197,7 +197,7 @@ namespace Aviators
 
         public string GameStatistic(Game game, bool isLastGame = false)
         {
-            Image bitmap = Image.FromFile("Images\\Blanks\\gameStat1.jpg");
+            Image bitmap = Image.FromFile("Images\\Blanks\\gameStat.jpg");
 
             if (isLastGame)
                 bitmap = Image.FromFile("Images\\Blanks\\lastStat.jpg");

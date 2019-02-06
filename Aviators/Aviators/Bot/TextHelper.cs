@@ -78,17 +78,15 @@
             if (inStr == "светон")
                 return "ХК \"Светон\"";
 
-<<<<<<< HEAD
             if (inStr == "мчс")
                 return "ХК \"Огненные медведи\" АГПС МЧС";
-
 
             if (inStr == "финунивер")
                 return "ХК Финансовый Университет";
 
             if (inStr == "рниму")
                 return "ХК \"White Jackets\" РНИМУ";
-=======
+
             if (inStr == "ннгу")
                 return "ХК ННГУ им. Н.И. Лобачевского";
 
@@ -100,7 +98,6 @@
 
             if (inStr == "гуу")
                 return "ХК ГУУ";
->>>>>>> 9760a8e4517125fe51abed50a32aceb930a46c8c
 
             return s;
         }
