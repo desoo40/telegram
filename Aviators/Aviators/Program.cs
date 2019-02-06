@@ -30,8 +30,6 @@ namespace Aviators
             #region Тест для генератора статы
 
 
-            //var ig = new ImageGenerator2();
-            //Game g = new Game();
             //g.BestPlayer = new Player(71, "Кирилл", "Зайцев");
             //g.Team2 = "РЭУ";
             //g.Date = DateTime.Now;
@@ -93,6 +91,11 @@ namespace Aviators
                 sw.Stop();
                 Console.WriteLine($"Инициализация и обработка файлов заняла {sw.Elapsed.ToString("g")}");
             }
+
+
+            var ig = new ImageGenerator();
+            Game g = DB.DBCommands.DBGame.GetLastGame(null);
+            ig.GameStatistic(g);
 
             Console.WriteLine("Starting Bot...");
             try

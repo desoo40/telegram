@@ -99,6 +99,13 @@
             if (inStr == "гуу")
                 return "ХК ГУУ";
 
+            if (inStr == "бифк")
+                return "ХК \"Алтын\" БИФК";
+
+
+            if (inStr == "мл")
+                return "ХК \"Морские львы\" (ЮХЛ)";
+
             return s;
         }
     }

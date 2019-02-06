@@ -357,9 +357,6 @@
     <Content Include="DB\PlayersPhoto\хаймоненко.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-    <Content Include="DB\PlayersPhoto\черненков.jpg">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
     <Content Include="DB\PlayersPhoto\шрейдер.jpg">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
